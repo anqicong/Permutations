@@ -1,0 +1,40 @@
+{
+    "meta": {
+        "author": "Anqi Cong, acong",
+        "email": "acong@andrew.cmu.edu",
+
+        "title": "Sort the Shapes",
+        "description": "Fill me in!",
+        "id": "andrewid-sts",
+        "language": "",
+        "difficulty": "medium",
+        "mainFile": "main.js",
+        "instrFile": "instr.html",
+        "constructorName": "main",
+        "menuDisplayName": "Sort the Shapes",
+        "mode": "practice",
+        "requires": {
+        }
+    },
+    "rectangles": [{
+            "w": 25,
+            "h": 25
+    },{
+            "w": 40,
+            "h": 25
+    }],
+    "ellipses": [{
+            "w": 50,
+            "h": 50
+    },{
+            "w": 100,
+            "h": 50
+    }],
+    "time":{
+        "timer": 15
+    },
+    "state":{
+        "submitted": false,
+        "saved": false
+    }
+}
