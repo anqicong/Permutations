@@ -1,10 +1,9 @@
 /** 
- * @file Permutations
+ * @file test
  * @author Anqi Cong, Luyao Hou, Emma Zhong
  */
-
 var main = function(ex) {
-	
+
 	//Step takes in a function and its argument arrays, call the function
 	//when the step is executed
 	function Step(lineNum, func, args) {
@@ -57,5 +56,5 @@ var main = function(ex) {
 
 	var code = CodeWell(0, 0, ex.width()/2, ex.height());
 	code.draw("medium");
-	
-}
+
+};
