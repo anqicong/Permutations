@@ -12,6 +12,11 @@
         },{
             "path":"exercises/placeholder"
         }]
+    },
+    "code": {
+        "lang": "python",
+        "variableEscape": "_1",
+        "display": "def permutations(_1):",
+        "test": "def"
     }
-
 }
