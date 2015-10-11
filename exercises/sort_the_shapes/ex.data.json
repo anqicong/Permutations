@@ -15,5 +15,10 @@
         "mode": "practice",
         "requires": {
         }
+    },
+    "code": {
+        "display": "def permutations(a):\n  if(len(a) == 0):\n    return [[]]\n  else:\n    allPerms = []\n    for subPerm in permutations(a[1:]):\n      for i in range(len(subPerm) + 1):\n        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]\n\nprint permutations([1, 2, 3])",
+        "lines": 11,
+        "language": "python"
     }
 }
