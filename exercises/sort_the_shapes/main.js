@@ -142,36 +142,43 @@ var main = function(ex) {
 		};
 		return code;
 	}
-	var card_color = [48,144,255];
-	var up_margin = 40;
-	var margin = 20;
-	var side_margin = 10;
-	var total_width = ex.width()/2 - side_margin*2;
-	var total_height = ex.height() - side_margin*2;
+
+	/**********************************************************************
+	 * Cards
+	 *********************************************************************/
 
 	function Card(level,level_count){
+		//create one index card, representing a recursive call
 		var card = {};
+
+		//initiate return value and return value from last call
 		card.rvalue = undefined;
 		card.last_return = undefined;
 		card.level = level;
+
+		//set dimensions
 		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
 		card.y = side_margin + (card.level-1)*up_margin;
 		card.width = total_width - (card.level-1)*side_margin*2;
 		card.height = total_height - (card.level-1)*(up_margin + margin);
+
+		//set color
 		card.r = (card_color[0]*(level_count-card.level+1)/level_count).toString(16);
 		card.g = ((card_color[1]*(level_count-card.level+1))/level_count).toString(16);
 		card.b = ((card_color[2]*(level_count-card.level+1))/level_count).toString(16);
 
-		card.pop_up = function(){};
+		card.pop_up = function(){
+			//@TODO
+		};
 
-		card.vanish = function(){};
+		card.vanish = function(){
+			//@TODO
+		};
 
 		card.draw = function(){
+			//just rects right now, will be fancier
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
-            console.log(card.r,card.g,card.b);
-            console.log(ex.graphics.ctx.fillStyle);
-            console.log(card.level,card.x,card.y,card.width,card.height);
 		};
 
 		return card;
@@ -181,7 +188,11 @@ var main = function(ex) {
 		var cards = {};
 		cards.count = all_cards.length;
 		cards.card_list = all_cards;
-
+        
+        cards.update = function(){
+        	//@TODO
+        }
+        
 		cards.degrade = function(){
 			var gone_card = cards.card_list.splice(cards.count - 1,1);
 			gone_card.vanish();
@@ -198,15 +209,8 @@ var main = function(ex) {
 
 		return cards;
 	}
-	var bottom_margin = 20;
-	var right_margin = 20;
-	var code = CodeWell(0, 0, ex.width()/2 - right_margin, 
-		                ex.height() - bottom_margin);
-    
-    ex.data.cards = Cards([Card(1,3),Card(2,3),Card(3,3)]);
-    ex.data.cards.draw();
+	    
 
-=======
 	/**********************************************************************
 	 * Init
 	 *********************************************************************/
@@ -248,6 +252,17 @@ var main = function(ex) {
 	var timeline = Timeline(prevX + buttonSize - 2, nextY + buttonSize/2, 
 							nextX, nextY + buttonSize/2);	
 	timeline.draw();
+
+    //create cards
+	var card_color = [48,144,255];
+	var up_margin = 40;
+	var margin = 20;
+	var side_margin = 10;
+	var total_width = ex.width()/2 - side_margin*2;
+	var total_height = ex.height() - side_margin*2;
+
+	ex.data.cards = Cards([Card(1,3),Card(2,3),Card(3,3)]);
+    ex.data.cards.draw();
 
 
 }
