@@ -51,6 +51,29 @@ var main = function(ex) {
 	}
 
 	/**********************************************************************
+	 * Timeline 
+	 *********************************************************************/
+
+	function Timeline(x0, y0, x1, y1){
+		var timeline = {};
+		timeline.x0 = x0;
+		timeline.y0 = y0;
+		timeline.x1 = x1;
+		timeline.y1 = y1;
+
+		timeline.draw = function(){
+			// draw line
+			ex.graphics.ctx.fillStyle = "blue";
+			ex.graphics.ctx.moveTo(timeline.x0, timeline.y0);
+	        ex.graphics.ctx.lineTo(timeline.x1, timeline.y1);
+	        ex.graphics.ctx.stroke();
+		};
+
+		return timeline;
+	}
+
+
+	/**********************************************************************
 	 * CodeWell
 	 *********************************************************************/
 
@@ -75,7 +98,7 @@ var main = function(ex) {
 		}
 
 		code.nextStep = function () {
-			if(code.curStep < code.steps.length) {
+			if(code.curStep < code.steps.length - 1) {
 				code.curStep += 1;
 				code.steps[code.curStep].call();
 				code.colorCode(code.steps[code.curStep].lineNum, 1,
@@ -129,16 +152,16 @@ var main = function(ex) {
 	// create codewell
 	var bottom_margin = 20;
 	var right_margin = 20;
-	var code = CodeWell(0, 0, ex.width()/2 - right_margin, 
-		                ex.height() - bottom_margin);
+	var code_height = 375
+	var code = CodeWell(0, 0, ex.width()/2 - right_margin, code_height);
 	code.init_steps();
 	code.draw("small");
 	code.colorCode(code.steps[code.curStep].lineNum, 1, "img/codeColor.png");
 
 	// create next button
-	var halfButtonSize = 25;
-	var nextX = ex.width()/2 - right_margin - halfButtonSize;
-	var nextY = ex.height() - bottom_margin - halfButtonSize;
+	var buttonSize = 30;
+	var nextX = ex.width()/2 - right_margin - buttonSize;
+	var nextY = ex.height() - bottom_margin - buttonSize;
 	var nextButton = ex.createButton(nextX, nextY, ">", 
 									 {
 									 	size:"small",
@@ -148,7 +171,7 @@ var main = function(ex) {
 	nextButton.on("click", code.nextStep);
 
 	// create prev button
-	var prevX = halfButtonSize;
+	var prevX = buttonSize - right_margin/2;
 	var prevButton = ex.createButton(prevX, nextY, "<",
 										{
 											size:"small",
@@ -157,6 +180,10 @@ var main = function(ex) {
 										});
 	prevButton.on("click", code.prevStep);
 
+	// create timeline
+	var timeline = Timeline(prevX + buttonSize - 2, nextY + buttonSize/2, 
+							nextX, nextY + buttonSize/2);	
+	timeline.draw();
 
 
 }
