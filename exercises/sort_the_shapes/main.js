@@ -1,300 +1,353 @@
 /** 
- * @file Permutations
- * @author Anqi Cong, Luyao Hou, Emma Zhong
+ * @file Select the Language
+ * @Luyao Hou 
  */
 
 var main = function(ex) {
-
-	/*********************************************************************
-	 * Server functions
-	 ********************************************************************/
-
-	// generateContent is a server function that randomly generates 2 starting
-	// numbers and the corresponding print statement
-	function generateContent(){
-		var random1 = Math.round(Math.random()*100);
-		var random2 = Math.round(Math.random()*100);
-		ex.data.content.list = [random1, random2];
-		ex.data.content.printStatement = "print permutations([" 
-										+ random1.toString() 
-										+ ", " 
-										+ random2.toString() 
-										+ "])";
-	}
-
-	// grade is a server function that returns a float between 0 and 1 that
-	// represents the percentage of points the student received
-	function grade(content, state){
-		// @TODO
-		return Math.random();
-	}
-
-	/**********************************************************************
-	 * Step
-	 *********************************************************************/
 	
-	//Step takes in a function and its argument arrays, calls the function
-	//when the step is executed
-	function Step(lineNum, func, args) {
-		var step = {};
-		step.lineNum = lineNum;
-		step.func = func;
-		step.args = args;
-		step.span = 1;
+	var ctx = ex.graphics.ctx;
+	//Disable display correct answer button
+    ex.chromeElements.displayCAButton.disable();
+    //Add events to other buttons
+    ex.chromeElements.submitButton.on("click", submitAnswer);
+    ex.chromeElements.undoButton.on("click", undoChange);
+    ex.chromeElements.redoButton.on("click", redoChange);
+    ex.chromeElements.resetButton.on("click", reset);
 
-		step.updateSpan = function(span) {
-			step.span = span;
-		};
+    //Margin from the exercise to the edges
+    var margin = 10;
+    //Width and height of font change buttons
+    var bWidth = 20;
+    var bHeight = 10;
+    //Margin between bottom of options and bottom edge
+    var bottom_margin = 100;
+    var header_height = 50;
+    //space between header and font buttons
+    var linespace = 40;
+    //height of options
+    var option_height = 20;
+    //Left and right margin from answers to middle of canvas and 
+    //right edge respectively
+    var lan_margin = 130;
+    var img_widths = [10, 15, 20, 25];
+    var fonts = ["small", "medium", "large", "xlarge"];
+    if(ex.data.font_index == -1) {
+    	ex.data.font_index = 1;
+    }
+    var font_index = ex.data.font_index;
 
-		step.call = function () {
-			if(func != undefined && args != undefined) {
-				func(args);
-			}
-		}
+    //Number to be added to x in the code
+    var add_num = ex.data.add_num;
+    
+    //Store option buttons
+    var option_b = new Array();
+    var header_arr = new Array();
+    var font_b = new Array();
 
-		return step;
-	}
+    //The answer that user choses, -1 represents not choosing any answer
+    var answer_chosen = ex.data.answer_chosen;
 
-	/**********************************************************************
-	 * Timeline 
-	 *********************************************************************/
+    //Undo and redo for font changes
+    var font_undo = new Array();
+    var font_redo = new Array();
 
-	function Timeline(x0, y0, x1, y1){
-		var timeline = {};
-		timeline.x0 = x0;
-		timeline.y0 = y0;
-		timeline.x1 = x1;
-		timeline.y1 = y1;
+    //Record which options are hidden
+    if(ex.data.hide_info.length == 0) {
+    	ex.data.hide_info = hide_arr();
+    }
+    var hide_info = ex.data.hide_info;
 
-		timeline.draw = function(){
-			// draw line
-			ex.graphics.ctx.fillStyle = "blue";
-			ex.graphics.ctx.moveTo(timeline.x0, timeline.y0);
-	        ex.graphics.ctx.lineTo(timeline.x1, timeline.y1);
-	        ex.graphics.ctx.stroke();
-		};
+    //A wrapper class for options
+    function Option(index) {
+    	var r = {};
+    	r.index = index;
+    	r.para = undefined;
+    	r.img = undefined;
+    	r.select = function() {
+    		op_select(r.index);
+    	};
+    	r.hide = function() {
+    		hide_info[r.index] = true;
+    		r.para.hide();
+    		r.img.hide();
+    	};
+    	return r;
+    }
 
-		return timeline;
-	}
+    //Generate the number in the code as string type between 
+    //1 to 10 inclusive
+    function generate_num() {
+    	return Math.floor(Math.random() * 10 + 1).toString();
+    }
 
+    //Create an array that stores hiding information of options
+    //true represents hidden
+    function hide_arr() {
+    	var length = ex.data.answer.options.length;
+    	var result = new Array();
+    	for (var i = 0; i < length; i++) {
+    		result[i] = false;
+    	}
+    	return result;
+    }
 
-	/**********************************************************************
-	 * CodeWell
-	 *********************************************************************/
+    //Decrease the font size of answers, "d" denotes decrease in font
+    function decrease_font(){
+    	if(font_index != 0) {
+    		--font_index;
+    		font_undo.push("d");
+    		ex.data.font_index = font_index;
+    		drawAll();
+    	}
+    }
 
-	function CodeWell(left, top, w, h, inputList){
-		var code = {};
-		code.left = left;
-		code.top = top;
-		code.w = w;
-		code.h = h;
-		code.steps = [];
-		code.curStep = 0;
-		code.curStepImage = undefined;
+    //Increase the font size of answers, "i" denotes increase in font
+    function increase_font() {
+    	if(font_index != fonts.length - 1) {
+    		++font_index;
+    		ex.data.font_index = font_index;
+    		font_undo.push("i");
+    		drawAll();
+    	}
+    }
 
-		code.addSimpleStep = function(lineNum) {
-			var step = Step(lineNum, undefined, undefined);
-			code.steps.push(step);
-		};
+    //Increase the font size without pushing to undo
+    function increase_font_no_undo() {
+    	if(font_index != fonts.length - 1) {
+    		++font_index;
+    		ex.data.font_index = font_index;
+    		drawAll();
+    	}
+    }
 
-		code.addFuncStep = function(lineNum, func, args) {
-			var step = Step(lineNum, func, args);
-			code.steps.push(step);
-		};
+    //Decrease the font size without pushing to undo
+    function decrease_font_no_undo() {
+    	if(font_index != 0) {
+    		--font_index;
+    		ex.data.font_index = font_index;
+    		drawAll();
+    	}
+    }
 
-		code.init_steps = function() {
-			var listLen = 2;
-			code.addSimpleStep(0);
-			code.addSimpleStep(10);
-			while (listLen > 0) {
-				code.addSimpleStep(1);
-				code.addSimpleStep(4);
-				code.addSimpleStep(5);
-				--listLen;
-			}
-			//Enter the for loops for first return
-			var returnLen = 1;
-			for (var i = 0; i < 2; i++) {
-				for (var j = 0; j < returnLen * (returnLen + 1); j++) {
-				var step = Step(5, undefined, undefined);
-				step.updateSpan(3);
-				code.steps.push(step);
-			    }
-			    code.addSimpleStep(8);
-			}
-		}
+    //When an option is selected
+    function op_select(index) {
+    	answer_chosen = index;
+    	ex.data.answer_chosen = answer_chosen;
+    	drawAll();
+    }
 
-		code.totalStep = function () {
-			return 42;
-		}
+    //submit user answer
+    function submitAnswer() {
+    	if(answer_chosen == -1) {
+    		ex.showFeedback("Incorrect!");
+    	}else {
+    		var answer = ex.data.answer.options[answer_chosen];
+    		if(answer == ex.data.answer.correct) {
+    			ex.showFeedback("Correct!");
+    		}else {
+    			ex.showFeedback("Incorrect!");
+    		}
+    	}
+    	for(var i = 0; i < font_b.length; i++) {
+    		font_b[i].disable();
+    	}
+    	for(var i = 0; i < option_b.length; i++) {
+    		if(option_b[i].para != undefined) {
+    			option_b[i].para.off("click", option_b[i].select);
+    		}
+    	}
+    	ex.data.submitted = true;
+    }
 
-		code.nextStep = function () {
-			if(code.curStep < code.steps.length - 1) {
-				code.curStep += 1;
-				code.steps[code.curStep].call();
-				var curSpan = code.steps[code.curStep].span;
-				code.colorCode(code.steps[code.curStep].lineNum, curSpan,
-					"img/codeColor.png");
-			}
-		};
+    //Reset font and hide
+    function reset() {
+    	hide_info = hide_arr();
+    	ex.data.hide_info = hide_info;
+    	font_index = 1;
+    	ex.data.font_index = font_index;
+    	drawAll();
+    }
 
-		code.prevStep = function () {
-			if (code.curStep > 0){
-				code.curStep -= 1;
-				code.steps[code.curStep].call();
-				code.colorCode(code.steps[code.curStep].lineNum, 1,
-					"img/codeColor.png");
-			}
-		}
+    //Undo font change
+    function undoChange() {
+    	if(font_undo.length > 0) {
+    		var action = font_undo[font_undo.length - 1];
+    		if(action == "d") {
+    			increase_font_no_undo();
+    			font_redo.push("d");
+    		}else {
+    			decrease_font_no_undo();
+    			font_redo.push("i");
+    		}
+    		var len = font_undo.length;
+    		font_undo.splice(len - 1, 1);
+    	}
+    }
 
-		code.draw = function (size) {
-			var display = ex.data.code.display + ex.data.content.printStatement
-			ex.createCode(left, top, display, {
-				width: code.w,
-				height: code.h,
-				language: ex.data.code.language,
-				size: size
-			})
+    //Redo font change
+    function redoChange() {
+    	if(font_redo.length > 0) {
+    		var action = font_redo[font_redo.length - 1];
+    		if(action == "d") {
+    			decrease_font();
+    		}else {
+    			increase_font();
+    		}
+    		var len = font_redo.length;
+    		font_redo.splice(len - 1, 1);
+    	}
+    }
 
-		};
+    //Draw the code well on the left part of exercise
+    function drawCode(){
+    	var margin_subtract = 4;
+    	var code = ex.data.code.display;
+    	var escapeStr = ex.data.code.variableEscape + "1";
+    	if(add_num == -1) {
+    		add_num = generate_num();
+    		ex.data.add_num = add_num;
+    	}
+    	code = code.replace(escapeStr, add_num);
+    	var codeWell = ex.createCode(margin, margin, code, {
+    		//to accomodate the space taken by code
+    		width: ex.width() / 2 - margin * 2,
+    		height: ex.height() - margin * margin_subtract,
+    		language: ex.data.code.lang,
+    		size: "large"
+    	});
+    }
 
-		//Color the code starting at line start with span of span lines
-		code.colorCode = function (start, span, colorImage) {
-			if (code.curStepImage != undefined) {
-				code.curStepImage.remove();
-			}
-			var codeHeight = 14;
-			code.curStepImage = ex.createImage(0, 
-				codeHeight * (start + 1), 
-				colorImage, {
-				width: ex.width() / 2,
-				height: codeHeight * span
+    //Draw the options composed of paragraphs and images
+    //Also add click events to paragraphs and images
+    function drawOptions() {
+    	//Height of each option
+    	var options = ex.data.answer.options;
+    	var option_space = (ex.height() - margin - header_height - 
+    	                   bottom_margin - linespace * 2 - bHeight - 
+    	                   option_height * options.length)/(
+    	                   options.length - 1);
+    	for (var i = 0; i < options.length; i++) {
+    		var font_style = "default";
+    		if (i == answer_chosen) {
+    			font_style = "italic";
+    		}
+    		//Create paragraph
+    		var p = undefined;
+    		if(!hide_info[i]) {
+    			var p = ex.createParagraph(ex.width()/2 + lan_margin, 
+			margin + bHeight + header_height + linespace * 2 + 
+			(option_height + option_space) * i, options[i],{
+				width: ex.width() / 2 - lan_margin * 2,
+				height: option_height,
+				textAlign: "left",
+				fontStyle: font_style,
+				size: fonts[font_index],
+				transition: "fade"
 			});
+    			//keep hidden options hidden
+    		}else {
+    			var p = ex.createParagraph(0, 0, "", {
+    				width: 0,
+    				height: 0
+    			});
+    		}
 			
-		};
-		return code;
-	}
+    		var new_op = Option(i);
+    		new_op.para = p;
+    		p.on("click", new_op.select);
+    		//Create images
+    		var img = undefined;
+    		if(!hide_info[i]) {
+                var img_width = img_widths[font_index];
+    			var img = ex.createImage(ex.width() - lan_margin,
+			margin + bHeight + header_height + linespace * 2 + 
+			(option_height + option_space) * i, "button_close.png", {
+				width: img_width,
+				height: img_width,
+				transition: "fade"
+			});
+    			//keep hidden options hidden
+    		}else {
+    			var img = ex.createImage(0, 0, "button_close.png", {
+    				width: 0,
+    				height: 0
+    			});
+    		}
+    		new_op.img = img;
+    		img.on("click", new_op.hide);
+    		option_b[i] = new_op;
+    	}
+    }
 
-	/**********************************************************************
-	 * Cards
-	 *********************************************************************/
-
-	function Card(level,level_count){
-		//create one index card, representing a recursive call
-		var card = {};
-
-		//initiate return value and return value from last call
-		card.rvalue = undefined;
-		card.last_return = undefined;
-		card.level = level;
-
-		//set dimensions
-		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
-		card.y = side_margin + (card.level-1)*up_margin;
-		card.width = total_width - (card.level-1)*side_margin*2;
-		card.height = total_height - (card.level-1)*(up_margin + margin);
-
-		//set color
-		card.r = (card_color[0]*(level_count-card.level+1)/level_count).toString(16);
-		card.g = ((card_color[1]*(level_count-card.level+1))/level_count).toString(16);
-		card.b = ((card_color[2]*(level_count-card.level+1))/level_count).toString(16);
-
-		card.pop_up = function(){
-			//@TODO
-		};
-
-		card.vanish = function(){
-			//@TODO
-		};
-
-		card.draw = function(){
-			//just rects right now, will be fancier
-			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
-            ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
-		};
-
-		return card;
-	}
-
-	function Cards(all_cards){
-		var cards = {};
-		cards.count = all_cards.length;
-		cards.card_list = all_cards;
-        
-        cards.update = function(){
-        	//@TODO
-        }
-        
-		cards.degrade = function(){
-			var gone_card = cards.card_list.splice(cards.count - 1,1);
-			gone_card.vanish();
-			cards.count -= 1;
-			cards.card_list[cards.count-1].last_return = gone_card.rvalue;
-		}
-
-		cards.draw = function(){
-			for (i = 0;i < cards.count;i++){
-                var current = cards.card_list[i];
-                current.draw();
-			}
-		}
-
-		return cards;
-	}
-	    
-
-	/**********************************************************************
-	 * Init
-	 *********************************************************************/
-
-	generateContent();
-
-	// create codewell
-	var bottom_margin = 20;
-	var right_margin = 20;
-	var code_height = 375
-	var code = CodeWell(0, 0, ex.width()/2 - right_margin, code_height);
-	code.init_steps();
-	code.draw("small");
-	code.colorCode(code.steps[code.curStep].lineNum, 1, "img/codeColor.png");
-
-	// create next button
-	var buttonSize = 30;
-	var nextX = ex.width()/2 - right_margin - buttonSize;
-	var nextY = ex.height() - bottom_margin - buttonSize;
-	var nextButton = ex.createButton(nextX, nextY, ">", 
-									 {
-									 	size:"small",
-									  	keybinding:["", 39],
-									  	color: "lightBlue"
-									 });
-	nextButton.on("click", code.nextStep);
-
-	// create prev button
-	var prevX = buttonSize - right_margin/2;
-	var prevButton = ex.createButton(prevX, nextY, "<",
-										{
-											size:"small",
-											keybinding:["", 37],
-											color: "lightBlue"
-										});
-	prevButton.on("click", code.prevStep);
-
-	// create timeline
-	var timeline = Timeline(prevX + buttonSize - 2, nextY + buttonSize/2, 
-							nextX, nextY + buttonSize/2);	
-	timeline.draw();
-
-    //create cards
-	var card_color = [48,144,255];
-	var up_margin = 40;
-	var margin = 20;
-	var side_margin = 10;
-	var total_width = ex.width()/2 - side_margin*2;
-	var total_height = ex.height() - side_margin*2;
-
-	ex.data.cards = Cards([Card(1,3),Card(2,3),Card(3,3)]);
-    ex.data.cards.draw();
+    //Draw the Select Language header and store the header
+    function drawHeader() {
+    	var x = ex.width() / 2;
+    	var y = margin + bHeight + linespace;
+    	var header = ex.createHeader(x, y, "Select Language:", {
+    		textAlign: "center",
+    		width: ex.width() / 2,
+    		height: header_height,
+    		size: "large"
+    	});
+    	header_arr[0] = header;
+    }
 
 
+    //Draw font size change buttons, store in font_b
+    function drawFontButton() {
+    	//Calculate the possition of buttons
+    	var smallB = ex.createButton(ex.width() - bWidth * 4 - margin * 2, 
+    		margin, "", {
+    			width: bWidth,
+    			height: bHeight,
+    			keybinding: ["-", 189]
+    		}).on("click", decrease_font);
+    	var largeB = ex.createButton(ex.width() - margin - bWidth * 2,
+    		margin, "", {
+    			width: bWidth,
+    			height: bHeight,
+    			keybinding: ["+", 187]
+    		}).on("click", increase_font);
+    	font_b[0] = smallB;
+    	font_b[1] = largeB;
+    }
+
+    //Clear all UI elements on the canvas
+    function clearElements() {
+    	ctx.clearRect(0, 0, ex.width(), ex.height());
+    	//Remove options
+    	if (option_b.length != 0) {
+    		for (var i = 0; i < option_b.length; i++) {
+    			if(option_b[i].para != undefined) {
+    				option_b[i].para.remove();
+    			}
+    			if(option_b[i].img != undefined) {
+    				option_b[i].img.remove();
+    			}
+    		}
+    	}
+    	//Remove header
+    	if(header_arr.length > 0) {
+    		header_arr[0].remove();
+    	}
+    	//Remove buttons
+    	if(font_b.length > 0) {
+    		font_b[0].remove();
+    		font_b[1].remove();
+    	}
+    }
+
+    //Draw all UI elements
+    function drawAll(){
+    	clearElements();
+    	drawCode();
+    	drawFontButton();
+    	drawHeader();
+    	drawOptions();
+    }
+    drawAll();
+    //Auto submit if the user has already submitted his or her answer
+    if(ex.data.submitted) {
+    	submitAnswer();
+    }
 }
