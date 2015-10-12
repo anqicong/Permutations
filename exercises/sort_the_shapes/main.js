@@ -113,17 +113,20 @@ var main = function(ex) {
 			//Print statement
 			code.addSimpleStep(10);
 			var totalDepth = 3;
+			//Recursive case
 			while (listLen > 0) {
 				var addCard = function () {
 					var card = Card(ex.data.cards.count + 1, totalDepth);
 					ex.data.cards.insert(card);
 					card.draw();
 				};
+				//Call the function
+				code.addFuncStep(0, addCard, undefined);
 				//Check if condition
-				code.addFuncStep(1, addCard, undefined);
+				code.addSimpleStep(1);
 				//Initialize allPerms
 				code.addSimpleStep(4);
-				//Recursive call
+				//for loop of sub permutations
 				code.addSimpleStep(5);
 				--listLen;
 			}
@@ -133,7 +136,8 @@ var main = function(ex) {
 				ex.data.cards.insert(card);
 				card.draw();
 			}
-			code.addFuncStep(1, addCard, undefined);
+			code.addFuncStep(0, addCard, undefined);
+			code.addSimpleStep(1);
 			//Things to be down when return from base case
 			var returnBCase = function() {
 				//@TODO
