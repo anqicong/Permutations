@@ -40,6 +40,11 @@ var main = function(ex) {
 		step.lineNum = lineNum;
 		step.func = func;
 		step.args = args;
+		step.span = 1;
+
+		step.updateSpan = function(span) {
+			step.span = span;
+		};
 
 		step.call = function () {
 			if(func != undefined && args != undefined) {
@@ -87,10 +92,36 @@ var main = function(ex) {
 		code.curStep = 0;
 		code.curStepImage = undefined;
 
+		code.addSimpleStep = function(lineNum) {
+			var step = Step(lineNum, undefined, undefined);
+			code.steps.push(step);
+		};
+
+		code.addFuncStep = function(lineNum, func, args) {
+			var step = Step(lineNum, func, args);
+			code.steps.push(step);
+		};
+
 		code.init_steps = function() {
-			var step = Step(0, undefined, undefined);
-			var step2 = Step(9, undefined, undefined);
-			code.steps = [step, step2];
+			var listLen = 2;
+			code.addSimpleStep(0);
+			code.addSimpleStep(10);
+			while (listLen > 0) {
+				code.addSimpleStep(1);
+				code.addSimpleStep(4);
+				code.addSimpleStep(5);
+				--listLen;
+			}
+			//Enter the for loops for first return
+			var returnLen = 1;
+			for (var i = 0; i < 2; i++) {
+				for (var j = 0; j < returnLen * (returnLen + 1); j++) {
+				var step = Step(5, undefined, undefined);
+				step.updateSpan(3);
+				code.steps.push(step);
+			    }
+			    code.addSimpleStep(8);
+			}
 		}
 
 		code.totalStep = function () {
@@ -101,7 +132,8 @@ var main = function(ex) {
 			if(code.curStep < code.steps.length - 1) {
 				code.curStep += 1;
 				code.steps[code.curStep].call();
-				code.colorCode(code.steps[code.curStep].lineNum, 1,
+				var curSpan = code.steps[code.curStep].span;
+				code.colorCode(code.steps[code.curStep].lineNum, curSpan,
 					"img/codeColor.png");
 			}
 		};
