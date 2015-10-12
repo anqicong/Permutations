@@ -108,7 +108,9 @@ var main = function(ex) {
 
 		code.init_steps = function() {
 			var listLen = 2;
+			//Load function
 			code.addSimpleStep(0);
+			//Print statement
 			code.addSimpleStep(10);
 			var totalDepth = 3;
 			while (listLen > 0) {
@@ -117,25 +119,30 @@ var main = function(ex) {
 					ex.data.cards.insert(card);
 					card.draw();
 				};
+				//Check if condition
 				code.addFuncStep(1, addCard, undefined);
+				//Initialize allPerms
 				code.addSimpleStep(4);
+				//Recursive call
 				code.addSimpleStep(5);
 				--listLen;
 			}
+			//The card for the base case
 			var addCard = function() {
 				var card = Card(ex.data.cards.count + 1, totalDepth);
 				ex.data.cards.insert(card);
 				card.draw();
 			}
 			code.addFuncStep(1, addCard, undefined);
+			//Things to be down when return from base case
 			var returnBCase = function() {
-
+				//@TODO
 			}
 			code.addFuncStep(2, returnBCase, undefined);
-			//Enter the for loops for first return
-			var returnLen = 1;
+			//Steps for "for" loops
+			var returnListLen = 1;
 			for (var i = 0; i < 2; i++) {
-				for (var j = 0; j < returnLen * (returnLen + 1); j++) {
+				for (var j = 0; j < returnListLen * (returnListLen + 1); j++) {
 				var step = Step(5, undefined, undefined);
 				step.updateSpan(3);
 				code.steps.push(step);
