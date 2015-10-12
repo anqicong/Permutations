@@ -4,6 +4,27 @@
  */
 
 var main = function(ex) {
+
+	// generateContent is a server function that randomly generates 2 starting
+	// numbers and the corresponding print statement
+	function generateContent(){
+		var random1 = Math.round(Math.random()*100);
+		var random2 = Math.round(Math.random()*100);
+		ex.data.content.list = [random1, random2]
+		ex.data.content.printStatement = "print permutations([" 
+										+ random1.toString() 
+										+ ", " 
+										+ random2.toString() 
+										+ "])"
+	}
+	generateContent();
+
+	// grade is a server function that returns a float between 0 and 1 that
+	// represents the percentage of points the student received
+	function grade(content, state){
+		// @TODO
+		return Math.random();
+	}
 	
 	//Step takes in a function and its argument arrays, call the function
 	//when the step is executed
@@ -50,7 +71,8 @@ var main = function(ex) {
 		};
 
 		code.draw = function (size) {
-			ex.createCode(left, top, ex.data.code.display, {
+			var display = ex.data.code.display + ex.data.content.printStatement
+			ex.createCode(left, top, display, {
 				width: code.w,
 				height: code.h,
 				language: ex.data.code.language,
