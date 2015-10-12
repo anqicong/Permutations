@@ -5,19 +5,22 @@
 
 var main = function(ex) {
 
+	/*********************************************************************
+	 * Server functions
+	 ********************************************************************/
+
 	// generateContent is a server function that randomly generates 2 starting
 	// numbers and the corresponding print statement
 	function generateContent(){
 		var random1 = Math.round(Math.random()*100);
 		var random2 = Math.round(Math.random()*100);
-		ex.data.content.list = [random1, random2]
+		ex.data.content.list = [random1, random2];
 		ex.data.content.printStatement = "print permutations([" 
 										+ random1.toString() 
 										+ ", " 
 										+ random2.toString() 
-										+ "])"
+										+ "])";
 	}
-	generateContent();
 
 	// grade is a server function that returns a float between 0 and 1 that
 	// represents the percentage of points the student received
@@ -25,21 +28,31 @@ var main = function(ex) {
 		// @TODO
 		return Math.random();
 	}
+
+	/**********************************************************************
+	 * Step
+	 *********************************************************************/
 	
-	//Step takes in a function and its argument arrays, call the function
+	//Step takes in a function and its argument arrays, calls the function
 	//when the step is executed
 	function Step(lineNum, func, args) {
 		var step = {};
 		step.lineNum = lineNum;
 		step.func = func;
 		step.args = args;
+
 		step.call = function () {
 			if(func != undefined && args != undefined) {
 				func(args);
 			}
 		}
+
 		return step;
 	}
+
+	/**********************************************************************
+	 * CodeWell
+	 *********************************************************************/
 
 	function CodeWell(left, top, w, h, inputList){
 		var code = {};
@@ -66,9 +79,18 @@ var main = function(ex) {
 				code.curStep += 1;
 				code.steps[code.curStep].call();
 				code.colorCode(code.steps[code.curStep].lineNum, 1,
-					"codeColor.png");
+					"img/codeColor.png");
 			}
 		};
+
+		code.prevStep = function () {
+			if (code.curStep > 0){
+				code.curStep -= 1;
+				code.steps[code.curStep].call();
+				code.colorCode(code.steps[code.curStep].lineNum, 1,
+					"img/codeColor.png");
+			}
+		}
 
 		code.draw = function (size) {
 			var display = ex.data.code.display + ex.data.content.printStatement
@@ -98,13 +120,43 @@ var main = function(ex) {
 		return code;
 	}
 
+	/**********************************************************************
+	 * Init
+	 *********************************************************************/
+
+	generateContent();
+
+	// create codewell
 	var bottom_margin = 20;
 	var right_margin = 20;
 	var code = CodeWell(0, 0, ex.width()/2 - right_margin, 
 		                ex.height() - bottom_margin);
 	code.init_steps();
 	code.draw("small");
-	code.colorCode(code.steps[code.curStep].lineNum, 1, "codeColor.png");
-	ex.chromeElements.redoButton.on("click", code.nextStep);
+	code.colorCode(code.steps[code.curStep].lineNum, 1, "img/codeColor.png");
+
+	// create next button
+	var halfButtonSize = 25;
+	var nextX = ex.width()/2 - right_margin - halfButtonSize;
+	var nextY = ex.height() - bottom_margin - halfButtonSize;
+	var nextButton = ex.createButton(nextX, nextY, ">", 
+									 {
+									 	size:"small",
+									  	keybinding:["", 39],
+									  	color: "lightBlue"
+									 });
+	nextButton.on("click", code.nextStep);
+
+	// create prev button
+	var prevX = halfButtonSize;
+	var prevButton = ex.createButton(prevX, nextY, "<",
+										{
+											size:"small",
+											keybinding:["", 37],
+											color: "lightBlue"
+										});
+	prevButton.on("click", code.prevStep);
+
+
 
 }
