@@ -138,7 +138,7 @@ var main = function(ex) {
 			}
 			code.addFuncStep(0, addCard, undefined);
 			code.addSimpleStep(1);
-			//Things to be down when return from base case
+			//Things to be done when return from base case
 			var returnBCase = function() {
 				//@TODO
 			}
@@ -218,7 +218,7 @@ var main = function(ex) {
 		card.rvalue = undefined;
 		card.last_return = undefined;
 		card.level = level;
-
+        card.list = [];
 		//set dimensions
 		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
 		card.y = side_margin + (card.level-1)*up_margin;
@@ -242,18 +242,24 @@ var main = function(ex) {
 			//just rects right now, will be fancier
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
+            ex.graphics.ctx.fillStyle = "white";
+            ex.graphics.ctx.fillText(
+            	"Permutations([ "+card.list.toString()+" ])",ex.width()-120,card.y+20);
 		};
 
 		return card;
 	}
 
-	function Cards(all_cards){
+	function Cards(all_cards,list){
 		var cards = {};
 		cards.count = all_cards.length;
+		cards.num_list = list;
 		cards.card_list = all_cards;
-
+        
+        
 		cards.insert = function(card) {
 			cards.card_list.push(card);
+			card.list = cards.num_list.slice(cards.count,2);
 			++cards.count;
 		}
         
@@ -329,7 +335,7 @@ var main = function(ex) {
 	var total_width = ex.width()/2 - side_margin*2;
 	var total_height = ex.height() - side_margin*2;
 
-	ex.data.cards = Cards([]);
+	ex.data.cards = Cards([],ex.data.content.list);
 	//ex.data.cards = Cards([Card(1,3),Card(2,3),Card(3,3)]);
     //ex.data.cards.draw();
 
