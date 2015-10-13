@@ -244,7 +244,7 @@ var main = function(ex) {
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
             ex.graphics.ctx.fillStyle = "white";
             ex.graphics.ctx.fillText(
-            	"Permutations([ "+card.list.toString()+" ])",ex.width()-120,card.y+20);
+            	"permutations([ "+card.list.toString()+" ])",ex.width()-120,card.y+20);
 		};
 
 		return card;
