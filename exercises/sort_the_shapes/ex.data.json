@@ -1,17 +1,16 @@
 {
     "meta": {
-        "author": "Anqi Cong, acong",
-        "email": "acong@andrew.cmu.edu",
-        "title": "Permutations",
-        "description": "Fill me in!",
-        "id": "acong, jzhong1, lhou",
+        "author": "Luyao Hou",
+        "email": "lhou@andrew.cmu.edu",
+        "title": "Sort the Shapes",
+        "description": "Sort the Shapes",
+        "id": "andrewid-sts",
         "language": "",
         "difficulty": "medium",
         "mainFile": "main.js",
         "instrFile": "instr.html",
         "constructorName": "main",
-        "menuDisplayName": "Permutations",
-        "mode": "practice",
+        "menuDisplayName": "Sort the Shapes",
         "requires": {
         }
     },

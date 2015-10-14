@@ -200,6 +200,7 @@ var main = function(ex) {
 			//Things to be done when return from base case
 			var returnBCase = function() {
 				var card = ex.data.cards.getAtIndex(ex.data.cards.count-1);
+				ex.data.getAtIndex(1).draw();
 				card.drawReturn();
 			}
 			code.addFuncStep(2, returnBCase, undefined);
@@ -424,6 +425,11 @@ var main = function(ex) {
 			ctx.fillText(returnValue, card.x+30, card.y + card.height / 2);
 		}
 
+		card.drawBox() = function () {
+			ctx.fillStyle = "#D3F8D4";
+			ctx.fillRect(card.x, 50, card.width, card.height - 50);
+		}
+
 		return card;
 	}
 
@@ -521,7 +527,7 @@ var main = function(ex) {
 	 * Init
 	 *********************************************************************/
 
-	ctx = ex.graphics.ctx;
+	var ctx = ex.graphics.ctx;
 
 	generateContent();
 
