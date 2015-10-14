@@ -193,6 +193,7 @@ var main = function(ex) {
 				}
 				ex.data.cards.insert(card);
 				card.draw();
+				
 			}
 			code.addFuncStep(0, addCard, undefined);
 			code.addSimpleStep(1);
@@ -305,6 +306,8 @@ var main = function(ex) {
 	 *********************************************************************/
 
     function Check(text,x,y){
+    	//class checkbox 
+    	//user can select base or recursive case
     	var check = {};
     	check.x = x;
     	check.y = y;
@@ -332,7 +335,8 @@ var main = function(ex) {
             		check.checkmark,{width:"10px",height:"10px"});
             }
     	}
-
+        
+        //remove the checkmark
     	check.removeCheck = function() {
     		if (check.checkImage != undefined) {
     			check.checkImage.remove();
@@ -359,9 +363,12 @@ var main = function(ex) {
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
+
+        //recursive or not
         if (card.level == level_count) card.base = true;
         else card.recursive = true;
         card.case_answer_correct = false;
+
 		//set dimensions
 		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
 		card.y = side_margin + (card.level-1)*up_margin;
@@ -390,6 +397,7 @@ var main = function(ex) {
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
             ex.graphics.ctx.fillStyle = "white";
+            //write page number and list
             ex.graphics.ctx.fillText(
             	"permutations([ "+card.list.toString()+" ])",card.x+10,card.y+20);
             ex.graphics.ctx.fillText(card.level.toString(),
@@ -420,6 +428,7 @@ var main = function(ex) {
 	}
 
 	function Cards(all_cards,list){
+		//collection of cards
 		var cards = {};
 		cards.count = all_cards.length;
 		cards.num_list = list;
