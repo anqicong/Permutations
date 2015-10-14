@@ -254,7 +254,7 @@ var main = function(ex) {
 	var margin = 20;
 	var display = ex.data.code.display + ex.data.content.printStatement;
 	var codeW = ex.width()/2 - margin;
-	var codeH = 375;
+	var codeH = 250;
 	ex.createCode(margin, margin, display, {
 		width: codeW,
 		height: codeH,
@@ -279,7 +279,7 @@ var main = function(ex) {
 	nextButton.on("click", timeline.next);
 
 	// create prev button
-	var prevX = buttonSize - margin/2;
+	var prevX = buttonSize + margin/2;
 	var prevButton = ex.createButton(prevX, nextY, "<",
 										{
 											size:"small",
