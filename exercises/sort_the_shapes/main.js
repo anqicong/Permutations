@@ -317,6 +317,7 @@ var main = function(ex) {
         card.list = [];
         card.base = false;
         card.recursive = false;
+        card.level_count = level_count;
         if (card.level == level_count) card.base = true;
         else card.recursive = true;
 		//set dimensions
@@ -347,7 +348,9 @@ var main = function(ex) {
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
             ex.graphics.ctx.fillStyle = "white";
             ex.graphics.ctx.fillText(
-            	"permutations([ "+card.list.toString()+" ])",ex.width()-120,card.y+20);
+            	"permutations([ "+card.list.toString()+" ])",card.x+10,card.y+20);
+            ex.graphics.ctx.fillText(card.level.toString(),
+            	ex.width()-margin-30*card.level/card.level_count,card.y+20);
             card.checkbox_b.draw();
             card.checkbox_r.draw();
 		};
@@ -487,7 +490,7 @@ var main = function(ex) {
 
     //create cards
 	var card_color = [48,144,255];
-	var up_margin = 40;
+	var up_margin = 25;
 	var margin = 20;
 	var side_margin = 10;
 	var total_width = ex.width()/2 - side_margin*2;

@@ -3,7 +3,7 @@
         "author": "Anqi Cong, acong",
         "email": "acong@andrew.cmu.edu",
 
-        "title": "Sort the Shapes",
+        "title": "Permutations!",
         "description": "Fill me in!",
         "id": "andrewid-sts",
         "language": "",
@@ -11,7 +11,7 @@
         "mainFile": "main.js",
         "instrFile": "instr.html",
         "constructorName": "main",
-        "menuDisplayName": "Sort the Shapes",
+        "menuDisplayName": "Permutations",
         "mode": "practice",
         "requires": {
         }
