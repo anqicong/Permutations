@@ -33,19 +33,19 @@ var main = function(ex) {
         card.case_answer_correct = false;
 
 		//set dimensions
-		card.x = card.side_margin + ex.width()/2+ (card.level-1)*card.side_margin;
-		card.y = card.side_margin + (card.level-1)*card.up_margin;
-		card.width = card.total_width - (card.level-1)*card.side_margin*2;
-		card.height = card.total_height - (card.level-1)*(card.up_margin + card.margin);
+		card.x = card.side_margin + ex.width()/2+ (card.level)*card.side_margin;
+		card.y = card.side_margin + (card.level)*card.up_margin;
+		card.width = card.total_width - (card.level)*card.side_margin*2;
+		card.height = card.total_height - (card.level)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
         card.checkbox_r = Check("recursive",card.x+30,card.y+30);
         card.checkbox_b = Check("base",card.x+130,card.y+30);
 
 		//set color
-		card.r = (card.card_color[0]*(level_count-card.level+1)/level_count).toString(16);
-		card.g = ((card.card_color[1]*(level_count-card.level+1))/level_count).toString(16);
-		card.b = ((card.card_color[2]*(level_count-card.level+1))/level_count).toString(16);
+		card.r = (card.card_color[0]*(level_count-card.level)/level_count).toString(16);
+		card.g = ((card.card_color[1]*(level_count-card.level))/level_count).toString(16);
+		card.b = ((card.card_color[2]*(level_count-card.level))/level_count).toString(16);
 
 		card.pop_up = function(){
 			//@TODO
@@ -58,7 +58,7 @@ var main = function(ex) {
 		card.draw_loop = function(){
 			ex.graphics.ctx.fillText("Click on the box to insert" 
 				+ card.list[0].toString(),card.x+50,card.y+50);
-			card.last_return = permutations(card.list[1:]);
+			card.last_return = permutations(card.list.slice(1, card.list.length));
 			ex.graphics.ctx.fillText("[",card.x+30,card.y+100);
 			var insert_box_1 = Rect(card.x+30,card.y+100,15,15);
 			insert_box_1.draw();
@@ -100,7 +100,7 @@ var main = function(ex) {
             ex.graphics.ctx.fillText(
             	"permutations([ "+card.list.toString()+" ])",card.x+10,card.y+20);
             ex.graphics.ctx.fillText(card.level.toString(),
-            	ex.width()-margin-30*card.level/card.level_count,card.y+20);
+            	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
             card.checkbox_b.draw();
             card.checkbox_r.draw();
 		};
@@ -169,7 +169,7 @@ var main = function(ex) {
 			state.curStepImage = ex.createImage(margin, 
 				getLineY(lineNum, ex.width() / 2) + margin, 
 				state.codeColorImage, {
-				width: ex.width() / 2,
+				width: ex.width() / 2 - 2*margin,
 				height: codeHeight * state.lineSpan
 			});
 		};
@@ -179,12 +179,15 @@ var main = function(ex) {
 			if (state.curStepImage != undefined) {
 				state.curStepImage.remove();
 			}
-			ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2,
-				ex.height());
+			//ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2,
+				//ex.height());
 		}
 
 		state.draw = function() {
 			state.colorCode();
+			for (var i = 0; i < cardList.length; i++){
+				cardList[i].draw();
+			}
 		}
 
 		return state;
@@ -196,16 +199,20 @@ var main = function(ex) {
 		timeline.currStateIndex = 0;
 
 		timeline.init = function(){
-			// add 2 test states
-			var state0 = State(0, 1, [Card(1, 3)]);
+			// def and print line states
+			var state0 = State(0, 1, []);
 			timeline.states.push(state0);
-			var state1 = State(10, 1, [Card(2, 3)]);
+			state0.draw();
+			var state1 = State(10, 1, []);
 			timeline.states.push(state1);
 			// creating all the cards
 			var cards = [];
 			for (var i = 0; i < ex.data.content.list.length; i++){
 				cards.push(Card(i, ex.data.content.list.length+1));
 			}
+			// 1st card
+			var state2 = State(0, 1, [cards[0]]);
+			timeline.states.push(state2);
 		};
 
 		timeline.next = function(){
@@ -336,13 +343,68 @@ var main = function(ex) {
 	}
 
 	/**********************************************************************
+	 * Mouse Events
+	 *********************************************************************/
+
+    //Check if the user clicks inside check box
+	function checkCheckbox(x, y) {
+	 	//Get the card on the top
+	 	var curState = timeline.states[timeline.currStateIndex];
+	 	if (curState.cardList.length == 0) {
+	 		return;
+	 	}
+	 	var topCard = curState.cardList[curState.cardList.length - 1];
+	 	var isBaseCase = (curState.cardList.length == 
+	 		ex.data.content.list.length + 1);
+	 	var rBox = topCard.checkbox_r;
+	 	var bBox = topCard.checkbox_b;
+	 	//Disable click if the quesiton is already answered
+	 	if (rBox.chosen || bBox.chosen) {
+	 		return;
+	 	}
+	 	if (rBox.clicked(x, y)) {
+	 		if (!isBaseCase) {
+	 			ex.showFeedback("Correct!");
+	 			topCard.case_answer_correct = true;
+	 			rBox.chosen = true;
+	 			rBox.draw();
+	 		}else {
+	 			ex.showFeedback("Incorrect: List length is 0!");
+	 			bBox.checkmark = "img/checkmark_incorrect.png";
+	 			bBox.chosen = true;
+	 			bBox.draw();
+	 		}
+	 		return;
+	 	}
+	 	if (bBox.clicked(x, y)) {
+	 		if (isBaseCase) {
+	 			ex.showFeedback("Correct!");
+	 			topCard.case_answer_correct = true;
+	 			bBox.chosen = true;
+	 			bBox.draw();
+	 		}else {
+	 			ex.showFeedback("Incorrect: List length is greater than 0!");
+	 			rBox.checkmark = "img/checkmark_incorrect.png";
+	 			rBox.chosen = true;
+	 			rBox.draw();
+	 		}
+	 		return;
+	 	}
+	}
+
+	function mouseClicked(event) {
+	 	checkCheckbox(event.offsetX, event.offsetY);
+	}
+
+
+	/**********************************************************************
 	 * Init
 	 *********************************************************************/
 
 	// create codewell
 	var margin = 20;
 	var display = ex.data.code.display + ex.data.content.printStatement;
-	var codeW = ex.width()/2 - margin;
+	var codeW = ex.width()/2 - 3*margin;
 	var codeH = 250;
 	ex.createCode(margin, margin, display, {
 		width: codeW,
@@ -376,6 +438,8 @@ var main = function(ex) {
 											color: "lightBlue"
 										});
 	prevButton.on("click", timeline.prev);
+
+	ex.graphics.on("mousedown", mouseClicked);
 
 
 }
