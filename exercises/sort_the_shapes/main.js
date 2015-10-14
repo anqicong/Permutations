@@ -227,7 +227,7 @@ var main = function(ex) {
 			code.curStepImage = ex.createImage(0, 
 				getLineY(start, code.w), 
 				colorImage, {
-				width: code.w,
+				width: code.w + right_margin,
 				height: codeHeight * span
 			});
 			
@@ -452,6 +452,7 @@ var main = function(ex) {
 	var bottom_margin = 20;
 	var right_margin = 20;
 	var code_height = 375
+	//Create code well
 	var code = CodeWell(0, 0, ex.width() / 2 - right_margin, code_height);
 	code.init_steps();
 	code.draw("small");
