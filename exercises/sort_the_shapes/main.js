@@ -123,6 +123,7 @@ var main = function(ex) {
 		state.lineNum = lineNum;
 		state.lineSpan = lineSpan;
 		state.cardList = cardList;
+		state.codeColorImage = "img/codeColor.png";
 
 		//Color the code curretly being executed
 		state.colorCode = function(){
@@ -136,7 +137,7 @@ var main = function(ex) {
 				getLineY(start, ex.width() / 2), 
 				state.codeColorImage, {
 				width: ex.width() / 2 + margin,
-				height: codeHeight * state.lineSpan;
+				height: codeHeight * state.lineSpan
 			});
 		};
 
