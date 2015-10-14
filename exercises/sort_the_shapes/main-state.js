@@ -52,6 +52,84 @@ var main = function(ex) {
 		return timeline;
 	}
 
+    /**********************************************************************
+	 * Rect
+	 *********************************************************************/
+
+	function Rect (l,t,w,h) {
+        var r = {};
+        r.left = l;
+        r.top = t;
+        r.w = w;
+        r.h = h;
+        r.right = r.left + r.w;
+        r.bottom = r.top + r.h;
+        r.draw = function () {
+            ex.graphics.fillStyle = "white";
+            ex.graphics.ctx.fillRect(r.left,r.top,r.w,r.h);
+        };
+        r.clicked = function (x,y) {
+            if (x > r.left && x < r.right && y > r.top && y  < r.bottom) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        r.move = function(dx,dy) {
+            r.left += dx;
+            r.top += dy;
+            r.right = r.left + r.w;
+            r.bottom = r.top + r.h;
+        };
+        return r;
+    }
+
+    /**********************************************************************
+	 * Checkbox
+	 *********************************************************************/
+
+    function Check(text,x,y){
+    	//class checkbox 
+    	//user can select base or recursive case
+    	var check = {};
+    	check.x = x;
+    	check.y = y;
+    	check.w = 10;
+    	check.text = text;
+    	check.box = Rect(check.x,check.y,check.w,check.w);
+    	check.chosen = false;
+    	check.checkmark = "img/checkmark_correct.png";
+    	check.checkImage = undefined;
+
+    	check.clicked = function (x, y) {
+    		if (x >= check.x && x <= check.x + check.w && y >= check.y && 
+    			y <= check.y + check.w) {
+    		    return true;
+    		}else {
+    			return false;
+    		}
+    	}
+
+    	check.draw = function(){
+    		check.box.draw();
+    		ex.graphics.ctx.fillText(check.text,check.x+20,check.y+10);
+            if (check.chosen) {
+            	check.checkImage = ex.createImage(check.x,check.y,
+            		check.checkmark,{width:"10px",height:"10px"});
+            }
+    	}
+        
+        //remove the checkmark
+    	check.removeCheck = function() {
+    		if (check.checkImage != undefined) {
+    			check.checkImage.remove();
+    			check.checkImage = undefined;
+    		}
+    	}
+
+        return check;
+
+    }
 
 	/**********************************************************************
 	 * Server functions
