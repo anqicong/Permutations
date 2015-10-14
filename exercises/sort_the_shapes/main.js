@@ -207,6 +207,54 @@ var main = function(ex) {
 	}
 
 	/**********************************************************************
+	 * Rect
+	 *********************************************************************/
+
+	function Rect (l,t,w,h) {
+        var r = {};
+        r.left = l;
+        r.top = t;
+        r.w = w;
+        r.h = h;
+        r.right = r.left + r.w;
+        r.bottom = r.top + r.h;
+        r.draw = function () {
+            ex.graphics.fillStyle = "white";
+            ex.graphics.ctx.fillRect(r.left,r.top,r.w,r.h);
+        };
+        r.clicked = function (x,y) {
+            if (x > r.left && x < r.right && y > r.top && y  < r.bottom) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        r.move = function(dx,dy) {
+            r.left += dx;
+            r.top += dy;
+            r.right = r.left + r.w;
+            r.bottom = r.top + r.h;
+        };
+        return r;
+    }
+    function Check(text,x,y){
+    	var check = {};
+    	check.x = x;
+    	check.y = y;
+    	check.text = text;
+    	check.box = Rect(check.x,check.y,10,10);
+    	check.chosen = false;
+    	check.checkmark = "img/checkmark.png";
+    	check.draw = function(){
+    		check.box.draw();
+    		ex.graphics.ctx.fillText(check.text,check.x+20,check.y);
+            if (check.box.chosen) ex.createImage(check.x,check.y,check.checkmark,
+            	{width:"10px",height:"10px"});
+    	}
+        return check;
+
+    }
+	/**********************************************************************
 	 * Cards
 	 *********************************************************************/
 
@@ -219,11 +267,18 @@ var main = function(ex) {
 		card.last_return = undefined;
 		card.level = level;
         card.list = [];
+        card.base = false;
+        card.recursive = false;
+        if (card.level == level_count) card.base = true;
+        else card.recursive = true;
 		//set dimensions
 		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
 		card.y = side_margin + (card.level-1)*up_margin;
 		card.width = total_width - (card.level-1)*side_margin*2;
 		card.height = total_height - (card.level-1)*(up_margin + margin);
+        
+        card.checkbox_r = Check("recursive",card.x+30,card.y+30);
+        card.checkbox_b = Check("base",card.x+130,card.y+30);
 
 		//set color
 		card.r = (card_color[0]*(level_count-card.level+1)/level_count).toString(16);
@@ -237,14 +292,26 @@ var main = function(ex) {
 		card.vanish = function(){
 			//@TODO
 		};
-
-		card.draw = function(){
+        
+        //card.r_button = ex.createButton(card.x+30,card.y+30,"",
+        //    	{color:"white",size:"small",width:5,height:5}).on("click",function(){
+        //    		card.recursive_checked = true;
+        //    		card.base_checked = false;
+        //    	});
+        //card.b_button = ex.createButton(card.x+200,card.y+30,"",
+        //    	{color:"white",size:"small",width:5,height:5}).on("click",function(){
+        //    		card.recursive_checked = true;
+        //    		card.base_checked = false;
+        //    	});
+  		card.draw = function(){
 			//just rects right now, will be fancier
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
             ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
             ex.graphics.ctx.fillStyle = "white";
             ex.graphics.ctx.fillText(
             	"permutations([ "+card.list.toString()+" ])",ex.width()-120,card.y+20);
+            card.checkbox_b.draw();
+            card.checkbox_r.draw();
 		};
 
 		return card;
