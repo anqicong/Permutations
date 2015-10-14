@@ -29,6 +29,26 @@ var main = function(ex) {
 		return Math.random();
 	}
 
+    /**********************************************************************
+	 * Find Permutations
+	 *********************************************************************/
+
+	 function permutation(list) {
+	 	if (list.length == 0) {
+	 		return [[]];
+	 	}else {
+	 		var allPerms = [];
+	 		for (subPerm in permutation(list.slice(1, list.length))) {
+	 			for (var i = 0; i < subPerm.length + 1; i++) {
+	 				allPerms = subPerm.slice(0, i);
+	 				allPerms.concat(list[0]);
+	 				allPerms.concat(subPerm.slice(i, subPerm.length));
+	 			}
+	 		}
+	 		return allPerms;
+	 	}
+	 }
+
 	/**********************************************************************
 	 * Step
 	 *********************************************************************/
@@ -178,7 +198,8 @@ var main = function(ex) {
 			code.addSimpleStep(1);
 			//Things to be done when return from base case
 			var returnBCase = function() {
-				//@TODO
+				var card = ex.data.cards.getAtIndex(ex.data.cards.count-1);
+				card.drawReturn();
 			}
 			code.addFuncStep(2, returnBCase, undefined);
 			//Steps for "for" loops
@@ -291,7 +312,7 @@ var main = function(ex) {
     	check.text = text;
     	check.box = Rect(check.x,check.y,check.w,check.w);
     	check.chosen = false;
-    	check.checkmark = "img/checkmark.png";
+    	check.checkmark = "img/checkmark_correct.png";
     	check.checkImage = undefined;
 
     	check.clicked = function (x, y) {
@@ -340,11 +361,13 @@ var main = function(ex) {
         card.level_count = level_count;
         if (card.level == level_count) card.base = true;
         else card.recursive = true;
+        card.case_answer_correct = false;
 		//set dimensions
 		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
 		card.y = side_margin + (card.level-1)*up_margin;
 		card.width = total_width - (card.level-1)*side_margin*2;
 		card.height = total_height - (card.level-1)*(up_margin + margin);
+		card.returnText = undefined;
         
         card.checkbox_r = Check("recursive",card.x+30,card.y+30);
         card.checkbox_b = Check("base",card.x+130,card.y+30);
@@ -374,6 +397,24 @@ var main = function(ex) {
             card.checkbox_b.draw();
             card.checkbox_r.draw();
 		};
+
+		card.drawReturn = function() {
+			var returnValue = "";
+			var returnList = permutation(card.list);
+			for (var i = 0; i < returnList.length; i++) {
+				if (returnList[i].length == 0) {
+					returnValue += "[ ]";
+				}else {
+					returnValue += "[ " + returnList[i].toString() + " ]";
+					if (i != returnList.length - 1) {
+						returnValue += ", ";
+					}
+				}
+			}
+			returnValue = "return: [ " + returnValue + " ]";
+			ctx.fillStyle = "#ffffff";
+			ctx.fillText(returnValue, card.x+30, card.y + card.height / 2);
+		}
 
 		return card;
 	}
@@ -436,10 +477,12 @@ var main = function(ex) {
 	 	if (rBox.clicked(x, y)) {
 	 		if (!isBaseCase) {
 	 			ex.showFeedback("Correct!");
+	 			topCard.case_answer_correct = true;
 	 			rBox.chosen = true;
 	 			rBox.draw();
 	 		}else {
 	 			ex.showFeedback("Incorrect: List length is 0!");
+	 			bBox.checkmark = "img/checkmark_incorrect.png";
 	 			bBox.chosen = true;
 	 			bBox.draw();
 	 		}
@@ -448,10 +491,12 @@ var main = function(ex) {
 	 	if (bBox.clicked(x, y)) {
 	 		if (isBaseCase) {
 	 			ex.showFeedback("Correct!");
+	 			topCard.case_answer_correct = true;
 	 			bBox.chosen = true;
 	 			bBox.draw();
 	 		}else {
 	 			ex.showFeedback("Incorrect: List length is greater than 0!");
+	 			rBox.checkmark = "img/checkmark_incorrect.png";
 	 			rBox.chosen = true;
 	 			rBox.draw();
 	 		}
