@@ -90,6 +90,33 @@ var main = function(ex) {
 		return card;
 	}
 
+	//Approximate the start of y coordinate of the line
+	function getLineY(lineNum, w) {
+		var codeWellLimit = 400;
+		var codeHeight = 14;
+		switch (lineNum) {
+			case 0: return 13; break;
+			case 5: return 86; break;
+			//reuturn allPerms
+			case 8: 
+			if (w < codeWellLimit) {
+				return 130 + codeHeightl
+			}else {
+				return 130
+			}
+			break;
+			//print statement
+			case 10: 
+			if (w < codeWellLimit) {
+				return 160 + codeHeight
+			}else {
+				return 160
+			}
+			break;
+			default: return (lineNum + 1) * codeHeight; break;
+		}
+	}
+
 
 	function State(lineNum, lineSpan, cardList){
 		var state = {};
@@ -97,9 +124,25 @@ var main = function(ex) {
 		state.lineSpan = lineSpan;
 		state.cardList = cardList;
 
-		state.draw = function(){
-
+		//Color the code curretly being executed
+		state.colorCode = function(){
+			var codeHeight = 14;
+			//Remove the previous image
+			if (state.curStepImage != undefined) {
+				state.curStepImage.remove();
+			}
+			var codeHeight = 14;
+			code.curStepImage = ex.createImage(0, 
+				getLineY(start, ex.width() / 2), 
+				state.codeColorImage, {
+				width: ex.width() / 2 + margin,
+				height: codeHeight * state.lineSpan;
+			});
 		};
+
+		state.draw = function() {
+			state.colorCode();
+		}
 
 		return state;
 	}
