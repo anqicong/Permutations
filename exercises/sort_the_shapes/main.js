@@ -132,11 +132,11 @@ var main = function(ex) {
 				state.curStepImage.remove();
 			}
 			var codeHeight = 14;
-			code.curStepImage = ex.createImage(0, 
-				getLineY(start, ex.width() / 2), 
+			state.curStepImage = ex.createImage(0, 
+				getLineY(lineNum, ex.width() / 2), 
 				state.codeColorImage, {
 				width: ex.width() / 2 + margin,
-				height: codeHeight * state.lineSpan;
+				height: codeHeight * state.lineSpan
 			});
 		};
 
