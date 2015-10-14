@@ -123,23 +123,29 @@ var main = function(ex) {
 		state.lineNum = lineNum;
 		state.lineSpan = lineSpan;
 		state.cardList = cardList;
+		state.curStepImage = undefined;
 		state.codeColorImage = "img/codeColor.png";
 
 		//Color the code curretly being executed
 		state.colorCode = function(){
 			var codeHeight = 14;
-			//Remove the previous image
-			if (state.curStepImage != undefined) {
-				state.curStepImage.remove();
-			}
 			var codeHeight = 14;
-			state.curStepImage = ex.createImage(0, 
-				getLineY(lineNum, ex.width() / 2), 
+			state.curStepImage = ex.createImage(margin, 
+				getLineY(lineNum, ex.width() / 2) + margin, 
 				state.codeColorImage, {
-				width: ex.width() / 2 + margin,
+				width: ex.width() / 2,
 				height: codeHeight * state.lineSpan
 			});
 		};
+
+		state.clear = function () {
+			//Clear the code color image
+			if (state.curStepImage != undefined) {
+				state.curStepImage.remove();
+			}
+			ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2,
+				ex.height());
+		}
 
 		state.draw = function() {
 			state.colorCode();
@@ -157,8 +163,8 @@ var main = function(ex) {
 			// add 2 test states
 			var state0 = State(0, 1, [Card(1, 3)]);
 			timeline.states.push(state0);
-			var state1 = State(9, 1, [Card(2, 3)]);
-			timeline.states.push(state0);
+			var state1 = State(10, 1, [Card(2, 3)]);
+			timeline.states.push(state1);
 			// creating all the cards
 			var cards = [];
 			for (var i = 0; i < ex.data.content.list.length; i++){
@@ -168,6 +174,7 @@ var main = function(ex) {
 
 		timeline.next = function(){
 			if (timeline.currStateIndex < timeline.states.length - 1){
+				timeline.states[timeline.currStateIndex].clear();
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
 				console.log("next: ", timeline.currStateIndex);
@@ -176,6 +183,7 @@ var main = function(ex) {
 
 		timeline.prev = function(){
 			if (timeline.currStateIndex > 0){
+				timeline.states[timeline.currStateIndex].clear();
 				timeline.currStateIndex -= 1;
 				timeline.states[timeline.currStateIndex].draw();
 				console.log("prev: ", timeline.currStateIndex);
@@ -184,6 +192,7 @@ var main = function(ex) {
 
 		timeline.goto = function(index){
 			if (index >= 0 && index < timeline.states.length){
+				timeline.states[timeline.currStateIndex].clear();
 				timeline.currStateIndex = index;
 				timeline.states[timeline.currStateIndex].draw();
 			}
