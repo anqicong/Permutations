@@ -5,7 +5,7 @@
 
 var main = function(ex) {
 
-	function Card(level, maxLevel){
+	function Card(level, level_count){
 		//create one index card, representing a recursive call
 		var card = {};
 
@@ -18,6 +18,14 @@ var main = function(ex) {
         card.recursive = false;
         card.level_count = level_count;
 
+        // variables for creating cards
+        card.card_color = [48,144,255];
+		card.up_margin = 25;
+		card.margin = 20;
+		card.side_margin = 10;
+		card.total_width = ex.width()/2 - card.side_margin*2;
+		card.total_height = ex.height() - card.side_margin*2;
+
         //recursive or not
         if (card.level == level_count) card.base = true;
         else card.recursive = true;
@@ -25,19 +33,19 @@ var main = function(ex) {
         card.case_answer_correct = false;
 
 		//set dimensions
-		card.x = side_margin + ex.width()/2+ (card.level-1)*side_margin;
-		card.y = side_margin + (card.level-1)*up_margin;
-		card.width = total_width - (card.level-1)*side_margin*2;
-		card.height = total_height - (card.level-1)*(up_margin + margin);
+		card.x = card.side_margin + ex.width()/2+ (card.level-1)*card.side_margin;
+		card.y = card.side_margin + (card.level-1)*card.up_margin;
+		card.width = card.total_width - (card.level-1)*card.side_margin*2;
+		card.height = card.total_height - (card.level-1)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
         card.checkbox_r = Check("recursive",card.x+30,card.y+30);
         card.checkbox_b = Check("base",card.x+130,card.y+30);
 
 		//set color
-		card.r = (card_color[0]*(level_count-card.level+1)/level_count).toString(16);
-		card.g = ((card_color[1]*(level_count-card.level+1))/level_count).toString(16);
-		card.b = ((card_color[2]*(level_count-card.level+1))/level_count).toString(16);
+		card.r = (card.card_color[0]*(level_count-card.level+1)/level_count).toString(16);
+		card.g = ((card.card_color[1]*(level_count-card.level+1))/level_count).toString(16);
+		card.b = ((card.card_color[2]*(level_count-card.level+1))/level_count).toString(16);
 
 		card.pop_up = function(){
 			//@TODO
@@ -103,6 +111,15 @@ var main = function(ex) {
 
 		timeline.init = function(){
 			// add 2 test states
+			var state0 = State(0, 1, [Card(1, 3)]);
+			timeline.states.push(state0);
+			var state1 = State(9, 1, [Card(2, 3)]);
+			timeline.states.push(state0);
+			// creating all the cards
+			var cards = [];
+			for (var i = 0; i < ex.data.content.list.length; i++){
+				cards.push(Card(i, ex.data.content.list.length+1));
+			}
 		};
 
 		timeline.next = function(){
