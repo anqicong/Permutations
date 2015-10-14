@@ -34,13 +34,14 @@ var main = function(ex) {
 		timeline.currStateIndex = 0;
 
 		timeline.init = function(){
-
+			// add 2 test states
 		};
 
 		timeline.next = function(){
 			if (timeline.currStateIndex < timeline.states.length - 1){
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
+				console.log("next: ", timeline.currStateIndex);
 			}
 		};
 
@@ -48,6 +49,7 @@ var main = function(ex) {
 			if (timeline.currStateIndex > 0){
 				timeline.currStateIndex -= 1;
 				timeline.states[timeline.currStateIndex].draw();
+				console.log("prev: ", timeline.currStateIndex);
 			}
 		};
 
@@ -84,29 +86,42 @@ var main = function(ex) {
 	 *********************************************************************/
 
 	// create codewell
+	var margin = 20;
+	var display = ex.data.code.display + ex.data.content.printStatement;
+	var codeW = ex.width()/2 - margin;
+	var codeH = 375;
+	ex.createCode(margin, margin, display, {
+		width: codeW,
+		height: codeH,
+		language: ex.data.code.language,
+		size: "small"
+	})
 
 	// create timeline
+	var timeline = Timeline();
+	timeline.init();
 
-	// create next button
+	// create next and prev button
 	var buttonSize = 30;
-	var nextX = ex.width()/2 - right_margin - buttonSize;
-	var nextY = ex.height() - bottom_margin - buttonSize;
+	var nextX = ex.width()/2 - margin - buttonSize;
+	var nextY = ex.height() - margin - buttonSize;
 	var nextButton = ex.createButton(nextX, nextY, ">", 
 									 {
 									 	size:"small",
 									  	keybinding:["", 39],
 									  	color: "lightBlue"
 									 });
-	nextButton.on("click", code.nextStep);
+	nextButton.on("click", timeline.next);
 
 	// create prev button
-	var prevX = buttonSize - right_margin/2;
+	var prevX = buttonSize - margin/2;
 	var prevButton = ex.createButton(prevX, nextY, "<",
 										{
 											size:"small",
 											keybinding:["", 37],
 											color: "lightBlue"
 										});
-	prevButton.on("click", code.prevStep);
+	prevButton.on("click", timeline.prev);
+
 
 }
