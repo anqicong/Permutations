@@ -38,15 +38,24 @@ var main = function(ex) {
 		};
 
 		timeline.next = function(){
-
+			if (timeline.currStateIndex < timeline.states.length - 1){
+				timeline.currStateIndex += 1;
+				timeline.states[timeline.currStateIndex].draw();
+			}
 		};
 
 		timeline.prev = function(){
-
+			if (timeline.currStateIndex > 0){
+				timeline.currStateIndex -= 1;
+				timeline.states[timeline.currStateIndex].draw();
+			}
 		};
 
-		timeline.goto = function(){
-
+		timeline.goto = function(index){
+			if (index >= 0 && index < timeline.states.length){
+				timeline.currStateIndex = index;
+				timeline.states[timeline.currStateIndex].draw();
+			}
 		};
 
 		return timeline;
