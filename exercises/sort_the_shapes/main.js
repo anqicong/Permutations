@@ -241,16 +241,30 @@ var main = function(ex) {
     	var check = {};
     	check.x = x;
     	check.y = y;
+    	check.w = 10;
     	check.text = text;
-    	check.box = Rect(check.x,check.y,10,10);
+    	check.box = Rect(check.x,check.y,check.w,check.w);
     	check.chosen = false;
     	check.checkmark = "img/checkmark.png";
+
+    	check.clicked = function (x, y) {
+    		if (x >= check.x && x <= check.x + check.w && y >= check.y && 
+    			y <= check.y + check.w) {
+    		    return true;
+    		}else {
+    			return false;
+    		}
+    	}
+
     	check.draw = function(){
     		check.box.draw();
     		ex.graphics.ctx.fillText(check.text,check.x+20,check.y);
-            if (check.box.chosen) ex.createImage(check.x,check.y,check.checkmark,
-            	{width:"10px",height:"10px"});
+            if (check.chosen) {
+            	check.checkImage = ex.createImage(check.x,check.y,
+            		check.checkmark,{width:"10px",height:"10px"});
+            }
     	}
+
         return check;
 
     }
@@ -323,7 +337,10 @@ var main = function(ex) {
 		cards.num_list = list;
 		cards.card_list = all_cards;
         
-        
+        cards.getAtIndex = function(index) {
+        	return cards.card_list[index];
+        }
+
 		cards.insert = function(card) {
 			cards.card_list.push(card);
 			card.list = cards.num_list.slice(cards.count,2);
@@ -350,11 +367,60 @@ var main = function(ex) {
 
 		return cards;
 	}
-	    
+	
+	/**********************************************************************
+	 * Mouse Events
+	 *********************************************************************/
+
+    //Check if the user clicks inside check box
+	function checkCheckbox(x, y) {
+	 	if (ex.data.cards.length == 0) {
+	 		return;
+	 	}
+	 	//Get the card on the top
+	 	var topCard = ex.data.cards.getAtIndex(ex.data.cards.count - 1);
+	 	var isBaseCase = (ex.data.cards.count == 3);
+	 	var rBox = topCard.checkbox_r;
+	 	var bBox = topCard.checkbox_b;
+	 	//Disable click if the quesiton is already answered
+	 	if (rBox.chosen || bBox.chosen) {
+	 		return;
+	 	}
+	 	if (rBox.clicked(x, y)) {
+	 		if (!isBaseCase) {
+	 			ex.showFeedback("Correct!");
+	 			rBox.chosen = true;
+	 			rBox.draw();
+	 		}else {
+	 			ex.showFeedback("Incorrect: List length is greater than 0");
+	 			bBox.chosen = true;
+	 			bBox.draw();
+	 		}
+	 		return;
+	 	}
+	 	if (bBox.clicked(x, y)) {
+	 		if (isBaseCase) {
+	 			ex.showFeedback("Correct!");
+	 			bBox.chosen = true;
+	 			bBox.draw();
+	 		}else {
+	 			ex.showFeedback("Incorrect: List length is 0");
+	 			rBox.chosen = true;
+	 			rBox.draw();
+	 		}
+	 		return;
+	 	}
+	}
+
+	function mouseClicked(event) {
+	 	checkCheckbox(event.offsetX, event.offsetY);
+	}
 
 	/**********************************************************************
 	 * Init
 	 *********************************************************************/
+
+	ctx = ex.graphics.ctx;
 
 	generateContent();
 
@@ -403,8 +469,8 @@ var main = function(ex) {
 	var total_height = ex.height() - side_margin*2;
 
 	ex.data.cards = Cards([],ex.data.content.list);
-	//ex.data.cards = Cards([Card(1,3),Card(2,3),Card(3,3)]);
-    //ex.data.cards.draw();
+
+	ex.graphics.on("mousedown", mouseClicked);
 
 
 }
