@@ -237,6 +237,11 @@ var main = function(ex) {
         };
         return r;
     }
+
+    /**********************************************************************
+	 * Check
+	 *********************************************************************/
+
     function Check(text,x,y){
     	var check = {};
     	check.x = x;
@@ -258,7 +263,7 @@ var main = function(ex) {
 
     	check.draw = function(){
     		check.box.draw();
-    		ex.graphics.ctx.fillText(check.text,check.x+20,check.y);
+    		ex.graphics.ctx.fillText(check.text,check.x+20,check.y+10);
             if (check.chosen) {
             	check.checkImage = ex.createImage(check.x,check.y,
             		check.checkmark,{width:"10px",height:"10px"});
@@ -307,16 +312,6 @@ var main = function(ex) {
 			//@TODO
 		};
         
-        //card.r_button = ex.createButton(card.x+30,card.y+30,"",
-        //    	{color:"white",size:"small",width:5,height:5}).on("click",function(){
-        //    		card.recursive_checked = true;
-        //    		card.base_checked = false;
-        //    	});
-        //card.b_button = ex.createButton(card.x+200,card.y+30,"",
-        //    	{color:"white",size:"small",width:5,height:5}).on("click",function(){
-        //    		card.recursive_checked = true;
-        //    		card.base_checked = false;
-        //    	});
   		card.draw = function(){
 			//just rects right now, will be fancier
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
@@ -392,7 +387,7 @@ var main = function(ex) {
 	 			rBox.chosen = true;
 	 			rBox.draw();
 	 		}else {
-	 			ex.showFeedback("Incorrect: List length is greater than 0");
+	 			ex.showFeedback("Incorrect: List length is 0!");
 	 			bBox.chosen = true;
 	 			bBox.draw();
 	 		}
@@ -404,7 +399,7 @@ var main = function(ex) {
 	 			bBox.chosen = true;
 	 			bBox.draw();
 	 		}else {
-	 			ex.showFeedback("Incorrect: List length is 0");
+	 			ex.showFeedback("Incorrect: List length is greater than 0!");
 	 			rBox.chosen = true;
 	 			rBox.draw();
 	 		}
