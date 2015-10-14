@@ -74,8 +74,6 @@ var main = function(ex) {
 	 * Init
 	 *********************************************************************/
 
-	generateContent();
-
 	// create codewell
 
 	// create timeline
