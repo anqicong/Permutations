@@ -81,6 +81,32 @@ var main = function(ex) {
 		return timeline;
 	}
 
+	/**********************************************************************
+	 * Timeline 
+	 *********************************************************************/
+
+	function getLineY(lineNum, w) {
+		switch (lineNum) {
+			case 0: return 13; break;
+			case 5: return 86; break;
+			case 8: 
+			if (w < 400) {
+				return 144
+			}else {
+				return 130
+			}
+			break;
+			case 10: 
+			if (w < 400) {
+				return 174
+			}else {
+				return 160
+			}
+			break;
+			default: return (lineNum + 1) * 14; break;
+		}
+	}
+
 
 	/**********************************************************************
 	 * CodeWell
@@ -148,7 +174,11 @@ var main = function(ex) {
 			for (var i = 0; i < 2; i++) {
 				for (var j = 0; j < returnListLen * (returnListLen + 1); j++) {
 				var step = Step(5, undefined, undefined);
-				step.updateSpan(3);
+				if (code.w < 400) {
+					step.updateSpan(4);
+				}else {
+					step.updateSpan(3);
+				}
 				code.steps.push(step);
 			    }
 			    code.addSimpleStep(8);
@@ -172,7 +202,6 @@ var main = function(ex) {
 		code.prevStep = function () {
 			if (code.curStep > 0){
 				code.curStep -= 1;
-				code.steps[code.curStep].call();
 				code.colorCode(code.steps[code.curStep].lineNum, 1,
 					"img/codeColor.png");
 			}
@@ -196,9 +225,9 @@ var main = function(ex) {
 			}
 			var codeHeight = 14;
 			code.curStepImage = ex.createImage(0, 
-				codeHeight * (start + 1), 
+				getLineY(start, code.w), 
 				colorImage, {
-				width: ex.width() / 2,
+				width: code.w,
 				height: codeHeight * span
 			});
 			
@@ -423,7 +452,7 @@ var main = function(ex) {
 	var bottom_margin = 20;
 	var right_margin = 20;
 	var code_height = 375
-	var code = CodeWell(0, 0, ex.width()/2 - right_margin, code_height);
+	var code = CodeWell(0, 0, ex.width() / 2 - right_margin, code_height);
 	code.init_steps();
 	code.draw("small");
 	code.colorCode(code.steps[code.curStep].lineNum, 1, "img/codeColor.png");
