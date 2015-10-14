@@ -142,7 +142,13 @@ var main = function(ex) {
 			//Recursive case
 			while (listLen > 0) {
 				var addCard = function () {
-					var card = Card(ex.data.cards.count + 1, totalDepth);
+					cardNum = ex.data.cards.count;
+					var card = Card(cardNum + 1, totalDepth);
+					if (ex.data.cards.count > 0) {
+						var curCard = ex.data.cards.getAtIndex(cardNum - 1);
+						curCard.checkbox_r.removeCheck();
+						curCard.checkbox_b.removeCheck();
+					}
 					ex.data.cards.insert(card);
 					card.draw();
 				};
@@ -158,7 +164,13 @@ var main = function(ex) {
 			}
 			//The card for the base case
 			var addCard = function() {
-				var card = Card(ex.data.cards.count + 1, totalDepth);
+				var cardNum = ex.data.cards.count;
+				var card = Card(cardNum + 1, totalDepth);
+				if (ex.data.cards.count > 0) {
+					var curCard = ex.data.cards.getAtIndex(cardNum - 1);
+					curCard.checkbox_r.removeCheck();
+					curCard.checkbox_b.removeCheck();
+				}
 				ex.data.cards.insert(card);
 				card.draw();
 			}
@@ -280,6 +292,7 @@ var main = function(ex) {
     	check.box = Rect(check.x,check.y,check.w,check.w);
     	check.chosen = false;
     	check.checkmark = "img/checkmark.png";
+    	check.checkImage = undefined;
 
     	check.clicked = function (x, y) {
     		if (x >= check.x && x <= check.x + check.w && y >= check.y && 
@@ -297,6 +310,13 @@ var main = function(ex) {
             	check.checkImage = ex.createImage(check.x,check.y,
             		check.checkmark,{width:"10px",height:"10px"});
             }
+    	}
+
+    	check.removeCheck = function() {
+    		if (check.checkImage != undefined) {
+    			check.checkImage.remove();
+    			check.checkImage = undefined;
+    		}
     	}
 
         return check;
