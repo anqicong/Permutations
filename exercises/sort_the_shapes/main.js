@@ -121,7 +121,7 @@ var main = function(ex) {
 
 		card.drawReturn = function() {
 			var returnValue = "";
-			var returnList = permutation(card.list);
+			var returnList = permutations(card.list);
 			for (var i = 0; i < returnList.length; i++) {
 				if (returnList[i].length == 0) {
 					returnValue += "[ ]";
@@ -256,7 +256,7 @@ var main = function(ex) {
 			// def and print line states
 			var state0 = State(0, 1, []);
 			state0.draw(); // initialize
-			var state1 = State(10, 1, []); // depth 1 state 1
+			var state1 = State(10, 1, []); 
 			// creating all the cards
 			var cards = [];
 			for (var i = 0; i < ex.data.content.list.length + 1; i++){
