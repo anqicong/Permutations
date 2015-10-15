@@ -46,6 +46,7 @@ var main = function(ex) {
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
+        
 
         // variables for creating cards
         card.card_color = [48,144,255];
@@ -68,6 +69,11 @@ var main = function(ex) {
 		card.height = card.total_height - (card.level)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
+        card.list_startx = card.x + 70;
+        card.insertion_box =[];
+        for (var i = 0;i < card.last_return.length;i++){
+            
+        }
         card.checkbox_r = Check("recursive case", card.x+30, card.y+30);
         card.checkbox_b = Check("base case", card.x+190, card.y+30);
 
@@ -154,6 +160,7 @@ var main = function(ex) {
             card.checkbox_b.draw();
             card.checkbox_r.draw();
             // draw the loop if stage is loop
+            if (card.list.length<1) displayLoop = false;
             if (displayLoop == true){
             	card.draw_loop();
             }
