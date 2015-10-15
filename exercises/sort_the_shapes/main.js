@@ -113,19 +113,36 @@ var main = function(ex) {
 			var cur_x = card.x+70;
 			for (var i = 0; i < card.last_return.length;i++){
 				var cur_list = card.last_return[i];
+				ex.graphics.ctx.fillStyle = "white";
 				ex.graphics.ctx.fillText("[",cur_x,cur_y);
 				cur_x += 20;
 
 			    card.insertion_boxes[i][0].draw();
+			    if (card.insertion_boxes[i][0].chosen){
+			        var num_x = card.insertion_boxes[i][0].left;
+			       	var num_y = card.insertion_boxes[i][0].top;
+			       	ex.graphics.ctx.fillStyle = "black";
+			       	console.log(card.list[0].toString());
+			       	console.log(num_x,num_y);
+			       	ex.graphics.ctx.fillText(card.list[0].toString(),num_x,num_y+10);
+			    }
 				for (var j=0;j<cur_list.length;j++){
 					cur_x += 25;
+					ex.graphics.ctx.fillStyle = "white";
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,cur_y);
                     cur_x += 20;
 			        card.insertion_boxes[i][j+1].draw();
+			        ex.graphics.ctx.fillStyle = "black";
+			        if (card.insertion_boxes[i][j+1].chosen){
+			        	var num_x = card.insertion_boxes[i][j+1].left;
+			        	var num_y = card.insertion_boxes[i][j+1].top;
+			        	ex.graphics.ctx.fillText(card.list[0].toString(),num_x,num_y+10);
+			        }
 			    }
 
 			    cur_x += 25;
+			    ex.graphics.ctx.fillStyle = "white";
 			    ex.graphics.ctx.fillText("]",cur_x,cur_y);
 			    cur_x += 25;
 
@@ -414,6 +431,7 @@ var main = function(ex) {
         r.top = t;
         r.w = w;
         r.h = h;
+        r.chosen = false;
         r.right = r.left + r.w;
         r.bottom = r.top + r.h;
         r.draw = function () {
@@ -506,7 +524,34 @@ var main = function(ex) {
 	 * Mouse Events
 	 *********************************************************************/
     function checkInsertionBox(x,y){
-    	
+    	var curState = timeline.states[timeline.currStateIndex];
+	 	if (curState.cardList.length == 0) {
+	 		return;
+	 	}
+	 	var topCard = curState.cardList[curState.cardList.length - 1];
+	 	var cur_boxes = topCard.insertion_boxes;
+	 	for (var i = 0;i < cur_boxes.length;i++){
+	 		var inner_list = cur_boxes[i];
+            for (var j = 0;j < inner_list.length;j++){
+            	if (inner_list[j].clicked(x,y)){
+                    clicked_i = i;
+                    clicked_j = j;
+                    break;
+            	}
+            }
+	 	}
+	 	for (var i = 0;i < cur_boxes.length;i++){
+	 		var inner_list = cur_boxes[i];
+            for (var j = 0;j < inner_list.length;j++){
+            	if ((i == clicked_i) && (j == clicked_j)){
+            		topCard.insertion_boxes[i][j].chosen = true; 
+            	}else{
+            		topCard.insertion_boxes[i][j].chosen = false;
+            	}
+            }
+	 	}
+	 	if (displayLoop) topCard.draw_loop();
+
     }
     //Check if the user clicks inside check box
 	function checkCheckbox(x, y) {
