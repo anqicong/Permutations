@@ -102,8 +102,9 @@ var main = function(ex) {
 		
 		card.draw_loop = function(){
 			// draw the interactive part
-			ex.graphics.ctx.fillText("Click the boxes to insert " 
-				+ card.list[0].toString(),card.x+30,cur_y - 20);
+			ex.graphics.ctx.fillText("Insert " 
+				+ card.list[0].toString() + " to the right places",
+				card.x+30,cur_y - 20);
 			ex.graphics.ctx.fillText("[",card.x+60,cur_y);
 			var cur_x = card.x+70;
 			for (var i = 0; i < card.last_return.length;i++){
@@ -332,9 +333,6 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].draw();
 				timeline.states[timeline.currStateIndex].enter();
 				console.log("next: ", timeline.currStateIndex);
-				if (timeline.currStateIndex >= 12){
-					displayLoop = true;
-				}
 			}
 		};
 
