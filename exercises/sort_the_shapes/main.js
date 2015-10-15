@@ -88,15 +88,15 @@ var main = function(ex) {
 		
 		card.draw_loop = function(){
 			// draw the interactive part
+			var cur_y = card.y + card.height/2;
 			ex.graphics.ctx.fillText("Click the boxes to insert " 
-				+ card.list[0].toString(),card.x+30,card.y+80);
-			var cur_y = card.y + 100;
-			ex.graphics.ctx.fillText("[",card.x+30,cur_y);
-			var cur_x = card.x+40;
+				+ card.list[0].toString(),card.x+30,cur_y - 20);
+			ex.graphics.ctx.fillText("[",card.x+60,cur_y);
+			var cur_x = card.x+70;
 			for (var i = 0; i < card.last_return.length;i++){
 				var cur_list = card.last_return[i];
 				ex.graphics.ctx.fillText("[",cur_x,cur_y);
-				cur_x += 10;
+				cur_x += 20;
 
 				var insert_box_1 = Rect(cur_x,cur_y - 10,15,15);
 			    insert_box_1.draw();
@@ -104,7 +104,7 @@ var main = function(ex) {
 					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,cur_y);
-                    cur_x += 10;
+                    cur_x += 20;
                     var insert_box = Rect(cur_x,cur_y - 10,15,15);
 			        insert_box.draw();
 			    }
@@ -307,6 +307,7 @@ var main = function(ex) {
 					timeline.currStateIndex == 13 ||
 					timeline.currStateIndex == 15) {
 					displayReturn = true;
+				    displayLoop = false;
 				}else {
 					displayReturn = false;
 				}
