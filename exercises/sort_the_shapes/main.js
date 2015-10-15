@@ -527,25 +527,29 @@ var main = function(ex) {
 	 	}
 	 	var topCard = curState.cardList[curState.cardList.length - 1];
 	 	var cur_boxes = topCard.insertion_boxes;
+	 	var click = false;
 	 	for (var i = 0;i < cur_boxes.length;i++){
 	 		var inner_list = cur_boxes[i];
             for (var j = 0;j < inner_list.length;j++){
             	if (inner_list[j].clicked(x,y)){
                     clicked_i = i;
                     clicked_j = j;
+                    click = true;
                     break;
             	}
             }
 	 	}
-	 	for (var i = 0;i < cur_boxes.length;i++){
-	 		var inner_list = cur_boxes[i];
-            for (var j = 0;j < inner_list.length;j++){
-            	if ((i == clicked_i) && (j == clicked_j)){
-            		topCard.insertion_boxes[i][j].chosen = true; 
-            	}else{
-            		topCard.insertion_boxes[i][j].chosen = false;
+	 	if (click){
+	 		for (var i = 0;i < cur_boxes.length;i++){
+	 		    var inner_list = cur_boxes[i];
+            	for (var j = 0;j < inner_list.length;j++){
+            		if ((i == clicked_i) && (j == clicked_j)){
+            			topCard.insertion_boxes[i][j].chosen = true; 
+            		}else{
+            			topCard.insertion_boxes[i][j].chosen = false;
+            		}
             	}
-            }
+	 		}
 	 	}
 	 	if (displayLoop) topCard.draw_loop();
 
