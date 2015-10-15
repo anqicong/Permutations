@@ -14,9 +14,9 @@ var main = function(ex) {
 
 		//initiate return value and return value from last call
 		card.rvalue = undefined;
-		card.last_return = undefined;
 		card.level = level;
-        card.list = [];
+        card.list = ex.data.content.list.slice(card.level-1,level_count);
+        card.last_return = [[1,2],[2,1]];
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
@@ -58,6 +58,36 @@ var main = function(ex) {
 			//@TODO
 		};
 
+		
+		card.draw_loop = function(){
+			ex.graphics.ctx.fillText("Click on the box to insert " 
+				+ card.list[0].toString(),card.x+30,card.y+80);
+			console.log(card.list);
+			console.log(card.last_return);
+			ex.graphics.ctx.fillText("[",card.x+30,card.y+100);
+			var cur_x = card.x+40;
+			for (var i = 0; i < card.last_return.length;i++){
+				var cur_list = card.last_return[i];
+				ex.graphics.ctx.fillText("[",cur_x,card.y+100);
+				cur_x += 10;
+
+				var insert_box_1 = Rect(cur_x,card.y+90,15,15);
+			    insert_box_1.draw();
+				for (var j=0;j<cur_list.length;j++){
+					cur_x += 20;
+                    ex.graphics.ctx.fillText(cur_list[j].toString(),
+                	    cur_x,card.y+100);
+                    cur_x += 10;
+                    var insert_box = Rect(cur_x,card.y+90,15,15);
+			        insert_box.draw();
+			    }
+			    cur_x += 20;
+			    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
+			    cur_x += 20;
+			    
+			}
+			cur_x -= 10;
+		    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
 		card.draw_loop = function(){
 			ex.graphics.ctx.fillText("Click on the box to insert" 
 				+ card.list[0].toString(), card.x+50, card.y+50);
