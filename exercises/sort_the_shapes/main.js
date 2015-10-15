@@ -298,6 +298,9 @@ var main = function(ex) {
 					if (lineNumsAfterRecurse[lineNum] == 5){
 						var showLoop = function() {
 							displayLoop = true;
+							var curState = timeline.states[timeline.currStateIndex];
+							var topCard = curState.cardList[curState.cardList.length - 1];
+							topCard.draw_loop();
 						}
 						var noLoop = function() {
 							displayLoop = false;
@@ -336,9 +339,6 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].draw();
 				timeline.states[timeline.currStateIndex].enter();
 				console.log("prev: ", timeline.currStateIndex);
-				if (timeline.currStateIndex < 12){
-					displayLoop = false;
-				}
 			}
 		};
 
