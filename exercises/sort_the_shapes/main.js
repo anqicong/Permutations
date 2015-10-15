@@ -69,10 +69,19 @@ var main = function(ex) {
 		card.height = card.total_height - (card.level)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
-        card.list_startx = card.x + 70;
-        card.insertion_box =[];
+        var list_x = card.x + 90;
+        var cur_y = card.y + card.height/2;
+
+        card.insertion_boxes =[];
         for (var i = 0;i < card.last_return.length;i++){
-            
+        	var cur_list = card.last_return[i];
+        	var cur_boxes = [];
+            for (var j=0;j<cur_list.length+1;j++){
+            	cur_boxes.push(Rect(list_x,cur_y-10,15,15));
+            	list_x += 45;
+            }
+            list_x += 10;
+            card.insertion_boxes.push(cur_boxes);
         }
         card.checkbox_r = Check("recursive case", card.x+30, card.y+30);
         card.checkbox_b = Check("base case", card.x+190, card.y+30);
@@ -93,7 +102,6 @@ var main = function(ex) {
 		
 		card.draw_loop = function(){
 			// draw the interactive part
-			var cur_y = card.y + card.height/2;
 			ex.graphics.ctx.fillText("Click the boxes to insert " 
 				+ card.list[0].toString(),card.x+30,cur_y - 20);
 			ex.graphics.ctx.fillText("[",card.x+60,cur_y);
@@ -103,15 +111,13 @@ var main = function(ex) {
 				ex.graphics.ctx.fillText("[",cur_x,cur_y);
 				cur_x += 20;
 
-				var insert_box_1 = Rect(cur_x,cur_y - 10,15,15);
-			    insert_box_1.draw();
+			    card.insertion_boxes[i][0].draw();
 				for (var j=0;j<cur_list.length;j++){
 					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,cur_y);
                     cur_x += 20;
-                    var insert_box = Rect(cur_x,cur_y - 10,15,15);
-			        insert_box.draw();
+			        card.insertion_boxes[i][j+1].draw();
 			    }
 
 			    cur_x += 25;
@@ -454,7 +460,9 @@ var main = function(ex) {
 	/**********************************************************************
 	 * Mouse Events
 	 *********************************************************************/
-
+    function checkInsertionBox(x,y){
+    	
+    }
     //Check if the user clicks inside check box
 	function checkCheckbox(x, y) {
 	 	//Get the card on the top
@@ -503,6 +511,7 @@ var main = function(ex) {
 
 	function mouseClicked(event) {
 	 	checkCheckbox(event.offsetX, event.offsetY);
+	 	checkInsertionBox(event.offsetX, event.offsetY);
 	}
 
 
