@@ -206,7 +206,11 @@ var main = function(ex) {
 			// creating all the cards
 			var cards = [];
 			for (var i = 0; i < ex.data.content.list.length + 1; i++){
-				cards.push(Card(i, ex.data.content.list.length+1));
+				var card = Card(i, ex.data.content.list.length + 1);
+				card.list = ex.data.content.list.slice(i, 
+					ex.data.content.list.length);
+				cards.push(card);
+
 			}
 			// rest of depth 1
 			var d1s2 = State(0, 1, [cards[0]]);
