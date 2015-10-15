@@ -33,14 +33,14 @@ var main = function(ex) {
         card.case_answer_correct = false;
 
 		//set dimensions
-		card.x = card.side_margin + ex.width()/2+ (card.level)*card.side_margin;
+		card.x = card.side_margin + ex.width()/2 + (card.level)*card.side_margin;
 		card.y = card.side_margin + (card.level)*card.up_margin;
 		card.width = card.total_width - (card.level)*card.side_margin*2;
 		card.height = card.total_height - (card.level)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
-        card.checkbox_r = Check("recursive",card.x+30,card.y+30);
-        card.checkbox_b = Check("base",card.x+130,card.y+30);
+        card.checkbox_r = Check("recursive", card.x+30, card.y+30);
+        card.checkbox_b = Check("base", card.x+130, card.y+30);
 
 		//set color
 		card.r = (card.card_color[0]*(level_count-card.level)/level_count).toString(16);
@@ -85,17 +85,51 @@ var main = function(ex) {
 			}
 			cur_x -= 10;
 		    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
+		card.draw_loop = function(){
+			ex.graphics.ctx.fillText("Click on the box to insert" 
+				+ card.list[0].toString(), card.x+50, card.y+50);
+			card.last_return = permutations(card.list.slice(1, card.list.length));
+			ex.graphics.ctx.fillText("[", card.x+30, card.y+100);
+			var insert_box_1 = Rect(card.x+30, card.y+100,15,15);
+			insert_box_1.draw();
+			for (var i = 0; i < card.last_return.length;i++){
+                ex.graphics.ctx.fillText(card.last_return[i].toString(),
+                	card.x+60+i*20, card.y+100);
+                var insert_box = Rect(card.x+80+i*20, card.y+100,15,15);
+			    insert_box.draw();
+			}
+		    ex.graphics.ctx.fillText("]", card.x+60+i*20, card.y+100);
+
+		}
+
+		card.draw_loop = function(){
+			ex.graphics.ctx.fillText("Click on the box to insert " 
+				+ card.list[0].toString(), card.x+30, card.y+80);
+			console.log(card.list.slice(1, card.list.length));
+			card.last_return = permutation(card.list.slice(1, card.list.length));
+			ex.graphics.ctx.fillText("[", card.x+30, card.y+100);
+			var insert_box_1 = Rect(card.x+40, card.y+90, 15, 15);
+			insert_box_1.draw();
+			for (var i = 0; i < card.last_return.length;i++){
+                ex.graphics.ctx.fillText(card.last_return[i].toString(),
+                	card.x+60+i*30, card.y+100);
+                console.log(card.last_return[0][0]);
+                var insert_box = Rect(card.x+70+i*30, card.y+90,15,15);
+			    insert_box.draw();
+			}
+		    ex.graphics.ctx.fillText("]", card.x+60+i*30, card.y+100);
 		};
 
         
   		card.draw = function(){
 			//just rects right now, will be fancier
 			ex.graphics.ctx.fillStyle = "#"+card.r+card.g+card.b;
-            ex.graphics.ctx.fillRect(card.x,card.y,card.width,card.height);
+            ex.graphics.ctx.fillRect(card.x, card.y, card.width, card.height);
             ex.graphics.ctx.fillStyle = "white";
             //write page number and list
             ex.graphics.ctx.fillText(
-            	"permutations([ "+card.list.toString()+" ])",card.x+10,card.y+20);
+            	"permutations([ " + card.list.toString() +" ])", card.x+10, card.y+20);
+            console.log(card.list);
             ex.graphics.ctx.fillText(card.level.toString(),
             	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
             card.checkbox_b.draw();
@@ -134,7 +168,7 @@ var main = function(ex) {
 			//reuturn allPerms
 			case 8: 
 			if (w < codeWellLimit) {
-				return 130 + codeHeightl
+				return 130 + codeHeight
 			}else {
 				return 130
 			}
@@ -177,8 +211,7 @@ var main = function(ex) {
 			if (state.curStepImage != undefined) {
 				state.curStepImage.remove();
 			}
-			//ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2,
-				//ex.height());
+			ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2, ex.height());
 		}
 
 		state.draw = function() {
@@ -199,18 +232,36 @@ var main = function(ex) {
 		timeline.init = function(){
 			// def and print line states
 			var state0 = State(0, 1, []);
-			timeline.states.push(state0);
-			state0.draw();
-			var state1 = State(10, 1, []);
-			timeline.states.push(state1);
+			state0.draw(); // initialize
+			var d1s1 = State(10, 1, []); // depth 1 state 1
 			// creating all the cards
 			var cards = [];
-			for (var i = 0; i < ex.data.content.list.length; i++){
+			for (var i = 0; i < ex.data.content.list.length + 1; i++){
 				cards.push(Card(i, ex.data.content.list.length+1));
 			}
-			// 1st card
-			var state2 = State(0, 1, [cards[0]]);
-			timeline.states.push(state2);
+			// rest of depth 1
+			var d1s2 = State(0, 1, [cards[0]]);
+			var d1s3 = State(4, 1, [cards[0]]);
+			var d1s4 = State(5, 1, [cards[0]]);
+			// d2
+			var d2s1 = State(0, 1, [cards[0], cards[1]]);
+			var d2s2 = State(4, 1, [cards[0], cards[1]]);
+			var d2s3 = State(5, 1, [cards[0], cards[1]]);
+			// d3
+			var d3s1 = State(0, 1, cards);
+			var d3s2 = State(1, 1, cards);
+			var d3s3 = State(2, 1, cards);
+			// back to d2
+			var d2s4 = State(5, 3, [cards[0], cards[1]]);
+			var d2s5 = State(8, 1, [cards[0], cards[1]]);
+			// back to d1
+			var d1s5 = State(5, 3, [cards[0]]);
+			var d1s6 = State(8, 1, [cards[0]]);
+			timeline.states = [state0, d1s1, d1s2, d1s3, d1s4, 
+								d2s1, d2s3, 
+								d3s1, d3s2, d3s3, 
+								d2s4, d2s5,
+								d1s5, d1s6];
 		};
 
 		timeline.next = function(){
@@ -362,29 +413,29 @@ var main = function(ex) {
 	 	}
 	 	if (rBox.clicked(x, y)) {
 	 		if (!isBaseCase) {
-	 			ex.showFeedback("Correct!");
+	 			//ex.showFeedback("Correct!");
 	 			topCard.case_answer_correct = true;
 	 			rBox.chosen = true;
 	 			rBox.draw();
 	 		}else {
 	 			ex.showFeedback("Incorrect: List length is 0!");
 	 			bBox.checkmark = "img/checkmark_incorrect.png";
-	 			bBox.chosen = true;
-	 			bBox.draw();
+	 			//bBox.chosen = true;
+	 			//bBox.draw();
 	 		}
 	 		return;
 	 	}
 	 	if (bBox.clicked(x, y)) {
 	 		if (isBaseCase) {
-	 			ex.showFeedback("Correct!");
+	 			//ex.showFeedback("Correct!");
 	 			topCard.case_answer_correct = true;
 	 			bBox.chosen = true;
 	 			bBox.draw();
 	 		}else {
 	 			ex.showFeedback("Incorrect: List length is greater than 0!");
 	 			rBox.checkmark = "img/checkmark_incorrect.png";
-	 			rBox.chosen = true;
-	 			rBox.draw();
+	 			//rBox.chosen = true;
+	 			//rBox.draw();
 	 		}
 	 		return;
 	 	}
@@ -398,6 +449,8 @@ var main = function(ex) {
 	/**********************************************************************
 	 * Init
 	 *********************************************************************/
+
+	generateContent();
 
 	// create codewell
 	var margin = 20;
