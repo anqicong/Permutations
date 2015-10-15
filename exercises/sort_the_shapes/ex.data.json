@@ -1,16 +1,16 @@
 {
     "meta": {
-        "author": "Luyao Hou",
-        "email": "lhou@andrew.cmu.edu",
-        "title": "Sort the Shapes",
-        "description": "Sort the Shapes",
-        "id": "andrewid-sts",
+        "author": "Luyao Hou, Anqi Cong, Emma Zhong",
+        "email": "lhou@andrew.cmu.edu, acong@andrew.cmu.edu, jzhong1@andrew.cmu.edu",
+        "title": "Permutations",
+        "description": "Permutations",
+        "id": "lhou, acong, jzhong1",
         "language": "",
         "difficulty": "medium",
         "mainFile": "main.js",
         "instrFile": "instr.html",
         "constructorName": "main",
-        "menuDisplayName": "Sort the Shapes",
+        "menuDisplayName": "Permutations",
         "requires": {
         }
     },
