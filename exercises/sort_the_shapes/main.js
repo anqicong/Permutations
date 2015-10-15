@@ -125,7 +125,7 @@ var main = function(ex) {
 			       	ex.graphics.ctx.fillStyle = "black";
 			       	console.log(card.list[0].toString());
 			       	console.log(num_x,num_y);
-			       	ex.graphics.ctx.fillText(card.list[0].toString(),num_x,num_y+10);
+			       	ex.graphics.ctx.fillText(card.list[0].toString(),num_x-2,num_y+10);
 			    }
 				for (var j=0;j<cur_list.length;j++){
 					cur_x += 25;
@@ -138,7 +138,7 @@ var main = function(ex) {
 			        if (card.insertion_boxes[i][j+1].chosen){
 			        	var num_x = card.insertion_boxes[i][j+1].left;
 			        	var num_y = card.insertion_boxes[i][j+1].top;
-			        	ex.graphics.ctx.fillText(card.list[0].toString(),num_x,num_y+10);
+			        	ex.graphics.ctx.fillText(card.list[0].toString(),num_x-2,num_y+10);
 			        }
 			    }
 
