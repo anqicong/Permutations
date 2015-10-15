@@ -1,0 +1,30 @@
+clicked recursive case after def line
+can't unclick recursive case
+looks like the answer space, depth could be more clear
+don't ask recursive or base right away
+go through if statement and then skips to else
+"recursive case" and "base case"
+label the final output, make it clear that you're not done at the base case
+why are all the lines highlighted
+underscores instead of boxes for the loop part, or a different color
+add commas in loop part
+we need stages and to enforce people click on something
+red check interesting...visual difference necessary at all??
+be able to uncheck things and submit when you click next?
+need display that it's ended
+yellow fading alert instead of final feedback for practice mode for wrong base and recursive
+not sure what the key insight, what are we for looping through?
+instructions for this: make allPerms for one iteration of the loop
+thought 79 goes in one place
+red arrow? only practice mode
+COMMAS
+connection between previous return value and the old frame
+label the number depth on the code highlight
+go through the if statement!!
+maybe use 3 elements and not 2 to show the idea more clearly
+highlight different color because green/red convey correctness
+label the number to insert as a[0]
+ensure the numbers to permute aren't the same LOL
+write allPerms
+use the empty space on the left? each depth's allPerms, perhaps could help in quiz mode (but is it overkill?)
+font needs to be bigger

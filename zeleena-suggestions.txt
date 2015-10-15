@@ -1,0 +1,22 @@
+- being able to unclick r/b checkboxes
+- depth could be more clear at first
+*- don't ask r/b case right away
+*- go through if statement and then to the else
+*- label "recursive case" and "base case"
+- label the final output (and make sure it doesn't look like you're done at the base case, and in general make connection between return value from one frame into the loop from the other case more clear)
+- underscores instead of boxes for loop part? or make visually distinct from r/b checks
+- enforce checking a checkbox
+- add commas in loop part
+- make the checks green 
+- being clear when we're finished with the function
+- yellow fading alert instead of feedback box for incorrect checkbox
+- change instructions for building allPerms part
+- label the depth on the code highlight
+- 3 elements
+- label the number to insert during the loop part as a[0]
+- ensure numbers to permute aren't the same
+- write allPerms
+- use empty space on left
+*- font bigger
+
+* == done
