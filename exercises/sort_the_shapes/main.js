@@ -7,7 +7,6 @@ var main = function(ex) {
 
 	// display loop?
 	var displayLoop = false;
-	var displayReturn = false;
 
     /**********************************************************************
 	 * Find Permutations
@@ -121,7 +120,7 @@ var main = function(ex) {
 
 		card.drawReturn = function() {
 			var returnValue = "";
-			var returnList = permutation(card.list);
+			var returnList = permutations(card.list);
 			for (var i = 0; i < returnList.length; i++) {
 				if (returnList[i].length == 0) {
 					returnValue += "[ ]";
@@ -157,9 +156,6 @@ var main = function(ex) {
             // draw the loop if stage is loop
             if (displayLoop == true){
             	card.draw_loop();
-            }
-            if (displayReturn) {
-            	card.drawReturn();
             }
 		};
 
@@ -223,6 +219,7 @@ var main = function(ex) {
 		}
 
 		state.exit = function() {
+			state.clear();
 			if (state.exitFunc != undefined) {
 				state.exitFunc();
 			}
@@ -279,7 +276,10 @@ var main = function(ex) {
 			// d3
 			var d3s1 = State(0, 1, cards);
 			var d3s2 = State(1, 1, cards);
-			var d3s3 = State(2, 1, cards);
+			var drawReturn = function() {
+				cards[2].drawReturn();
+			}
+			var d3s3 = State(2, 1, cards, drawReturn, undefined);
 			// back to d2
 			var d2s5 = State(5, 3, [cards[0], cards[1]]);
 			var d2s6 = State(8, 1, [cards[0], cards[1]]);
@@ -295,7 +295,7 @@ var main = function(ex) {
 
 		timeline.next = function(){
 			if (timeline.currStateIndex < timeline.states.length - 1){
-				timeline.states[timeline.currStateIndex].clear();
+				timeline.states[timeline.currStateIndex].exit();
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
 				timeline.states[timeline.currStateIndex].enter();
@@ -303,23 +303,17 @@ var main = function(ex) {
 				if (timeline.currStateIndex >= 12){
 					displayLoop = true;
 				}
-				if (timeline.currStateIndex == 11 ||
-					timeline.currStateIndex == 13 ||
-					timeline.currStateIndex == 15) {
-					displayReturn = true;
-				}else {
-					displayReturn = false;
-				}
 			}
 		};
 
 		timeline.prev = function(){
 			if (timeline.currStateIndex > 0){
-				timeline.states[timeline.currStateIndex].clear();
+				timeline.states[timeline.currStateIndex].exit();
 				timeline.currStateIndex -= 1;
 				timeline.states[timeline.currStateIndex].draw();
+				timeline.states[timeline.currStateIndex].enter();
 				console.log("prev: ", timeline.currStateIndex);
-				if (timeline.currStateIndex < 9){
+				if (timeline.currStateIndex < 12){
 					displayLoop = false;
 				}
 			}
