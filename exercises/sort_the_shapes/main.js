@@ -301,6 +301,8 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].enter();
 				console.log("next: ", timeline.currStateIndex);
 				if (timeline.currStateIndex >= 12){
+					displayLoop = true;
+				}
 				if (timeline.currStateIndex == 11 ||
 					timeline.currStateIndex == 13 ||
 					timeline.currStateIndex == 15) {
