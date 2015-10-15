@@ -9,26 +9,6 @@ var main = function(ex) {
 	var displayLoop = false;
 	var displayReturn = false;
 
-    /**********************************************************************
-	 * Find Permutations
-	 *********************************************************************/
-
-	 function permutation(list) {
-	 	if (list.length == 0) {
-	 		return [[]];
-	 	}else {
-	 		var allPerms = [];
-	 		for (subPerm in permutation(list.slice(1, list.length))) {
-	 			for (var i = 0; i < subPerm.length + 1; i++) {
-	 				allPerms = subPerm.slice(0, i);
-	 				allPerms.concat(list[0]);
-	 				allPerms.concat(subPerm.slice(i, subPerm.length));
-	 			}
-	 		}
-	 		return allPerms;
-	 	}
-	 }
-
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
 		var card = {};
@@ -183,13 +163,15 @@ var main = function(ex) {
 	}
 
 
-	function State(lineNum, lineSpan, cardList){
+	function State(lineNum, lineSpan, cardList, enter, exit){
 		var state = {};
 		state.lineNum = lineNum;
 		state.lineSpan = lineSpan;
 		state.cardList = cardList;
 		state.curStepImage = undefined;
 		state.codeColorImage = "img/codeColor.png";
+		state.enterFunc = enter;
+		state.exitFunc = exit;
 
 		//Color the code curretly being executed
 		state.colorCode = function(){
@@ -202,6 +184,18 @@ var main = function(ex) {
 				height: codeHeight * state.lineSpan
 			});
 		};
+
+		state.enter = function() {
+			if (state.enterFunc != undefined) {
+				state.enterFunc();
+			}
+		}
+
+		state.exit = function() {
+			if (state.exitFunc != undefined) {
+				state.exitFunc();
+			}
+		}
 
 		state.clear = function () {
 			//Clear the code color image
@@ -242,28 +236,30 @@ var main = function(ex) {
 
 			}
 			// rest of depth 1
-			var d1s2 = State(0, 1, [cards[0]]);
-			var d1s3 = State(4, 1, [cards[0]]);
-			var d1s4 = State(5, 1, [cards[0]]);
+			var d1s2 = State(0, 1, []);
+			var d1s3 = State(1, 1, [cards[0]]);
+			var d1s4 = State(4, 1, [cards[0]]);
+			var d1s5 = State(5, 1, [cards[0]]);
 			// d2
-			var d2s1 = State(0, 1, [cards[0], cards[1]]);
-			var d2s2 = State(4, 1, [cards[0], cards[1]]);
-			var d2s3 = State(5, 1, [cards[0], cards[1]]);
+			var d2s1 = State(0, 1, [cards[0]]);
+			var d2s2 = State(1, 1, [cards[0], cards[1]]);
+			var d2s3 = State(4, 1, [cards[0], cards[1]]);
+			var d2s4 = State(5, 1, [cards[0], cards[1]]);
 			// d3
 			var d3s1 = State(0, 1, cards);
 			var d3s2 = State(1, 1, cards);
 			var d3s3 = State(2, 1, cards);
 			// back to d2
-			var d2s4 = State(5, 3, [cards[0], cards[1]]);
-			var d2s5 = State(8, 1, [cards[0], cards[1]]);
+			var d2s5 = State(5, 3, [cards[0], cards[1]]);
+			var d2s6 = State(8, 1, [cards[0], cards[1]]);
 			// back to d1
-			var d1s5 = State(5, 3, [cards[0]]);
-			var d1s6 = State(8, 1, [cards[0]]);
-			timeline.states = [state0, d1s1, d1s2, d1s3, d1s4, 
-								d2s1, d2s3, 
+			var d1s6 = State(5, 3, [cards[0]]);
+			var d1s7 = State(8, 1, [cards[0]]);
+			timeline.states = [state0, d1s1, d1s2, d1s3, d1s4, d1s5,
+								d2s1, d2s2, d2s3, d2s4, 
 								d3s1, d3s2, d3s3, 
-								d2s4, d2s5,
-								d1s5, d1s6];
+								d2s5, d2s6,
+								d1s6, d1s7];
 		};
 
 		timeline.next = function(){
@@ -271,13 +267,14 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].clear();
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
+				timeline.states[timeline.currStateIndex].enter();
 				console.log("next: ", timeline.currStateIndex);
-				if (timeline.currStateIndex >= 10){
+				if (timeline.currStateIndex >= 13){
 					displayLoop = true;
 				}
-				if (timeline.currStateIndex == 8 ||
-					timeline.currStateIndex == 10 ||
-					timeline.currStateIndex == 12) {
+				if (timeline.currStateIndex == 11 ||
+					timeline.currStateIndex == 13 ||
+					timeline.currStateIndex == 15) {
 					displayReturn = true;
 				}else {
 					displayReturn = false;
