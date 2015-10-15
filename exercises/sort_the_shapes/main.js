@@ -8,6 +8,28 @@ var main = function(ex) {
 	// display loop?
 	var displayLoop = false;
 
+    function permutations(list) {
+        if (list.length == 0) {
+            return [[]];
+        }
+        else {
+            var allPerms = [];
+        	var restPerms = permutations(list.slice(1, list.length));
+
+        	for (var j = 0;j < restPerms.length;j++ ) {
+            	var subPerm = restPerms[j];
+            	for (var i = 0; i < subPerm.length +1; i++) {
+                	var thisPerm = subPerm.slice(0, i);
+                	thisPerm = thisPerm.concat(list[0]);
+                	thisPerm = thisPerm.concat(subPerm.slice(i, subPerm.length));
+                	allPerms.push(thisPerm);
+            	}
+        	}
+        	return allPerms;
+     	}
+	}
+
+
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
 		var card = {};
@@ -15,8 +37,8 @@ var main = function(ex) {
 		//initiate return value and return value from last call
 		card.rvalue = undefined;
 		card.level = level;
-        card.list = ex.data.content.list.slice(card.level-1,level_count);
-        card.last_return = [[1,2],[2,1]];
+        card.list = ex.data.content.list.slice(card.level,level_count);
+        card.last_return = permutations(card.list.slice(1,card.list.length));
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
@@ -74,16 +96,16 @@ var main = function(ex) {
 				var insert_box_1 = Rect(cur_x,card.y+90,15,15);
 			    insert_box_1.draw();
 				for (var j=0;j<cur_list.length;j++){
-					cur_x += 20;
+					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,card.y+100);
                     cur_x += 10;
                     var insert_box = Rect(cur_x,card.y+90,15,15);
 			        insert_box.draw();
 			    }
-			    cur_x += 20;
+			    cur_x += 25;
 			    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
-			    cur_x += 20;
+			    cur_x += 25;
 			    
 			}
 			cur_x -= 10;
