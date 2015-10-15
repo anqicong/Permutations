@@ -271,21 +271,28 @@ var main = function(ex) {
 			// for the non-base case depths
 			for (var i = 0; i < ex.data.content.list.length; i++){
 				for (var lineNum = 0; lineNum < lineNumsBeforeRecurse.length; lineNum++){
-					timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, cards.slice(0, i+1)));
+					timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, cards.slice(0, i+1), undefined, undefined));
 				}
 			}
 			// base case 
 			for (var lineNum = 0; lineNum < lineNumsForBaseCase.length; lineNum++){
-				timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards));
+				if (lineNum == 2) {
+					var drawBReturn = function() {
+						cards[2].drawReturn();
+					}
+					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, drawBReturn, undefined));
+				}else {
+					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, undefined, undefined));
+				}
 			}
 			// going back down the stack
 			for (var i = ex.data.content.list.length - 1; i >= 0; i--){
 				for (var lineNum = 0; lineNum < lineNumsAfterRecurse.length; lineNum++){
 					if (lineNumsAfterRecurse[lineNum] == 5){
-						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 3, cards.slice(0, i+1)));
+						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 3, cards.slice(0, i+1), undefined, undefined));
 					}
 					else{
-						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1)));
+						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1), undefined, undefined));
 					}
 				}
 			}
