@@ -13,21 +13,27 @@ var main = function(ex) {
 	 * Find Permutations
 	 *********************************************************************/
 
-	 function permutation(list) {
-	 	if (list.length == 0) {
-	 		return [[]];
-	 	}else {
-	 		var allPerms = [];
-	 		for (subPerm in permutation(list.slice(1, list.length))) {
-	 			for (var i = 0; i < subPerm.length + 1; i++) {
-	 				allPerms = subPerm.slice(0, i);
-	 				allPerms.concat(list[0]);
-	 				allPerms.concat(subPerm.slice(i, subPerm.length));
-	 			}
-	 		}
-	 		return allPerms;
-	 	}
-	 }
+    function permutations(list) {
+        if (list.length == 0) {
+            return [[]];
+        }
+        else {
+            var allPerms = [];
+        	var restPerms = permutations(list.slice(1, list.length));
+
+        	for (var j = 0;j < restPerms.length;j++ ) {
+            	var subPerm = restPerms[j];
+            	for (var i = 0; i < subPerm.length +1; i++) {
+                	var thisPerm = subPerm.slice(0, i);
+                	thisPerm = thisPerm.concat(list[0]);
+                	thisPerm = thisPerm.concat(subPerm.slice(i, subPerm.length));
+                	allPerms.push(thisPerm);
+            	}
+        	}
+        	return allPerms;
+     	}
+	}
+
 
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
@@ -36,8 +42,8 @@ var main = function(ex) {
 		//initiate return value and return value from last call
 		card.rvalue = undefined;
 		card.level = level;
-        card.list = ex.data.content.list.slice(card.level-1,level_count);
-        card.last_return = [[1,2],[2,1]];
+        card.list = ex.data.content.list.slice(card.level,level_count);
+        card.last_return = permutations(card.list.slice(1,card.list.length));
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
@@ -82,29 +88,31 @@ var main = function(ex) {
 		
 		card.draw_loop = function(){
 			// draw the interactive part
+			var cur_y = card.y + card.height/2;
 			ex.graphics.ctx.fillText("Click the boxes to insert " 
-				+ card.list[0].toString(),card.x+30,card.y+80);
-			var cur_y = card.y + 100;
-			ex.graphics.ctx.fillText("[",card.x+30,cur_y);
-			var cur_x = card.x+40;
+				+ card.list[0].toString(),card.x+30,cur_y - 20);
+			ex.graphics.ctx.fillText("[",card.x+60,cur_y);
+			var cur_x = card.x+70;
 			for (var i = 0; i < card.last_return.length;i++){
 				var cur_list = card.last_return[i];
 				ex.graphics.ctx.fillText("[",cur_x,cur_y);
-				cur_x += 10;
+				cur_x += 20;
 
 				var insert_box_1 = Rect(cur_x,cur_y - 10,15,15);
 			    insert_box_1.draw();
 				for (var j=0;j<cur_list.length;j++){
-					cur_x += 20;
+					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,cur_y);
-                    cur_x += 10;
+                    cur_x += 20;
                     var insert_box = Rect(cur_x,cur_y - 10,15,15);
 			        insert_box.draw();
 			    }
-			    cur_x += 20;
+
+			    cur_x += 25;
 			    ex.graphics.ctx.fillText("]",cur_x,cur_y);
-			    cur_x += 20;
+			    cur_x += 25;
+
 			    
 			}
 			cur_x -= 10;
@@ -186,13 +194,15 @@ var main = function(ex) {
 	}
 
 
-	function State(lineNum, lineSpan, cardList){
+	function State(lineNum, lineSpan, cardList, enter, exit){
 		var state = {};
 		state.lineNum = lineNum;
 		state.lineSpan = lineSpan;
 		state.cardList = cardList;
 		state.curStepImage = undefined;
 		state.codeColorImage = "img/codeColor.png";
+		state.enterFunc = enter;
+		state.exitFunc = exit;
 
 		//Color the code curretly being executed
 		state.colorCode = function(){
@@ -205,6 +215,18 @@ var main = function(ex) {
 				height: codeHeight * state.lineSpan
 			});
 		};
+
+		state.enter = function() {
+			if (state.enterFunc != undefined) {
+				state.enterFunc();
+			}
+		}
+
+		state.exit = function() {
+			if (state.exitFunc != undefined) {
+				state.exitFunc();
+			}
+		}
 
 		state.clear = function () {
 			//Clear the code color image
@@ -277,14 +299,16 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].clear();
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
+				timeline.states[timeline.currStateIndex].enter();
 				console.log("next: ", timeline.currStateIndex);
-				if (timeline.currStateIndex >= 9){
+				if (timeline.currStateIndex >= 12){
 					displayLoop = true;
 				}
-				if (timeline.currStateIndex == 8 ||
-					timeline.currStateIndex == 10 ||
-					timeline.currStateIndex == 12) {
+				if (timeline.currStateIndex == 11 ||
+					timeline.currStateIndex == 13 ||
+					timeline.currStateIndex == 15) {
 					displayReturn = true;
+				    displayLoop = false;
 				}else {
 					displayReturn = false;
 				}
