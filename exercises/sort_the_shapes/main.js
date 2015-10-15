@@ -9,6 +9,32 @@ var main = function(ex) {
 	var displayLoop = false;
 	var displayReturn = false;
 
+    /**********************************************************************
+	 * Find Permutations
+	 *********************************************************************/
+
+    function permutations(list) {
+        if (list.length == 0) {
+            return [[]];
+        }
+        else {
+            var allPerms = [];
+        	var restPerms = permutations(list.slice(1, list.length));
+
+        	for (var j = 0;j < restPerms.length;j++ ) {
+            	var subPerm = restPerms[j];
+            	for (var i = 0; i < subPerm.length +1; i++) {
+                	var thisPerm = subPerm.slice(0, i);
+                	thisPerm = thisPerm.concat(list[0]);
+                	thisPerm = thisPerm.concat(subPerm.slice(i, subPerm.length));
+                	allPerms.push(thisPerm);
+            	}
+        	}
+        	return allPerms;
+     	}
+	}
+
+
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
 		var card = {};
@@ -16,8 +42,8 @@ var main = function(ex) {
 		//initiate return value and return value from last call
 		card.rvalue = undefined;
 		card.level = level;
-        card.list = ex.data.content.list.slice(card.level-1,level_count);
-        card.last_return = [[1,2],[2,1]];
+        card.list = ex.data.content.list.slice(card.level,level_count);
+        card.last_return = permutations(card.list.slice(1,card.list.length));
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
@@ -43,8 +69,8 @@ var main = function(ex) {
 		card.height = card.total_height - (card.level)*(card.up_margin + card.margin);
 		card.returnText = undefined;
         
-        card.checkbox_r = Check("recursive", card.x+30, card.y+30);
-        card.checkbox_b = Check("base", card.x+130, card.y+30);
+        card.checkbox_r = Check("recursive case", card.x+30, card.y+30);
+        card.checkbox_b = Check("base case", card.x+190, card.y+30);
 
 		//set color
 		card.r = (card.card_color[0]*(level_count-card.level)/level_count).toString(16);
@@ -61,34 +87,36 @@ var main = function(ex) {
 
 		
 		card.draw_loop = function(){
-			ex.graphics.ctx.fillText("Click on the box to insert " 
+			// draw the interactive part
+			ex.graphics.ctx.fillText("Click the boxes to insert " 
 				+ card.list[0].toString(),card.x+30,card.y+80);
-			console.log(card.list);
-			console.log(card.last_return);
-			ex.graphics.ctx.fillText("[",card.x+30,card.y+100);
+			var cur_y = card.y + 100;
+			ex.graphics.ctx.fillText("[",card.x+30,cur_y);
 			var cur_x = card.x+40;
 			for (var i = 0; i < card.last_return.length;i++){
 				var cur_list = card.last_return[i];
-				ex.graphics.ctx.fillText("[",cur_x,card.y+100);
+				ex.graphics.ctx.fillText("[",cur_x,cur_y);
 				cur_x += 10;
 
-				var insert_box_1 = Rect(cur_x,card.y+90,15,15);
+				var insert_box_1 = Rect(cur_x,cur_y - 10,15,15);
 			    insert_box_1.draw();
 				for (var j=0;j<cur_list.length;j++){
-					cur_x += 20;
+					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
-                	    cur_x,card.y+100);
+                	    cur_x,cur_y);
                     cur_x += 10;
-                    var insert_box = Rect(cur_x,card.y+90,15,15);
+                    var insert_box = Rect(cur_x,cur_y - 10,15,15);
 			        insert_box.draw();
 			    }
-			    cur_x += 20;
-			    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
-			    cur_x += 20;
+
+			    cur_x += 25;
+			    ex.graphics.ctx.fillText("]",cur_x,cur_y);
+			    cur_x += 25;
+
 			    
 			}
 			cur_x -= 10;
-		    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
+		    ex.graphics.ctx.fillText("]",cur_x,cur_y);
 		}
 
 		card.drawReturn = function() {
@@ -116,11 +144,14 @@ var main = function(ex) {
             ex.graphics.ctx.fillRect(card.x, card.y, card.width, card.height);
             ex.graphics.ctx.fillStyle = "white";
             //write page number and list
+            ex.graphics.ctx.font = "16px Courier New"
             ex.graphics.ctx.fillText(
-            	"permutations([ " + card.list.toString() +" ])", card.x+10, card.y+20);
+            	"permutations([" + card.list.toString() +"])", card.x+10, card.y+20);
             console.log(card.list);
             ex.graphics.ctx.fillText(card.level.toString(),
             	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
+            // draw checkboxes
+            ex.graphics.ctx.font = "14px Courier New"
             card.checkbox_b.draw();
             card.checkbox_r.draw();
             // draw the loop if stage is loop
@@ -269,9 +300,7 @@ var main = function(ex) {
 				timeline.states[timeline.currStateIndex].draw();
 				timeline.states[timeline.currStateIndex].enter();
 				console.log("next: ", timeline.currStateIndex);
-				if (timeline.currStateIndex >= 13){
-					displayLoop = true;
-				}
+				if (timeline.currStateIndex >= 12){
 				if (timeline.currStateIndex == 11 ||
 					timeline.currStateIndex == 13 ||
 					timeline.currStateIndex == 15) {
@@ -288,7 +317,7 @@ var main = function(ex) {
 				timeline.currStateIndex -= 1;
 				timeline.states[timeline.currStateIndex].draw();
 				console.log("prev: ", timeline.currStateIndex);
-				if (timeline.currStateIndex < 10){
+				if (timeline.currStateIndex < 9){
 					displayLoop = false;
 				}
 			}
