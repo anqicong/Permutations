@@ -87,15 +87,15 @@ var main = function(ex) {
 		
 		card.draw_loop = function(){
 			// draw the interactive part
+			var cur_y = card.y + card.height/2;
 			ex.graphics.ctx.fillText("Click the boxes to insert " 
-				+ card.list[0].toString(),card.x+30,card.y+80);
-			var cur_y = card.y + 100;
-			ex.graphics.ctx.fillText("[",card.x+30,cur_y);
-			var cur_x = card.x+40;
+				+ card.list[0].toString(),card.x+30,cur_y - 20);
+			ex.graphics.ctx.fillText("[",card.x+60,cur_y);
+			var cur_x = card.x+70;
 			for (var i = 0; i < card.last_return.length;i++){
 				var cur_list = card.last_return[i];
 				ex.graphics.ctx.fillText("[",cur_x,cur_y);
-				cur_x += 10;
+				cur_x += 20;
 
 				var insert_box_1 = Rect(cur_x,cur_y - 10,15,15);
 			    insert_box_1.draw();
@@ -103,7 +103,7 @@ var main = function(ex) {
 					cur_x += 25;
                     ex.graphics.ctx.fillText(cur_list[j].toString(),
                 	    cur_x,cur_y);
-                    cur_x += 10;
+                    cur_x += 20;
                     var insert_box = Rect(cur_x,cur_y - 10,15,15);
 			        insert_box.draw();
 			    }
@@ -147,8 +147,8 @@ var main = function(ex) {
             ex.graphics.ctx.fillText(
             	"permutations([" + card.list.toString() +"])", card.x+10, card.y+20);
             console.log(card.list);
-            ex.graphics.ctx.fillText(card.level.toString(),
-            	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
+            ex.graphics.ctx.fillText("depth: " + card.level.toString(),
+            	ex.width()-5*margin-30*card.level/card.level_count, card.y+20);
             // draw checkboxes
             ex.graphics.ctx.font = "14px Courier New"
             card.checkbox_b.draw();
@@ -253,7 +253,7 @@ var main = function(ex) {
 			// def and print line states
 			var state0 = State(0, 1, []);
 			state0.draw(); // initialize
-			var d1s1 = State(10, 1, []); // depth 1 state 1
+			var state1 = State(10, 1, []); 
 			// creating all the cards
 			var cards = [];
 			for (var i = 0; i < ex.data.content.list.length + 1; i++){
@@ -263,34 +263,32 @@ var main = function(ex) {
 				cards.push(card);
 
 			}
-			// rest of depth 1
-			var d1s2 = State(0, 1, []);
-			var d1s3 = State(1, 1, [cards[0]]);
-			var d1s4 = State(4, 1, [cards[0]]);
-			var d1s5 = State(5, 1, [cards[0]]);
-			// d2
-			var d2s1 = State(0, 1, [cards[0]]);
-			var d2s2 = State(1, 1, [cards[0], cards[1]]);
-			var d2s3 = State(4, 1, [cards[0], cards[1]]);
-			var d2s4 = State(5, 1, [cards[0], cards[1]]);
-			// d3
-			var d3s1 = State(0, 1, cards);
-			var d3s2 = State(1, 1, cards);
-			var drawReturn = function() {
-				cards[2].drawReturn();
+			// generalization
+			timeline.states = [state0, state1];
+			var lineNumsBeforeRecurse = [0, 1, 3, 4, 5];
+			var lineNumsForBaseCase = [0, 1, 2];
+			var lineNumsAfterRecurse = [5, 8];
+			// for the non-base case depths
+			for (var i = 0; i < ex.data.content.list.length; i++){
+				for (var lineNum = 0; lineNum < lineNumsBeforeRecurse.length; lineNum++){
+					timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, cards.slice(0, i+1)));
+				}
 			}
-			var d3s3 = State(2, 1, cards, drawReturn, undefined);
-			// back to d2
-			var d2s5 = State(5, 3, [cards[0], cards[1]]);
-			var d2s6 = State(8, 1, [cards[0], cards[1]]);
-			// back to d1
-			var d1s6 = State(5, 3, [cards[0]]);
-			var d1s7 = State(8, 1, [cards[0]]);
-			timeline.states = [state0, d1s1, d1s2, d1s3, d1s4, d1s5,
-								d2s1, d2s2, d2s3, d2s4, 
-								d3s1, d3s2, d3s3, 
-								d2s5, d2s6,
-								d1s6, d1s7];
+			// base case 
+			for (var lineNum = 0; lineNum < lineNumsForBaseCase.length; lineNum++){
+				timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards));
+			}
+			// going back down the stack
+			for (var i = ex.data.content.list.length - 1; i >= 0; i--){
+				for (var lineNum = 0; lineNum < lineNumsAfterRecurse.length; lineNum++){
+					if (lineNumsAfterRecurse[lineNum] == 5){
+						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 3, cards.slice(0, i+1)));
+					}
+					else{
+						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1)));
+					}
+				}
+			}
 		};
 
 		timeline.next = function(){
