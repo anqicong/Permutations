@@ -61,6 +61,7 @@ var main = function(ex) {
         else card.recursive = true;
 
         card.case_answer_correct = false;
+        card.displayCheckboxes = false;
 
 		//set dimensions
 		card.x = card.side_margin + ex.width()/2 + (card.level)*card.side_margin;
@@ -90,6 +91,10 @@ var main = function(ex) {
 		card.r = (card.card_color[0]*(level_count-card.level)/level_count).toString(16);
 		card.g = ((card.card_color[1]*(level_count-card.level))/level_count).toString(16);
 		card.b = ((card.card_color[2]*(level_count-card.level))/level_count).toString(16);
+
+		card.setDisplayCheckboxes = function(newDisplayCheckboxes){
+			card.displayCheckboxes = newDisplayCheckboxes;
+		};
 
 		card.pop_up = function(){
 			//@TODO
@@ -163,9 +168,11 @@ var main = function(ex) {
             ex.graphics.ctx.fillText("depth: " + card.level.toString(),
             	ex.width()-5*margin-30*card.level/card.level_count, card.y+20);
             // draw checkboxes
-            ex.graphics.ctx.font = "14px Courier New"
-            card.checkbox_b.draw();
-            card.checkbox_r.draw();
+            if (card.displayCheckboxes){
+	            ex.graphics.ctx.font = "14px Courier New"
+	            card.checkbox_b.draw();
+	            card.checkbox_r.draw();
+	        }
             // draw the loop if stage is loop
             if (card.list.length<1) displayLoop = false;
             if (displayLoop == true){
@@ -258,6 +265,49 @@ var main = function(ex) {
 		return state;
 	}
 
+	/**********************************************************************
+	 * Enter and exit functions
+	 *********************************************************************/
+
+	var showCheckboxes = function() {
+		var curState = timeline.states[timeline.currStateIndex];
+		var topCard = curState.cardList[curState.cardList.length - 1];
+		topCard.displayCheckboxes = true;
+		topCard.draw();
+	};
+
+	var hideCheckboxes = function() {
+		var curState = timeline.states[timeline.currStateIndex];
+		var topCard = curState.cardList[curState.cardList.length - 1];
+		topCard.displayCheckboxes = false;
+		topCard.draw();
+	};
+
+	var drawBReturn = function() {
+		cards[cards.length - 1].drawReturn();
+	};
+
+	var showLoop = function() {
+		displayLoop = true;
+		var curState = timeline.states[timeline.currStateIndex];
+		var topCard = curState.cardList[curState.cardList.length - 1];
+		topCard.draw_loop();
+	};
+
+	var noLoop = function() {
+		displayLoop = false;
+	};
+
+	var drawRReturn = function() {
+		var curState = timeline.states[timeline.currStateIndex];
+		var topCard = curState.cardList[curState.cardList.length - 1];
+		topCard.drawReturn();
+	};
+
+	/************************************************************************
+	 * Timeline
+	 ***********************************************************************/
+
 	function Timeline(){
 		var timeline = {};
 		timeline.states = [];
@@ -285,16 +335,28 @@ var main = function(ex) {
 			// for the non-base case depths
 			for (var i = 0; i < ex.data.content.list.length; i++){
 				for (var lineNum = 0; lineNum < lineNumsBeforeRecurse.length; lineNum++){
-					timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, cards.slice(0, i+1), undefined, undefined));
+					// if we get to the if statement, then we want to show the r/b checkboxes
+					if (lineNumsBeforeRecurse[lineNum] == 1){
+						timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, 
+											 cards.slice(0, i+1), showCheckboxes, undefined));
+					}
+					// if we go back to the beginning, hide the checkboxes
+					else if (lineNumsBeforeRecurse[lineNum] == 0){
+						timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, 
+											 cards.slice(0, i+1), hideCheckboxes, undefined));
+					}
+					else{
+						timeline.states.push(State(lineNumsBeforeRecurse[lineNum], 1, 
+											 cards.slice(0, i+1), undefined, undefined));
+					}
 				}
 			}
 			// base case 
 			for (var lineNum = 0; lineNum < lineNumsForBaseCase.length; lineNum++){
-				if (lineNum == 2) {
-					var drawBReturn = function() {
-						cards[cards.length - 1].drawReturn();
-					}
+				if (lineNumsForBaseCase[lineNum] == 2) {
 					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, drawBReturn, undefined));
+				}else if (lineNumsForBaseCase[lineNum] == 1){
+					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, showCheckboxes, undefined));
 				}else {
 					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, undefined, undefined));
 				}
@@ -303,23 +365,9 @@ var main = function(ex) {
 			for (var i = ex.data.content.list.length - 1; i >= 0; i--){
 				for (var lineNum = 0; lineNum < lineNumsAfterRecurse.length; lineNum++){
 					if (lineNumsAfterRecurse[lineNum] == 5){
-						var showLoop = function() {
-							displayLoop = true;
-							var curState = timeline.states[timeline.currStateIndex];
-							var topCard = curState.cardList[curState.cardList.length - 1];
-							topCard.draw_loop();
-						}
-						var noLoop = function() {
-							displayLoop = false;
-						}
 						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 3, cards.slice(0, i+1), showLoop, noLoop));
 					}
 					else{
-						var drawRReturn = function() {
-							var curState = timeline.states[timeline.currStateIndex];
-							var topCard = curState.cardList[curState.cardList.length - 1];
-							topCard.drawReturn();
-						}
 						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1), drawRReturn, undefined));
 					}
 				}
