@@ -300,10 +300,6 @@ var main = function(ex) {
 		topCard.draw();
 	};
 
-	var drawBReturn = function() {
-		cards[cards.length - 1].drawReturn();
-	};
-
 	var showLoop = function() {
 		displayLoop = true;
 		var curState = timeline.states[timeline.currStateIndex];
@@ -315,7 +311,7 @@ var main = function(ex) {
 		displayLoop = false;
 	};
 
-	var drawRReturn = function() {
+	var drawAllReturn = function() {
 		var curState = timeline.states[timeline.currStateIndex];
 		var topCard = curState.cardList[curState.cardList.length - 1];
 		topCard.drawReturn();
@@ -371,7 +367,7 @@ var main = function(ex) {
 			// base case 
 			for (var lineNum = 0; lineNum < lineNumsForBaseCase.length; lineNum++){
 				if (lineNumsForBaseCase[lineNum] == 2) {
-					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, drawBReturn, undefined));
+					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, drawAllReturn, undefined));
 				}else if (lineNumsForBaseCase[lineNum] == 1){
 					timeline.states.push(State(lineNumsForBaseCase[lineNum], 1, cards, showCheckboxes, undefined));
 				}else {
@@ -385,7 +381,7 @@ var main = function(ex) {
 						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 3, cards.slice(0, i+1), showLoop, noLoop));
 					}
 					else{
-						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1), drawRReturn, undefined));
+						timeline.states.push(State(lineNumsAfterRecurse[lineNum], 1, cards.slice(0, i+1), drawAllReturn, undefined));
 					}
 				}
 			}
