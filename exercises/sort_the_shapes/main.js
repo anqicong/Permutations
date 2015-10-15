@@ -5,6 +5,9 @@
 
 var main = function(ex) {
 
+	// display loop?
+	var displayLoop = false;
+
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
 		var card = {};
@@ -134,7 +137,10 @@ var main = function(ex) {
             	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
             card.checkbox_b.draw();
             card.checkbox_r.draw();
-            card.draw_loop();
+            // draw the loop if stage is loop
+            if (displayLoop == true){
+            	card.draw_loop();
+            }
 		};
 
 		card.drawReturn = function() {
@@ -211,6 +217,7 @@ var main = function(ex) {
 			if (state.curStepImage != undefined) {
 				state.curStepImage.remove();
 			}
+			// clear the rectangles
 			ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2, ex.height());
 		}
 
@@ -274,6 +281,9 @@ var main = function(ex) {
 				timeline.currStateIndex += 1;
 				timeline.states[timeline.currStateIndex].draw();
 				console.log("next: ", timeline.currStateIndex);
+				if (timeline.currStateIndex >= 10){
+					displayLoop = true;
+				}
 			}
 		};
 
@@ -283,6 +293,9 @@ var main = function(ex) {
 				timeline.currStateIndex -= 1;
 				timeline.states[timeline.currStateIndex].draw();
 				console.log("prev: ", timeline.currStateIndex);
+				if (timeline.currStateIndex < 10){
+					displayLoop = false;
+				}
 			}
 		};
 
