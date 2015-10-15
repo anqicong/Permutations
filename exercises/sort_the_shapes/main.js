@@ -85,41 +85,8 @@ var main = function(ex) {
 			}
 			cur_x -= 10;
 		    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
-		card.draw_loop = function(){
-			ex.graphics.ctx.fillText("Click on the box to insert" 
-				+ card.list[0].toString(), card.x+50, card.y+50);
-			card.last_return = permutations(card.list.slice(1, card.list.length));
-			ex.graphics.ctx.fillText("[", card.x+30, card.y+100);
-			var insert_box_1 = Rect(card.x+30, card.y+100,15,15);
-			insert_box_1.draw();
-			for (var i = 0; i < card.last_return.length;i++){
-                ex.graphics.ctx.fillText(card.last_return[i].toString(),
-                	card.x+60+i*20, card.y+100);
-                var insert_box = Rect(card.x+80+i*20, card.y+100,15,15);
-			    insert_box.draw();
-			}
-		    ex.graphics.ctx.fillText("]", card.x+60+i*20, card.y+100);
-
 		}
-
-		card.draw_loop = function(){
-			ex.graphics.ctx.fillText("Click on the box to insert " 
-				+ card.list[0].toString(), card.x+30, card.y+80);
-			console.log(card.list.slice(1, card.list.length));
-			card.last_return = permutation(card.list.slice(1, card.list.length));
-			ex.graphics.ctx.fillText("[", card.x+30, card.y+100);
-			var insert_box_1 = Rect(card.x+40, card.y+90, 15, 15);
-			insert_box_1.draw();
-			for (var i = 0; i < card.last_return.length;i++){
-                ex.graphics.ctx.fillText(card.last_return[i].toString(),
-                	card.x+60+i*30, card.y+100);
-                console.log(card.last_return[0][0]);
-                var insert_box = Rect(card.x+70+i*30, card.y+90,15,15);
-			    insert_box.draw();
-			}
-		    ex.graphics.ctx.fillText("]", card.x+60+i*30, card.y+100);
-		};
-
+		
         
   		card.draw = function(){
 			//just rects right now, will be fancier
