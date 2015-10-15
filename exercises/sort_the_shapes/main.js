@@ -180,8 +180,7 @@ var main = function(ex) {
 			if (state.curStepImage != undefined) {
 				state.curStepImage.remove();
 			}
-			//ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2,
-				//ex.height());
+			ex.graphics.ctx.clearRect(ex.width() / 2, 0, ex.width() / 2, ex.height());
 		}
 
 		state.draw = function() {
@@ -214,16 +213,16 @@ var main = function(ex) {
 			var d1s3 = State(4, 1, [cards[0]]);
 			var d1s4 = State(5, 1, [cards[0]]);
 			// d2
-			var d2s1 = State(0, 1, [cards[1]]);
-			var d2s2 = State(4, 1, [cards[1]]);
-			var d2s3 = State(5, 1, [cards[1]]);
+			var d2s1 = State(0, 1, [cards[0], cards[1]]);
+			var d2s2 = State(4, 1, [cards[0], cards[1]]);
+			var d2s3 = State(5, 1, [cards[0], cards[1]]);
 			// d3
-			var d3s1 = State(0, 1, [cards[2]]);
-			var d3s2 = State(1, 1, [cards[2]]);
-			var d3s3 = State(2, 1, [cards[2]]);
+			var d3s1 = State(0, 1, cards);
+			var d3s2 = State(1, 1, cards);
+			var d3s3 = State(2, 1, cards);
 			// back to d2
-			var d2s4 = State(5, 3, [cards[1]]);
-			var d2s5 = State(8, 1, [cards[1]]);
+			var d2s4 = State(5, 3, [cards[0], cards[1]]);
+			var d2s5 = State(8, 1, [cards[0], cards[1]]);
 			// back to d1
 			var d1s5 = State(5, 3, [cards[0]]);
 			var d1s6 = State(8, 1, [cards[0]]);
