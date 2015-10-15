@@ -11,9 +11,9 @@ var main = function(ex) {
 
 		//initiate return value and return value from last call
 		card.rvalue = undefined;
-		card.last_return = undefined;
 		card.level = level;
-        card.list = [];
+        card.list = ex.data.content.list.slice(card.level-1,level_count);
+        card.last_return = [[1,2],[2,1]];
         card.base = false;
         card.recursive = false;
         card.level_count = level_count;
@@ -55,39 +55,36 @@ var main = function(ex) {
 			//@TODO
 		};
 
-		card.draw_loop = function(){
-			ex.graphics.ctx.fillText("Click on the box to insert" 
-				+ card.list[0].toString(),card.x+50,card.y+50);
-			card.last_return = permutations(card.list.slice(1, card.list.length));
-			ex.graphics.ctx.fillText("[",card.x+30,card.y+100);
-			var insert_box_1 = Rect(card.x+30,card.y+100,15,15);
-			insert_box_1.draw();
-			for (var i = 0; i < card.last_return.length;i++){
-                ex.graphics.ctx.fillText(card.last_return[i].toString(),
-                	card.x+60+i*20,card.y+100);
-                var insert_box = Rect(card.x+80+i*20,card.y+100,15,15);
-			    insert_box.draw();
-			}
-		    ex.graphics.ctx.fillText("]",card.x+60+i*20,card.y+100);
-
-		}
-
+		
 		card.draw_loop = function(){
 			ex.graphics.ctx.fillText("Click on the box to insert " 
 				+ card.list[0].toString(),card.x+30,card.y+80);
-			console.log(card.list.slice(1,card.list.length));
-			card.last_return = permutation(card.list.slice(1,card.list.length));
+			console.log(card.list);
+			console.log(card.last_return);
 			ex.graphics.ctx.fillText("[",card.x+30,card.y+100);
-			var insert_box_1 = Rect(card.x+40,card.y+90,15,15);
-			insert_box_1.draw();
+			var cur_x = card.x+40;
 			for (var i = 0; i < card.last_return.length;i++){
-                ex.graphics.ctx.fillText(card.last_return[i].toString(),
-                	card.x+60+i*30,card.y+100);
-                console.log(card.last_return[0][0]);
-                var insert_box = Rect(card.x+70+i*30,card.y+90,15,15);
-			    insert_box.draw();
+				var cur_list = card.last_return[i];
+				ex.graphics.ctx.fillText("[",cur_x,card.y+100);
+				cur_x += 10;
+
+				var insert_box_1 = Rect(cur_x,card.y+90,15,15);
+			    insert_box_1.draw();
+				for (var j=0;j<cur_list.length;j++){
+					cur_x += 20;
+                    ex.graphics.ctx.fillText(cur_list[j].toString(),
+                	    cur_x,card.y+100);
+                    cur_x += 10;
+                    var insert_box = Rect(cur_x,card.y+90,15,15);
+			        insert_box.draw();
+			    }
+			    cur_x += 20;
+			    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
+			    cur_x += 20;
+			    
 			}
-		    ex.graphics.ctx.fillText("]",card.x+60+i*30,card.y+100);
+			cur_x -= 10;
+		    ex.graphics.ctx.fillText("]",cur_x,card.y+100);
 		};
 
         
@@ -103,6 +100,7 @@ var main = function(ex) {
             	ex.width()-2*margin-30*card.level/card.level_count, card.y+20);
             card.checkbox_b.draw();
             card.checkbox_r.draw();
+            card.draw_loop();
 		};
 
 		card.drawReturn = function() {
