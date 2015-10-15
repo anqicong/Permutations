@@ -7,6 +7,27 @@ var main = function(ex) {
 
 	// display loop?
 	var displayLoop = false;
+	var displayReturn = false;
+
+    /**********************************************************************
+	 * Find Permutations
+	 *********************************************************************/
+
+	 function permutation(list) {
+	 	if (list.length == 0) {
+	 		return [[]];
+	 	}else {
+	 		var allPerms = [];
+	 		for (subPerm in permutation(list.slice(1, list.length))) {
+	 			for (var i = 0; i < subPerm.length + 1; i++) {
+	 				allPerms = subPerm.slice(0, i);
+	 				allPerms.concat(list[0]);
+	 				allPerms.concat(subPerm.slice(i, subPerm.length));
+	 			}
+	 		}
+	 		return allPerms;
+	 	}
+	 }
 
 	function Card(level, level_count){
 		//create one index card, representing a recursive call
@@ -89,6 +110,24 @@ var main = function(ex) {
 			cur_x -= 10;
 		    ex.graphics.ctx.fillText("]",cur_x,cur_y);
 		}
+
+		card.drawReturn = function() {
+			var returnValue = "";
+			var returnList = permutation(card.list);
+			for (var i = 0; i < returnList.length; i++) {
+				if (returnList[i].length == 0) {
+					returnValue += "[ ]";
+				}else {
+					returnValue += "[ " + returnList[i].toString() + " ]";
+					if (i != returnList.length - 1) {
+						returnValue += ", ";
+					}
+				}
+			}
+			returnValue = "return: [ " + returnValue + " ]";
+			ex.graphics.ctx.fillStyle = "#ffffff";
+			ex.graphics.ctx.fillText(returnValue, card.x+30, card.y + card.height / 2);
+		}
 		
         
   		card.draw = function(){
@@ -111,25 +150,10 @@ var main = function(ex) {
             if (displayLoop == true){
             	card.draw_loop();
             }
+            if (displayReturn) {
+            	card.drawReturn();
+            }
 		};
-
-		card.drawReturn = function() {
-			var returnValue = "";
-			var returnList = permutation(card.list);
-			for (var i = 0; i < returnList.length; i++) {
-				if (returnList[i].length == 0) {
-					returnValue += "[ ]";
-				}else {
-					returnValue += "[ " + returnList[i].toString() + " ]";
-					if (i != returnList.length - 1) {
-						returnValue += ", ";
-					}
-				}
-			}
-			returnValue = "return: [ " + returnValue + " ]";
-			ctx.fillStyle = "#ffffff";
-			ctx.fillText(returnValue, card.x+30, card.y + card.height / 2);
-		}
 
 		return card;
 	}
@@ -253,6 +277,13 @@ var main = function(ex) {
 				console.log("next: ", timeline.currStateIndex);
 				if (timeline.currStateIndex >= 9){
 					displayLoop = true;
+				}
+				if (timeline.currStateIndex == 8 ||
+					timeline.currStateIndex == 10 ||
+					timeline.currStateIndex == 12) {
+					displayReturn = true;
+				}else {
+					displayReturn = false;
 				}
 			}
 		};
