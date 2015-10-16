@@ -64,6 +64,28 @@ var main = function(ex) {
 		return line;
 	}
 
+	function Button(x, y, text, lineNum, action){
+		var button = {};
+		button.x = x;
+		button.y = y;
+		button.text = text;
+		button.lineNum = lineNum;
+		button.action = action;
+
+		button.activate = function(){
+			//@TODO create options
+			var activatedButton = ex.createButton(button.x, button.y, text, 
+													 {
+													 	size:"small",
+													  	keybinding:["", 39],
+													  	color: "lightBlue"
+													 });
+			activatedButton.on("click", button.action);
+		};
+
+		return button;
+	}
+
 	function mouseClicked(event){
 
 	}
