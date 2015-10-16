@@ -43,12 +43,11 @@ var main = function(ex) {
 		return card;
 	}
 
-	function Line(x, y, lineNum, action){
+	function Line(x, y, lineNum){
 		var line = {};
 		line.x = x;
 		line.y = y;
 		line.lineNum = lineNum;
-		line.action = action;
 
 		line.clicked = function(x, y){
 
@@ -63,6 +62,14 @@ var main = function(ex) {
 		};
 
 		line.draw = function(){
+
+		};
+
+		line.doLineAction = function(){
+
+		};
+
+		line.clickIsLegal = function(){
 
 		};
 
