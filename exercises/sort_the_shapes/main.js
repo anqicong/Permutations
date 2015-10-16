@@ -21,6 +21,7 @@ var main = function(ex) {
 
 	function Card(depth){
 		var card = {};
+		card.depth = depth;
 
 		card.init = function(){
 
@@ -62,6 +63,14 @@ var main = function(ex) {
 
 		return line;
 	}
+
+	function mouseClicked(event){
+
+	}
+	ex.graphics.on("mousedown", mouseClicked);
+
+	var state = State();
+	state.init();
 
 
 }
