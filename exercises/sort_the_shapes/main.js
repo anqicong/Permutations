@@ -7,6 +7,8 @@ var main = function(ex) {
 
 	function State(){
 		var state = {};
+		state.cardsList = [];
+		state.topCard = undefined;
 
 		state.init = function(){
 
@@ -22,6 +24,9 @@ var main = function(ex) {
 	function Card(depth){
 		var card = {};
 		card.depth = depth;
+		card.curLineNum = 0;
+		card.linesList = [];
+		card.cardState = 0;
 
 		card.init = function(){
 
