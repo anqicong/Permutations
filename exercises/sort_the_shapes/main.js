@@ -8,14 +8,15 @@ var main = function(ex) {
 	function State(){
 		var state = {};
 		state.cardsList = [];
-		state.topCard = undefined;
 
 		state.init = function(){
 
 		};
 
 		state.draw = function(){
-
+			for (card in state.cardsList) {
+				card.draw();
+			}
 		};
 
 		return state;
