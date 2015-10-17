@@ -21,6 +21,17 @@
     },
     "content": {
         "list": [1, 2],
-        "printStatement": "print permutations([1, 2])"
+        "printStatement": "print permutations([1, 2])",
+        "code": ["def permutatins(a):", 
+                 "  if (len(a) == 0):",
+                 "    return [[]]",
+                 "  else:",
+                 "    allPerms = []",
+                 "    for subPerm in permutations(a[1:]):",
+                 "      for i in range(len(subPerm) + 1):",
+                 "        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]",
+                 "    return allPerms"],
+        "lines": 11,
+        "language": "python"
     }
 }

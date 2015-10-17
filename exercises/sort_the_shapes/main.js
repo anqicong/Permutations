@@ -5,17 +5,35 @@
 
 var main = function(ex) {
 
+	/**********************************************************************
+	 * Server functions
+	**********************************************************************/
+
+	//generateContent is a server function that randomly generates 2 
+	//starting numbers and the corresponding print statement
+	function generateContent() {
+		var random1 = Math.round(Math.random()*100);
+		var random2 = Math.round(Math.random()*100);
+		ex.data.content.list = [random1, random2];
+	}
+
 	function State(){
 		var state = {};
 		state.cardsList = [];
 
 		state.init = function(){
-
+			generateContent();
+			var firstCard = Card(0);
+			for (var i = 0; i < ex.data.content.code.length; i++) {
+				var lineHeight = 12;
+				firstCard.linesList.push(Line(20, i * lineHeight, i));
+			}
+			state.cardsList.push(firstCard);
 		};
 
 		state.draw = function(){
-			for (card in state.cardsList) {
-				card.draw();
+			for (var i = 0; i < state.cardsList.length; i++) {
+				state.cardsList[i].draw();
 			}
 		};
 
@@ -38,9 +56,9 @@ var main = function(ex) {
 		};
 
 		card.draw = function(){
-			for (var i = 0;i<card.linesList.length;i++){
-				var thisLine = card.cardsList[i];
-				if (thisLine.lineNum = card.curLineNum){
+			for (var i = 0;i < card.linesList.length;i++){
+				var thisLine = card.linesList[i];
+				if (thisLine.lineNum == card.curLineNum){
 					thisLine.highlight();
 				}
 				thisLine.draw();
@@ -129,6 +147,6 @@ var main = function(ex) {
 
 	var state = State();
 	state.init();
-
+	state.draw();
 
 }
