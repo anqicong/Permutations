@@ -24,20 +24,36 @@ var main = function(ex) {
 	function Card(depth){
 		var card = {};
 		card.depth = depth;
+		card.curLine = undefined;
 		card.curLineNum = 0;
 		card.linesList = [];
 		card.cardState = 0;
+		card.x = card.depth*leftMargin;
+		card.y = card.depth*topMargin;
+		card.width = maxWidth - card.x;
+		card.height = maxHeight - card.y;
 
 		card.init = function(){
-
 		};
 
 		card.draw = function(){
+			for (var i = 0;i<card.linesList.length;i++){
+				var thisLine = card.cardsList[i];
+				if (thisLine.lineNum = card.curLineNum){
+					thisLine.highlight();
+				}
+				thisLine.draw();
+			}
+			ex.graphics.ctx.fillStyle = "lightBlue";
+            ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
+            	card.width,card.height);
+            ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
+            	tabWidth,tabHeight); 
 
 		};
 
 		card.checkClick = function(x, y){
-
+            
 		};
 
 		return card;
@@ -102,6 +118,13 @@ var main = function(ex) {
 
 	}
 	ex.graphics.on("mousedown", mouseClicked);
+    //card constants
+    var leftMargin;
+    var topMargin;
+    var maxHeight;
+    var maxWidth;
+    var tabWidth;
+    var tabHeight;
 
 	var state = State();
 	state.init();
