@@ -24,9 +24,7 @@ var main = function(ex) {
 		state.init = function(){
 			generateContent();
 			var firstCard = Card(0);
-			for (var i = 0; i < ex.data.content.code.length; i++) {
-				firstCard.linesList.push(Line(20, (i + 1) * lineHeight, i));
-			}
+			firstCard.init();
 			state.cardsList.push(firstCard);
 		};
 
@@ -35,6 +33,10 @@ var main = function(ex) {
 				state.cardsList[i].draw();
 			}
 		};
+
+		state.getTopCard = function(){
+			return state.cardsList[0];
+		}
 
 		return state;
 	}
@@ -52,11 +54,13 @@ var main = function(ex) {
 		card.height = maxHeight - card.y;
 
 		card.init = function(){
-
+			for (var i = 0; i < ex.data.content.code.length; i++) {
+				card.linesList.push(Line(20, (i + 1) * lineHeight, i));
+			}
 		};
 
 		card.draw = function(){
-			ex.graphics.ctx.fillStyle = "lightBlue";
+			ex.graphics.ctx.fillStyle = "rgb(222, 222, 222)";
             ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
             	card.width,card.height);
             ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
@@ -73,9 +77,8 @@ var main = function(ex) {
 		};
 
 		card.checkClick = function(x, y){
-
             for (var line = 0; line < card.linesList.length; line++){
-            	card.listsList[line].checkClick();
+            	card.linesList[line].checkClick(x, y);
             }
 		};
 
@@ -88,14 +91,6 @@ var main = function(ex) {
 		line.y = y;
 		line.lineNum = lineNum;
 		line.highlightImage = undefined;
-
-		line.clicked = function(x, y){
-			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
-				line.doLineAction();
-				return true;
-			}
-			return false;
-		};
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
@@ -112,10 +107,11 @@ var main = function(ex) {
 		};
 
 		line.draw = function(){
-			var keywordColor = "#A50668";
-			var numberColor = "#4494BC";
+			var keywordColor = "rgb(249, 38, 114)";
+			var numberColor = "rgb(61, 163, 239)";
 			var text = ex.data.content.code[line.lineNum];
-			ex.graphics.ctx.fillStyle = "#000000";
+			//var typesList = ex.data.content.types[line.lineNum];
+			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
 			ex.graphics.ctx.fillText(text, line.x, line.y);
 		};
@@ -124,8 +120,18 @@ var main = function(ex) {
 
 		};
 
-		line.clickIsLegal = function(){
+		line.checkClick = function(x, y){
+			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
+				line.doLineAction();
+				console.log(line.lineNum);
+				return true;
+			}
+			return false;
+		};
 
+		line.clickIsLegal = function(){
+			//@TODO
+			return true;
 		};
 
 		return line;
@@ -154,15 +160,16 @@ var main = function(ex) {
 	}
 
 	function mouseClicked(event){
-
+		state.getTopCard().checkClick(event.offsetX, event.offsetY);
 	}
 	ex.graphics.on("mousedown", mouseClicked);
+
     //card constants
-    var leftMargin = 20;
+    var leftMargin = 15;
     var topMargin = 40;
     var maxHeight = ex.height()-topMargin;
     var maxWidth = ex.width()-leftMargin;
-    var tabWidth = 170;
+    var tabWidth = 190;
     var tabHeight = 20;
     var lineHeight = 15;
 

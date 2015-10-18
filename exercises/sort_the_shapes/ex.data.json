@@ -22,9 +22,8 @@
     "content": {
         "list": [1, 2],
         "printStatement": "print permutations([1, 2])",
-        "code": ["def permutatins(a):", 
-                 "  if (len(a) == 0):",
-                 "    return [[]]",
+        "code": ["def permutations(a):", 
+                 "  if (len(a) == 0): return [[]]",
                  "  else:",
                  "    allPerms = []",
                  "    for subPerm in permutations(a[1:]):",
