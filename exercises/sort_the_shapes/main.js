@@ -111,7 +111,8 @@ var main = function(ex) {
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
-			line.highlightImage = ex.createImage(line.x, line.y, img, {
+			line.highlightImage = ex.createImage(line.x, line.y - lineHeight,
+			 img, {
 				width: ex.width() - line.x,
 				height: lineHeight
 			});
