@@ -53,7 +53,7 @@ var main = function(ex) {
 
 		card.init = function(){
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				card.linesList.push(Line(20, (i + 1) * lineHeight, i));
+				card.linesList.push(Line(20, i * lineHeight, i));
 			}
 		};
 
@@ -111,8 +111,7 @@ var main = function(ex) {
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
-			line.highlightImage = ex.createImage(line.x, line.y - lineHeight,
-			 img, {
+			line.highlightImage = ex.createImage(line.x, line.y, img, {
 				width: ex.width() - line.x,
 				height: lineHeight
 			});
@@ -134,7 +133,7 @@ var main = function(ex) {
 			var text = line.getText();
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
-			ex.graphics.ctx.fillText(text, line.x, line.y);
+			ex.graphics.ctx.fillText(text, line.x, line.y + lineHeight);
 		};
 
 		line.doLineAction = function(){
