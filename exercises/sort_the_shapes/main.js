@@ -56,6 +56,12 @@ var main = function(ex) {
 		};
 
 		card.draw = function(){
+			ex.graphics.ctx.fillStyle = "lightBlue";
+            ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
+            	card.width,card.height);
+            ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
+            	tabWidth,tabHeight); 
+
 			for (var i = 0;i < card.linesList.length;i++){
 				var thisLine = card.linesList[i];
 				if (thisLine.lineNum == card.curLineNum){
@@ -63,12 +69,7 @@ var main = function(ex) {
 				}
 				thisLine.draw();
 			}
-			ex.graphics.ctx.fillStyle = "lightBlue";
-            ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
-            	card.width,card.height);
-            ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
-            	tabWidth,tabHeight); 
-
+			
 		};
 
 		card.checkClick = function(x, y){
@@ -141,12 +142,12 @@ var main = function(ex) {
 	}
 	ex.graphics.on("mousedown", mouseClicked);
     //card constants
-    var leftMargin;
-    var topMargin;
-    var maxHeight;
-    var maxWidth;
-    var tabWidth;
-    var tabHeight;
+    var leftMargin = 20;
+    var topMargin = 40;
+    var maxHeight = ex.height()-topMargin;
+    var maxWidth = ex.width()-leftMargin;
+    var tabWidth = 170;
+    var tabHeight = 20;
 
 	var state = State();
 	state.init();
