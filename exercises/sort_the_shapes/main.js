@@ -25,7 +25,6 @@ var main = function(ex) {
 			generateContent();
 			var firstCard = Card(0);
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				var lineHeight = 15;
 				firstCard.linesList.push(Line(20, (i + 1) * lineHeight, i));
 			}
 			state.cardsList.push(firstCard);
@@ -53,6 +52,7 @@ var main = function(ex) {
 		card.height = maxHeight - card.y;
 
 		card.init = function(){
+
 		};
 
 		card.draw = function(){
@@ -73,7 +73,9 @@ var main = function(ex) {
 		};
 
 		card.checkClick = function(x, y){
-            
+            for line in card.linesList {
+            	line.checkClick();
+            }
 		};
 
 		return card;
@@ -84,17 +86,28 @@ var main = function(ex) {
 		line.x = x;
 		line.y = y;
 		line.lineNum = lineNum;
+		line.highlightImage = undefined;
 
 		line.clicked = function(x, y){
-
+			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
+				line.doLineAction();
+				return true;
+			}
+			return false;
 		};
 
 		line.highlight = function(){
-
+			var img = "img/codeColor.png";
+			line.highlightImage = ex.createImage(line.x, line.y, img, {
+				width: ex.width() - line.x,
+				height: lineHeight
+			});
 		};
 
 		line.unhighlight = function(){
-
+			if (line.highlightImage != undefined) {
+				line.highlightImage.remove();
+			}
 		};
 
 		line.draw = function(){
@@ -150,6 +163,7 @@ var main = function(ex) {
     var maxWidth = ex.width()-leftMargin;
     var tabWidth = 170;
     var tabHeight = 20;
+    var lineHeight = 15;
 
 	var state = State();
 	state.init();
