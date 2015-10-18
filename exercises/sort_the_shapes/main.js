@@ -20,12 +20,14 @@ var main = function(ex) {
 	function State(){
 		var state = {};
 		state.cardsList = [];
+		state.topCard = undefined;
 
 		state.init = function(){
 			generateContent();
 			var firstCard = Card(0);
 			firstCard.init();
 			state.cardsList.push(firstCard);
+			state.topCard = firstCard;
 		};
 
 		state.draw = function(){
@@ -33,10 +35,6 @@ var main = function(ex) {
 				state.cardsList[i].draw();
 			}
 		};
-
-		state.getTopCard = function(){
-			return state.cardsList[state.cardsList.length - 1];
-		}
 
 		return state;
 	}
@@ -83,7 +81,7 @@ var main = function(ex) {
 
 		card.checkClick = function(x, y){
             for (var line = 0; line < card.linesList.length; line++){
-            	card.linesList[line].checkClick(x, y);
+            	card.linesList[line].checkClick(x, y, true);
             }
 		};
 
@@ -93,6 +91,11 @@ var main = function(ex) {
 				card.curLineNum += 1;
 			}
 			return card.curLineNum;
+		};
+
+		// given a line number, returns the line with that line number
+		card.getLineByLineNum = function(lineNum){
+			return cards.linesList[lineNum];
 		};
 
 		return card;
@@ -129,19 +132,20 @@ var main = function(ex) {
 		};
 
 		line.doLineAction = function(){
-			state.getTopCard().getAndSetNextLine();
+			state.topCard.getAndSetNextLine();
 		};
 
-		line.checkClick = function(x, y){
+		// doAction is a bool representing whether we want to check and do the action
+		// or just check if it was clicked
+		line.checkClick = function(x, y, doAction){
 			if (x >= line.x && y >= line.y && y <= line.y + lineHeight && line.clickIsLegal(x, y)) {
-				line.doLineAction();
+				if (doAction) line.doLineAction();
 				return true;
 			}
 			return false;
 		};
 
 		line.clickIsLegal = function(x, y){
-			//@TODO
 			return true;
 		};
 
@@ -171,7 +175,7 @@ var main = function(ex) {
 	}
 
 	function mouseClicked(event){
-		state.getTopCard().checkClick(event.offsetX, event.offsetY);
+		state.topCard.checkClick(event.offsetX, event.offsetY, true);
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
