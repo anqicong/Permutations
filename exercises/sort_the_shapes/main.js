@@ -65,7 +65,8 @@ var main = function(ex) {
             ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
             	tabWidth,tabHeight); 
             // draw lines
-            console.log(card.curLineNum);
+            console.log(state.topCard.getLineByLineNum(state.topCard.curLineNum).getText());
+            console.log(state.topCard.curLineNum);
 			for (var i = 0; i < card.linesList.length; i++){
 				var thisLine = card.linesList[i];
 				// unhighlight every line just in case
@@ -95,7 +96,7 @@ var main = function(ex) {
 
 		// given a line number, returns the line with that line number
 		card.getLineByLineNum = function(lineNum){
-			return cards.linesList[lineNum];
+			return card.linesList[lineNum];
 		};
 
 		return card;
@@ -122,10 +123,14 @@ var main = function(ex) {
 			}
 		};
 
+		line.getText = function(){
+			return ex.data.content.code[line.lineNum];
+		}
+
 		line.draw = function(){
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
-			var text = ex.data.content.code[line.lineNum];
+			var text = line.getText();
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
 			ex.graphics.ctx.fillText(text, line.x, line.y);
