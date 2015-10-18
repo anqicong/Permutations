@@ -35,7 +35,7 @@ var main = function(ex) {
 		};
 
 		state.getTopCard = function(){
-			return state.cardsList[0];
+			return state.cardsList[state.cardsList.length - 1];
 		}
 
 		return state;
@@ -60,14 +60,19 @@ var main = function(ex) {
 		};
 
 		card.draw = function(){
+			// draw card
 			ex.graphics.ctx.fillStyle = "rgb(222, 222, 222)";
             ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
             	card.width,card.height);
             ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
             	tabWidth,tabHeight); 
-
-			for (var i = 0;i < card.linesList.length;i++){
+            // draw lines
+            console.log(card.curLineNum);
+			for (var i = 0; i < card.linesList.length; i++){
 				var thisLine = card.linesList[i];
+				// unhighlight every line just in case
+				thisLine.unhighlight();
+				// highlight the current line
 				if (thisLine.lineNum == card.curLineNum){
 					thisLine.highlight();
 				}
@@ -80,6 +85,14 @@ var main = function(ex) {
             for (var line = 0; line < card.linesList.length; line++){
             	card.linesList[line].checkClick(x, y);
             }
+		};
+
+		// increments curLineNum and then returns it
+		card.getAndSetNextLine = function(){
+			if (card.curLineNum < ex.data.content.code.length - 1){
+				card.curLineNum += 1;
+			}
+			return card.curLineNum;
 		};
 
 		return card;
@@ -110,26 +123,24 @@ var main = function(ex) {
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
 			var text = ex.data.content.code[line.lineNum];
-			//var typesList = ex.data.content.types[line.lineNum];
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
 			ex.graphics.ctx.fillText(text, line.x, line.y);
 		};
 
 		line.doLineAction = function(){
-
+			state.getTopCard().getAndSetNextLine();
 		};
 
 		line.checkClick = function(x, y){
-			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
+			if (x >= line.x && y >= line.y && y <= line.y + lineHeight && line.clickIsLegal(x, y)) {
 				line.doLineAction();
-				console.log(line.lineNum);
 				return true;
 			}
 			return false;
 		};
 
-		line.clickIsLegal = function(){
+		line.clickIsLegal = function(x, y){
 			//@TODO
 			return true;
 		};
@@ -161,6 +172,7 @@ var main = function(ex) {
 
 	function mouseClicked(event){
 		state.getTopCard().checkClick(event.offsetX, event.offsetY);
+		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
 
