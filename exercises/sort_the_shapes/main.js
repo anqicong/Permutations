@@ -98,6 +98,8 @@ var main = function(ex) {
 		};
 
 		line.draw = function(){
+			var keywordColor = "#A50668";
+			var numberColor = "#4494BC";
 			var text = ex.data.content.code[line.lineNum];
 			ex.graphics.ctx.fillStyle = "#000000";
 			ex.graphics.ctx.font = "15px Courier New";
