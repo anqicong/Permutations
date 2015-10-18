@@ -25,8 +25,8 @@ var main = function(ex) {
 			generateContent();
 			var firstCard = Card(0);
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				var lineHeight = 12;
-				firstCard.linesList.push(Line(20, i * lineHeight, i));
+				var lineHeight = 15;
+				firstCard.linesList.push(Line(20, (i + 1) * lineHeight, i));
 			}
 			state.cardsList.push(firstCard);
 		};
@@ -97,7 +97,10 @@ var main = function(ex) {
 		};
 
 		line.draw = function(){
-
+			var text = ex.data.content.code[line.lineNum];
+			ex.graphics.ctx.fillStyle = "#000000";
+			ex.graphics.ctx.font = "15px Courier New";
+			ex.graphics.ctx.fillText(text, line.x, line.y);
 		};
 
 		line.doLineAction = function(){
