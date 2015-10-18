@@ -73,8 +73,9 @@ var main = function(ex) {
 		};
 
 		card.checkClick = function(x, y){
-            for line in card.linesList {
-            	line.checkClick();
+
+            for (var line = 0; line < card.linesList.length; line++){
+            	card.listsList[line].checkClick();
             }
 		};
 
@@ -169,4 +170,4 @@ var main = function(ex) {
 	state.init();
 	state.draw();
 
-}
+};
