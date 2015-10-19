@@ -56,6 +56,10 @@ var main = function(ex) {
 			return state.topCard.getLineByLineNum(lineNum);
 		};
 
+		state.getCard = function(depth){
+			return state.cardsList[depth];
+		};
+
 		return state;
 	}
 
@@ -69,10 +73,10 @@ var main = function(ex) {
 
 		//card constants
 	    card.leftMargin = 15;
-	    card.topMargin = 40;
+	    card.topMargin = 30;
 	    card.maxHeight = ex.height()-card.topMargin;
 	    card.maxWidth = ex.width()-card.leftMargin;
-	    card.tabWidth = 190;
+	    card.tabWidth = 220;
 	    card.tabHeight = 20;
 	    card.lineHeight = 15;
 	    card.x = card.depth*card.leftMargin;
@@ -83,11 +87,27 @@ var main = function(ex) {
 		card.init = function(){
 			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				card.linesList.push(Line(20, i * card.lineHeight, i));
+				var depthOffsetX = card.depth*15;
+				var depthOffsetY = card.depth*60;
+				if (i == 0){ // extra offset for first line
+					depthOffsetX += card.depth*155;
+				}
+				card.linesList.push(Line(20 + depthOffsetX, 
+										 i * card.lineHeight + depthOffsetY, i));
 			}
 			// init all the lines
 			for (var i = 0; i < card.linesList.length; i++){
 				card.linesList[i].init();
+				// create the text for the first line
+				if (i == 0){
+					var newText = "permutations([";
+					for (var numIndex = card.depth; numIndex < ex.data.content.list.length; numIndex++){
+						newText += ex.data.content.list[numIndex].toString() + ", ";
+					}
+					newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
+					newText += "]):";
+					card.linesList[i].setText(newText);
+				}
 			}
 		};
 
@@ -103,16 +123,28 @@ var main = function(ex) {
 					var y = card.y;
 					break;
 				case 1:
+					var x = card.x + card.leftMargin*11 + 4;
+					var y = card.y + card.lineHeight*2;
+					break;
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
 		};
 
 		card.draw = function(){
 			if (card.toDraw){
-				ex.graphics.ctx.fillStyle = "rgb(240, 240, 240)";
+				// get right color
+				var rgb = 240 - 25*card.depth;
+				var rgbStr = rgb.toString();
+				ex.graphics.ctx.fillStyle = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 				// draw card
-	            ex.graphics.ctx.fillRect(card.x,card.y + card.tabHeight,
-	            	card.width,card.height);
+				if (card.depth > 0){
+					var adjustForDepth = card.lineHeight*2;
+				}
+				else{
+					var adjustForDepth = 0;
+				}
+	            ex.graphics.ctx.fillRect(card.x ,card.y + card.tabHeight + adjustForDepth,
+	            	card.width, card.height);
 	            // draw tab
 	            card.drawTab();
 	            // draw lines
@@ -120,9 +152,12 @@ var main = function(ex) {
 					var thisLine = card.linesList[i];
 					// unhighlight every line just in case
 					thisLine.unhighlight();
-					// highlight the current line
-					if (thisLine.lineNum == card.curLineNum){
-						thisLine.highlight();
+					// if we're on the top card, highlight
+					if (state.topCard.depth == card.depth){
+						// highlight the current line
+						if (thisLine.lineNum == card.curLineNum){
+							thisLine.highlight();
+						}
 					}
 					thisLine.draw();
 				}
@@ -199,6 +234,10 @@ var main = function(ex) {
 			return ex.data.content.code[line.lineNum];
 		}
 
+		line.setText = function(newText){
+			line.text = newText;
+		}
+
 		line.revertText = function(){
 			line.text = ex.data.content.code[line.lineNum];
 		}
@@ -227,6 +266,12 @@ var main = function(ex) {
 					// next line
 					state.topCard.getAndSetNextLine();
 					break;
+				case 4:
+					var depthToActivate = state.topCard.depth + 1;
+					// deactivate and undraw the current top card, activate new card
+					state.topCard.setToDraw(false);
+					state.topCard = state.getCard(depthToActivate);
+					state.topCard.setToDraw(true);
 				default: 
 					state.topCard.getAndSetNextLine();
 					break;
