@@ -36,6 +36,18 @@ var main = function(ex) {
 			}
 		};
 
+		state.doClick = function(x, y){
+			state.topCard.doClick(x, y);
+		}
+
+		state.getCurLineNum = function(){
+			return state.topCard.curLineNum;
+		};
+
+		state.getLineFromTopCard = function(lineNum){
+			return state.topCard.getLineByLineNum(lineNum);
+		};
+
 		return state;
 	}
 
@@ -59,14 +71,12 @@ var main = function(ex) {
 
 		card.draw = function(){
 			// draw card
-			ex.graphics.ctx.fillStyle = "rgb(222, 222, 222)";
+			ex.graphics.ctx.fillStyle = "rgb(240, 240, 240)";
             ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
             	card.width,card.height);
             ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
             	tabWidth,tabHeight); 
             // draw lines
-            console.log(state.topCard.getLineByLineNum(state.topCard.curLineNum).getText());
-            console.log(state.topCard.curLineNum);
 			for (var i = 0; i < card.linesList.length; i++){
 				var thisLine = card.linesList[i];
 				// unhighlight every line just in case
@@ -80,9 +90,9 @@ var main = function(ex) {
 			
 		};
 
-		card.checkClick = function(x, y){
+		card.doClick = function(x, y){
             for (var line = 0; line < card.linesList.length; line++){
-            	card.linesList[line].checkClick(x, y, true);
+            	card.linesList[line].doClick(x, y);
             }
 		};
 
@@ -112,7 +122,7 @@ var main = function(ex) {
 		line.highlight = function(){
 			var img = "img/codeColor.png";
 			line.highlightImage = ex.createImage(line.x, line.y, img, {
-				width: ex.width() - line.x,
+				width: ex.width()*2/3,
 				height: lineHeight
 			});
 		};
@@ -140,18 +150,35 @@ var main = function(ex) {
 			state.topCard.getAndSetNextLine();
 		};
 
-		// doAction is a bool representing whether we want to check and do the action
-		// or just check if it was clicked
-		line.checkClick = function(x, y, doAction){
-			if (x >= line.x && y >= line.y && y <= line.y + lineHeight && line.clickIsLegal(x, y)) {
-				if (doAction) line.doLineAction();
+		line.checkClick = function(x, y){
+			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
 				return true;
 			}
 			return false;
 		};
 
+		line.doClick = function(x, y){
+			if (line.checkClick(x, y) && line.clickIsLegal(x, y)) {
+				line.doLineAction();
+			}
+		}
+
 		line.clickIsLegal = function(x, y){
-			return true;
+			switch (state.getCurLineNum()){
+				case 0: // def line
+					return state.getLineFromTopCard(1).checkClick(x, y);
+					break;
+				case 1: // if 
+					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
+						return state.getLineFromTopCard(2).checkClick(x, y);
+					}
+					break;
+				case 2:
+					break;
+				default:
+					return false;
+					break;
+			}
 		};
 
 		return line;
@@ -180,7 +207,7 @@ var main = function(ex) {
 	}
 
 	function mouseClicked(event){
-		state.topCard.checkClick(event.offsetX, event.offsetY, true);
+		state.doClick(event.offsetX, event.offsetY);
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
