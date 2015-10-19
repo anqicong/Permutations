@@ -91,7 +91,9 @@ var main = function(ex) {
 				var depthOffsetY = card.depth*60;
 				if (i == 0){ // extra offset for first line
 					depthOffsetX += card.depth*155;
+					if (card.depth == 2) depthOffsetX -= 140;
 				}
+				console.log(20 + depthOffsetX);
 				card.linesList.push(Line(20 + depthOffsetX, 
 										 i * card.lineHeight + depthOffsetY, i));
 			}
@@ -105,7 +107,9 @@ var main = function(ex) {
 						newText += ex.data.content.list[numIndex].toString() + ", ";
 					}
 					newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
+					console.log(newText);
 					newText += "]):";
+                    if (card.depth == ex.data.content.list.length) newText = "permutations([])";
 					card.linesList[i].setText(newText);
 				}
 			}
@@ -125,7 +129,13 @@ var main = function(ex) {
 				case 1:
 					var x = card.x + card.leftMargin*11 + 4;
 					var y = card.y + card.lineHeight*2;
+					card.tabWidth -= 30;
 					break;
+				case 2:
+				    var x = card.x + card.leftMargin*12 - 7;
+				    var y = card.y + card.lineHeight*4;
+				    card.tabWidth -= 50;
+
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
 		};
@@ -138,7 +148,7 @@ var main = function(ex) {
 				ex.graphics.ctx.fillStyle = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 				// draw card
 				if (card.depth > 0){
-					var adjustForDepth = card.lineHeight*2;
+					var adjustForDepth = card.lineHeight*2*card.depth;
 				}
 				else{
 					var adjustForDepth = 0;
@@ -206,7 +216,7 @@ var main = function(ex) {
 					var baseReturnButtonY = 18;
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
-													"return [[ ]]", 1, 
+													"return [ [ ] ]", 1, 
 													function() {ex.showFeedback(baseReturnButtonMessage)}, 
 													"xsmall");
 					break;
@@ -332,13 +342,14 @@ var main = function(ex) {
 			button.myButton = ex.createButton(button.x, button.y, text, 
 													 {
 													 	size:button.size,
-													  	color: "lightBlue"
+													  	color: "grey",
+													  	height:14,
 													 });
 			button.myButton.on("click", button.action);
 		};
 
 		button.deactivate = function(){
-			button.myButton.hide();
+			if (button.myButton != undefined) button.myButton.hide();
 		}
 
 		return button;
