@@ -211,6 +211,7 @@ var main = function(ex) {
 		line.lineNum = lineNum;
 		line.text = "";
 		line.highlightImage = undefined;
+		line.showBaseReturnButton = false;
 
 		line.init = function(){
 			// get text
@@ -220,7 +221,7 @@ var main = function(ex) {
 				case 1: 
 					// make the button
 					var baseReturnButtonX = 200;
-					var baseReturnButtonY = 18;
+					var baseReturnButtonY = line.y;
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
@@ -265,6 +266,9 @@ var main = function(ex) {
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
 			ex.graphics.ctx.fillText(line.text, line.x, line.y + state.topCard.lineHeight);
+			if (line.showBaseReturnButton && line.baseReturnButton != undefined) {
+				line.baseReturnButton.activate();
+			}
 		};
 
 		line.doLineAction = function(){
@@ -274,11 +278,11 @@ var main = function(ex) {
 					line.text = "  if (len(a) == 0): ";
 					state.topCard.getAndSetNextLine();
 					// activate the base case return button
-					line.baseReturnButton.activate();
+					line.showBaseReturnButton = true;
 					break;
 				case 2:
 					// deactivate the if statement's return button and rever the text
-					state.getLineFromTopCard(1).baseReturnButton.deactivate();
+					state.getLineFromTopCard(1).deactivateReturnButton();
 					state.getLineFromTopCard(1).revertText();
 					// next line
 					state.topCard.getAndSetNextLine();
@@ -290,11 +294,19 @@ var main = function(ex) {
 					state.topCard.unhighlightAll();
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
+					state.getLineFromTopCard(1).showBaseReturnButton = true;
 				default: 
 					state.topCard.getAndSetNextLine();
 					break;
 			}
 		};
+
+		line.deactivateReturnButton = function() {
+			if (line.baseReturnButton != undefined) {
+				line.baseReturnButton.deactivate();
+			}
+			line.showBaseReturnButton = false;
+		}
 
 		line.checkClick = function(x, y){
 			if (x >= line.x && y >= line.y && y <= line.y + state.topCard.lineHeight) {
@@ -357,7 +369,7 @@ var main = function(ex) {
 		};
 
 		button.deactivate = function(){
-			if (button.myButton != undefined) button.myButton.hide();
+			if (button.myButton != undefined) button.myButton.remove();
 		}
 
 		return button;
