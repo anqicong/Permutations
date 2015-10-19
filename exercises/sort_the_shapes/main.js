@@ -58,15 +58,24 @@ var main = function(ex) {
 		card.curLineNum = 0;
 		card.linesList = [];
 		card.cardState = 0;
-		card.x = card.depth*leftMargin;
-		card.y = card.depth*topMargin;
-		card.width = maxWidth - card.x;
-		card.height = maxHeight - card.y;
+
+		//card constants
+	    card.leftMargin = 15;
+	    card.topMargin = 40;
+	    card.maxHeight = ex.height()-card.topMargin;
+	    card.maxWidth = ex.width()-card.leftMargin;
+	    card.tabWidth = 190;
+	    card.tabHeight = 20;
+	    card.lineHeight = 15;
+	    card.x = card.depth*card.leftMargin;
+		card.y = card.depth*card.topMargin;
+		card.width = card.maxWidth - card.x;
+		card.height = card.maxHeight - card.y;
 
 		card.init = function(){
 			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				card.linesList.push(Line(20, i * lineHeight, i));
+				card.linesList.push(Line(20, i * card.lineHeight, i));
 			}
 			// init all the lines
 			for (var i = 0; i < card.linesList.length; i++){
@@ -74,13 +83,24 @@ var main = function(ex) {
 			}
 		};
 
+		card.drawTab = function(){
+			switch (card.depth){
+				case 0:
+					var x = card.x+card.leftMargin;
+					var y = card.y;
+					break;
+				case 1:
+			}
+			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
+		};
+
 		card.draw = function(){
-			// draw card
 			ex.graphics.ctx.fillStyle = "rgb(240, 240, 240)";
-            ex.graphics.ctx.fillRect(card.x,card.y + tabHeight,
+			// draw card
+            ex.graphics.ctx.fillRect(card.x,card.y + card.tabHeight,
             	card.width,card.height);
-            ex.graphics.ctx.fillRect(card.x+leftMargin,card.y,
-            	tabWidth,tabHeight); 
+            // draw tab
+            card.drawTab();
             // draw lines
 			for (var i = 0; i < card.linesList.length; i++){
 				var thisLine = card.linesList[i];
@@ -134,9 +154,11 @@ var main = function(ex) {
 					// make the button
 					var baseReturnButtonX = 200;
 					var baseReturnButtonY = 18;
+					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
-													"return [ [  ] ]", 1, 
-													function() {alert("this is a button")}, "xsmall");
+													"return [[ ]]", 1, 
+													function() {ex.showFeedback(baseReturnButtonMessage)}, 
+													"xsmall");
 					break;
 				default:
 					break;
@@ -148,7 +170,7 @@ var main = function(ex) {
 			var highlightWidth = line.text.length * 9;
 			line.highlightImage = ex.createImage(line.x, line.y, img, {
 				width: highlightWidth,
-				height: lineHeight
+				height: state.topCard.lineHeight
 			});
 		};
 
@@ -162,12 +184,16 @@ var main = function(ex) {
 			return ex.data.content.code[line.lineNum];
 		}
 
+		line.revertText = function(){
+			line.text = ex.data.content.code[line.lineNum];
+		}
+
 		line.draw = function(){
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
-			ex.graphics.ctx.fillText(line.text, line.x, line.y + lineHeight);
+			ex.graphics.ctx.fillText(line.text, line.x, line.y + state.topCard.lineHeight);
 		};
 
 		line.doLineAction = function(){
@@ -180,8 +206,11 @@ var main = function(ex) {
 					line.baseReturnButton.activate();
 					break;
 				case 2:
-					state.topCard.getAndSetNextLine();
+					// deactivate the if statement's return button and rever the text
 					state.getLineFromTopCard(1).baseReturnButton.deactivate();
+					state.getLineFromTopCard(1).revertText();
+					// next line
+					state.topCard.getAndSetNextLine();
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
@@ -190,7 +219,7 @@ var main = function(ex) {
 		};
 
 		line.checkClick = function(x, y){
-			if (x >= line.x && y >= line.y && y <= line.y + lineHeight) {
+			if (x >= line.x && y >= line.y && y <= line.y + state.topCard.lineHeight) {
 				return true;
 			}
 			return false;
@@ -260,15 +289,6 @@ var main = function(ex) {
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
-
-    //card constants
-    var leftMargin = 15;
-    var topMargin = 40;
-    var maxHeight = ex.height()-topMargin;
-    var maxWidth = ex.width()-leftMargin;
-    var tabWidth = 190;
-    var tabHeight = 20;
-    var lineHeight = 15;
 
 	var state = State();
 	state.init();
