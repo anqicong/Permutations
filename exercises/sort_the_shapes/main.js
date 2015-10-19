@@ -64,8 +64,13 @@ var main = function(ex) {
 		card.height = maxHeight - card.y;
 
 		card.init = function(){
+			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
 				card.linesList.push(Line(20, i * lineHeight, i));
+			}
+			// init all the lines
+			for (var i = 0; i < card.linesList.length; i++){
+				card.linesList[i].init();
 			}
 		};
 
@@ -117,12 +122,32 @@ var main = function(ex) {
 		line.x = x;
 		line.y = y;
 		line.lineNum = lineNum;
+		line.text = "";
 		line.highlightImage = undefined;
+
+		line.init = function(){
+			// get text
+			line.text = line.getText();
+			// create buttons
+			switch (line.lineNum){
+				case 1: 
+					// make the button
+					var baseReturnButtonX = 200;
+					var baseReturnButtonY = 18;
+					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
+													"return [ [  ] ]", 1, 
+													function() {alert("this is a button")}, "xsmall");
+					break;
+				default:
+					break;
+			}
+		};
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
+			var highlightWidth = line.text.length * 9;
 			line.highlightImage = ex.createImage(line.x, line.y, img, {
-				width: ex.width()*2/3,
+				width: highlightWidth,
 				height: lineHeight
 			});
 		};
@@ -140,14 +165,28 @@ var main = function(ex) {
 		line.draw = function(){
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
-			var text = line.getText();
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
-			ex.graphics.ctx.fillText(text, line.x, line.y + lineHeight);
+			ex.graphics.ctx.fillText(line.text, line.x, line.y + lineHeight);
 		};
 
 		line.doLineAction = function(){
-			state.topCard.getAndSetNextLine();
+			switch (line.lineNum){
+				case 1: // if
+					// change the text
+					line.text = "  if (len(a) == 0): ";
+					state.topCard.getAndSetNextLine();
+					// activate the base case return button
+					line.baseReturnButton.activate();
+					break;
+				case 2:
+					state.topCard.getAndSetNextLine();
+					state.getLineFromTopCard(1).baseReturnButton.deactivate();
+					break;
+				default: 
+					state.topCard.getAndSetNextLine();
+					break;
+			}
 		};
 
 		line.checkClick = function(x, y){
@@ -173,7 +212,11 @@ var main = function(ex) {
 						return state.getLineFromTopCard(2).checkClick(x, y);
 					}
 					break;
-				case 2:
+				case 2: // else
+					return state.getLineFromTopCard(3).checkClick(x, y);
+					break;
+				case 3: // allPerms
+					return state.getLineFromTopCard(4).checkClick(x, y);
 					break;
 				default:
 					return false;
@@ -184,24 +227,30 @@ var main = function(ex) {
 		return line;
 	}
 
-	function Button(x, y, text, lineNum, action){
+	function Button(x, y, text, lineNum, action, size){
 		var button = {};
 		button.x = x;
 		button.y = y;
 		button.text = text;
 		button.lineNum = lineNum;
 		button.action = action;
+		button.size = size;
+
+		button.myButton = undefined;
 
 		button.activate = function(){
 			//@TODO create options
-			var activatedButton = ex.createButton(button.x, button.y, text, 
+			button.myButton = ex.createButton(button.x, button.y, text, 
 													 {
-													 	size:"small",
-													  	keybinding:["", 39],
+													 	size:button.size,
 													  	color: "lightBlue"
 													 });
-			activatedButton.on("click", button.action);
+			button.myButton.on("click", button.action);
 		};
+
+		button.deactivate = function(){
+			button.myButton.hide();
+		}
 
 		return button;
 	}
