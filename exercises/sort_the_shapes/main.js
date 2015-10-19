@@ -362,7 +362,7 @@ var main = function(ex) {
 			button.myButton = ex.createButton(button.x, button.y, text, 
 													 {
 													 	size:button.size,
-													  	color: "grey",
+													  	color: "lightBlue",
 													  	height:14,
 													 });
 			button.myButton.on("click", button.action);
