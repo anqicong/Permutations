@@ -24,10 +24,18 @@ var main = function(ex) {
 
 		state.init = function(){
 			generateContent();
+			// make first card, set it to draw mode, make it the top card
 			var firstCard = Card(0);
 			firstCard.init();
+			firstCard.setToDraw(true);
 			state.cardsList.push(firstCard);
 			state.topCard = firstCard;
+			// generate and init the rest of the cards
+			for (var depth = 1; depth < ex.data.content.list.length + 1; depth++){
+				var newCard = Card(depth);
+				newCard.init();
+				state.cardsList.push(newCard);
+			}
 		};
 
 		state.draw = function(){
@@ -57,7 +65,7 @@ var main = function(ex) {
 		card.curLine = undefined;
 		card.curLineNum = 0;
 		card.linesList = [];
-		card.cardState = 0;
+		card.toDraw = false;
 
 		//card constants
 	    card.leftMargin = 15;
@@ -83,6 +91,11 @@ var main = function(ex) {
 			}
 		};
 
+		// card.toDraw is a bool representing whether or not that card should be drawn
+		card.setToDraw = function(value){
+			card.toDraw = value;
+		}
+
 		card.drawTab = function(){
 			switch (card.depth){
 				case 0:
@@ -95,22 +108,24 @@ var main = function(ex) {
 		};
 
 		card.draw = function(){
-			ex.graphics.ctx.fillStyle = "rgb(240, 240, 240)";
-			// draw card
-            ex.graphics.ctx.fillRect(card.x,card.y + card.tabHeight,
-            	card.width,card.height);
-            // draw tab
-            card.drawTab();
-            // draw lines
-			for (var i = 0; i < card.linesList.length; i++){
-				var thisLine = card.linesList[i];
-				// unhighlight every line just in case
-				thisLine.unhighlight();
-				// highlight the current line
-				if (thisLine.lineNum == card.curLineNum){
-					thisLine.highlight();
+			if (card.toDraw){
+				ex.graphics.ctx.fillStyle = "rgb(240, 240, 240)";
+				// draw card
+	            ex.graphics.ctx.fillRect(card.x,card.y + card.tabHeight,
+	            	card.width,card.height);
+	            // draw tab
+	            card.drawTab();
+	            // draw lines
+				for (var i = 0; i < card.linesList.length; i++){
+					var thisLine = card.linesList[i];
+					// unhighlight every line just in case
+					thisLine.unhighlight();
+					// highlight the current line
+					if (thisLine.lineNum == card.curLineNum){
+						thisLine.highlight();
+					}
+					thisLine.draw();
 				}
-				thisLine.draw();
 			}
 			
 		};
