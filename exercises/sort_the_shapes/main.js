@@ -194,6 +194,13 @@ var main = function(ex) {
 			return card.linesList[lineNum];
 		};
 
+		card.unhighlightAll = function() {
+			for (var i = 0; i < card.linesList.length; i++) {
+				var curLine = card.linesList[i];
+				curLine.unhighlight();
+			}
+		}
+
 		return card;
 	}
 
@@ -280,6 +287,7 @@ var main = function(ex) {
 					var depthToActivate = state.topCard.depth + 1;
 					// deactivate and undraw the current top card, activate new card
 					state.topCard.setToDraw(false);
+					state.topCard.unhighlightAll();
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
 				default: 
