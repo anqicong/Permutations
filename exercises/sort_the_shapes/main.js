@@ -44,6 +44,23 @@ var main = function(ex) {
 			}
 		};
 
+		/* TO BE IMPLEMENTED
+		state.animateCollapse = function() {
+			var doAnimation = function() {
+				state.topCard.height -= 10;
+				ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
+				state.draw();
+				alert(state.topCard.height);
+			}
+			window.setTimeout(doAnimation, 1000);
+			if (state.topCard.height <= 0) {
+				return;
+			}else {
+				window.setTimeout(doAnimation, 1000);
+			}
+		}
+		*/
+
 		state.doClick = function(x, y){
 			state.topCard.doClick(x, y);
 		}
@@ -67,7 +84,7 @@ var main = function(ex) {
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
 			}
-			state.draw();
+			
 		}
 
 		return state;
@@ -153,7 +170,7 @@ var main = function(ex) {
 		card.draw = function(){
 			if (card.toDraw){
 				// get right color
-				var rgb = 240 - 25*card.depth;
+				var rgb = 240 - 25 * card.depth;
 				var rgbStr = rgb.toString();
 				ex.graphics.ctx.fillStyle = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 				// draw card
@@ -249,6 +266,7 @@ var main = function(ex) {
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
+							//state.animateCollapse();
 							state.returnToPrev();
 							state.draw();
 						}else {
@@ -451,5 +469,4 @@ var main = function(ex) {
 	var state = State();
 	state.init();
 	state.draw();
-
 };
