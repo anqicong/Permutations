@@ -39,6 +39,28 @@ var main = function(ex) {
      	}
 	}
 
+	//Take in a 2d list
+	function listToString(list) {
+		var result = "[";
+		for (var i = 0; i < list.length; i++) {
+			result += "[";
+			for (var j = 0; j < list[i].length; j++) {
+				if (j == list.length - 1) {
+					result += list[i][j].toString();
+				}else {
+					result += list[i][j].toString() + ", ";
+				}
+			}
+			result += "]";
+			if (i != list.length - 1) {
+				result += ", ";
+			}
+		}
+		result += "]";
+		return result;
+	}
+	
+
 	function range(start, stop, step){
 		var a=[], b=start;
 		while(b<stop){a.push(b);b+=step;}
@@ -146,6 +168,7 @@ var main = function(ex) {
 		card.y = card.depth*card.topMargin;
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
+		card.returnedFromRecursiveCall = false;
 
 		card.init = function(){
 			// create all the lines
@@ -314,7 +337,7 @@ var main = function(ex) {
 													"xsmall");
 					break;
 				case 5:
-					line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
+					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.getLineFromTopCard(6).doLineAction();
@@ -367,6 +390,13 @@ var main = function(ex) {
 			}
 			else if (line.lineNum == 5 && line.showRangeTextBox){
 				return "      for i in ";
+			}
+			else if (line.lineNum == 4 && state.topCard != undefined && 
+				     state.topCard.returnedFromRecursiveCall) {
+				var newText = "    for subPerm in ";
+				var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
+				newText += listToString(permutations(list));
+				return newText;
 			}
 			else if (line.lineNum == 0){
 				var newText = "permutations([";
