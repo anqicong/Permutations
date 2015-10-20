@@ -6,7 +6,6 @@
 // Bugs (in rough order of priority)
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
-// - Code highlighting slightly off on different computers? Try now?
 // - Adjust text to fit high resolution displays
 
 // Resolved
@@ -15,6 +14,7 @@
 // - Base case return button shows up a line too early for cards 1 and 2
 // - On card of depth 2, line 0 code highlight isn't wide enough
 // - Base case 0th line missing a colon
+// - Code highlighting slightly off on different computers? Try now?
 
 var main = function(ex) {
 
@@ -315,9 +315,15 @@ var main = function(ex) {
 					break;
 				case 5:
 					line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
-					line.rangeDoneButton = Button(400, 170, "Done", 5, 
-												  function() {console.log(line.checkTextAnswer(line.rangeTextBox.getText()))}, 
-												  "xsmall");
+					line.rangeDoneButtonAction = function(){
+						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
+							state.getLineFromTopCard(6).doLineAction();
+						} 
+						else{ // incorrect
+							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
+						}
+					};
+					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall");
 				default:
 					break;
 			}
@@ -426,7 +432,8 @@ var main = function(ex) {
 					state.topCard.curLineNum = 5;
 					break;
 				case 6: // allPerms
-					//state.getLineFromTopCard(5).rangeDoneButton.deactivate();
+					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
+					state.getLineFromTopCard(5).rangeTextBox.deactivate();
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
