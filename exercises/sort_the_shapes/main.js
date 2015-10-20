@@ -62,10 +62,12 @@ var main = function(ex) {
 
 		//Return to the previous card
 		state.returnToPrev = function() {
-			if (state.topCard.depth == 0) {
-				return;
+			if (state.topCard.depth == ex.data.content.list.length) {
+				state.topCard.prepareForReturn();
+				state.topCard = state.cardsList[state.topCard.depth - 1];
+				state.topCard.prepareForEnter();
 			}
-
+			state.draw();
 		}
 
 		return state;
@@ -209,6 +211,19 @@ var main = function(ex) {
 			}
 		}
 
+		//Prepare to be reactivated from return
+		card.prepareForEnter = function() {
+			card.setToDraw(true);
+			card.curLineNum = 4;
+		}
+
+		//Prepare to be popped off the stack
+		card.prepareForReturn = function() {
+			card.setToDraw(false);
+			card.linesList[1].deactivateReturnButton();
+			card.unhighlightAll();
+		}
+
 		return card;
 	}
 
@@ -235,6 +250,7 @@ var main = function(ex) {
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
 							state.returnToPrev();
+							state.draw();
 						}else {
 							ex.showFeedback(baseReturnButtonMessage);
 						}
@@ -294,7 +310,7 @@ var main = function(ex) {
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
-			ex.graphics.ctx.font = "15px Courier New";
+			ex.graphics.ctx.font = "15px Courier";
 			ex.graphics.ctx.fillText(line.getText(), line.x, line.y + state.topCard.lineHeight);
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
@@ -343,7 +359,7 @@ var main = function(ex) {
 			return false;
 		};
 
-		line.doClick = function(x, y){
+		line.doClick = function(){
 			if (line.checkClick(x, y) && line.clickIsLegal()) {
 				line.doLineAction();
 			}
@@ -359,8 +375,10 @@ var main = function(ex) {
 					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
 						//return state.getLineFromTopCard(2).checkClick(x, y);
 						return line.lineNum == 2;
+					}else {
+						ex.showFeedback("We are in base case: list length is now 0.");
 					}
-					sbreak;
+					break;
 				case 2: // else
 					//return state.getLineFromTopCard(3).checkClick(x, y);
 					return line.lineNum == 3;
@@ -369,6 +387,8 @@ var main = function(ex) {
 					//return state.getLineFromTopCard(4).checkClick(x, y);
 					return line.lineNum == 4;
 					break;
+				case 4:
+					return line.lineNum == 5;
 				default:
 					return false;
 					break;
@@ -415,6 +435,7 @@ var main = function(ex) {
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY) && line.clickIsLegal()) {
+				line.doClick();
 				isLegal = true;
 				break;
 			}
@@ -422,7 +443,7 @@ var main = function(ex) {
 		if (!isLegal) {
 			return;
 		}
-		state.doClick(event.offsetX, event.offsetY);
+		//state.doClick(event.offsetX, event.offsetY);
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
