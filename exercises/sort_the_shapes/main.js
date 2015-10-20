@@ -6,14 +6,14 @@
 // Bugs (in rough order of priority)
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
-// - Code highlighting slightly off on different computers
-// - Base case 0th line missing a colon
+// - Code highlighting slightly off on different computers? Try now?
 
 // Resolved
 // - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
 // - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
 // - Base case return button shows up a line too early for cards 1 and 2
 // - On card of depth 2, line 0 code highlight isn't wide enough
+// - Base case 0th line missing a colon
 
 var main = function(ex) {
 
@@ -309,7 +309,8 @@ var main = function(ex) {
 			if (line.highlighted) {
 				return;
 			}
-			line.highlightImage = ex.createImage(line.x, line.y, img, {
+			var fill = 5;
+			line.highlightImage = ex.createImage(line.x, line.y + fill, img, {
 				width: highlightWidth,
 				height: state.topCard.lineHeight
 			});
@@ -340,11 +341,13 @@ var main = function(ex) {
 			else if (line.lineNum == 0){
 				var newText = "permutations([";
 				for (var numIndex = line.depth; numIndex < ex.data.content.list.length; numIndex++){
-					newText += ex.data.content.list[numIndex].toString() + ", ";
+					if (numIndex == ex.data.content.list.length - 1) {
+						newText += ex.data.content.list[numIndex].toString();
+					}else {
+						newText += ex.data.content.list[numIndex].toString() + ", ";
+					}
 				}
-				newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
 				newText += "]):";
-                if (line.depth == ex.data.content.list.length) newText = "permutations([])";
 				return newText;
 			}
 			return ex.data.content.code[line.lineNum];
