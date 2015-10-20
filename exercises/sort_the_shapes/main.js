@@ -136,7 +136,6 @@ var main = function(ex) {
 					newText += "]):";
                     if (card.depth == ex.data.content.list.length) newText = "permutations([])";
 					card.linesList[i].setText(newText);
-					console.log(newText);
 				}
 			}
 		};
@@ -229,6 +228,7 @@ var main = function(ex) {
 
 		//Prepare to be reactivated from return
 		card.prepareForEnter = function() {
+			console.log("here");
 			card.setToDraw(true);
 			card.curLineNum = 4;
 		}
@@ -272,6 +272,9 @@ var main = function(ex) {
 						}else {
 							ex.showFeedback(baseReturnButtonMessage);
 						}
+						console.log("Depth & curLineNum from base return button:");
+						console.log(state.topCard.depth);
+						console.log(state.topCard.curLineNum);
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
@@ -282,6 +285,7 @@ var main = function(ex) {
 					break;
 			}
 			line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
+			line.rangeDoneButton = Button(400, 170, "Done", 5, function() {console.log("we're here")}, "xsmall");
 		};
 
 		line.highlight = function(){
@@ -339,6 +343,7 @@ var main = function(ex) {
 			}
 			if (line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
 				line.rangeTextBox.activate();
+				line.rangeDoneButton.activate();
 			}
 		};
 
@@ -503,7 +508,9 @@ var main = function(ex) {
 		if (!isLegal) {
 			return;
 		}
-		//state.doClick(event.offsetX, event.offsetY);
+		console.log("Depth and curLineNum from mouseClicked");
+		console.log(state.topCard.depth);
+		console.log(state.topCard.curLineNum);
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
