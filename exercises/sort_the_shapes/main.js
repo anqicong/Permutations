@@ -351,12 +351,10 @@ var main = function(ex) {
 		}
 
 		line.setText = function(newText){
-			console.log("setText: " + newText);
 			line.text = newText;
 		}
 
 		line.revertText = function(){
-			console.log("revertText: " + ex.data.content.code[line.lineNum]);
 			line.text = ex.data.content.code[line.lineNum];
 		}
 
@@ -395,8 +393,10 @@ var main = function(ex) {
 					state.topCard.unhighlightAll();
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
+					break;
 				case 5: // for i
 					line.showRangeTextBox = true;
+					state.topCard.curLineNum = 5;
 					break;
 				case 6: // allPerms
 					//state.getLineFromTopCard(5).rangeDoneButton.deactivate();
