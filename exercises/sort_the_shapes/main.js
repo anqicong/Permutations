@@ -5,7 +5,9 @@
 
 // Bugs (in rough order of priority)
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
+// - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Code highlighting slightly off on different computers
+// - Base case 0th line missing a colon
 
 // Resolved
 // - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
@@ -230,6 +232,7 @@ var main = function(ex) {
 		card.prepareForEnter = function() {
 			card.setToDraw(true);
 			card.curLineNum = 4;
+			card.returnedFromRecursiveCall = true;
 		}
 
 		//Prepare to be popped off the stack
@@ -253,6 +256,11 @@ var main = function(ex) {
 		line.showBaseReturnButton = false;
 		line.showRangeTextBox = false;
 		line.highlighted = false;
+		line.returnedFromRecursiveCall = false;
+
+		line.baseReturnButton = undefined;
+		line.rangeTextBox = undefined;
+		line.rangeDoneButton = undefined;
 
 		line.init = function(){
 			// get text
@@ -281,13 +289,14 @@ var main = function(ex) {
 													baseReturn, 
 													"xsmall");
 					break;
+				case 5:
+					line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
+					line.rangeDoneButton = Button(400, 170, "Done", 5, 
+												  function() {console.log("we're here")}, 
+												  "xsmall");
 				default:
 					break;
 			}
-			line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
-			line.rangeDoneButton = Button(400, 170, "Done", 5, 
-										  function() {console.log("we're here")}, 
-										  "xsmall");
 		};
 
 		line.highlight = function(){
@@ -360,7 +369,7 @@ var main = function(ex) {
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
-			if (line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
+			if (line.rangeTextBox != undefined && line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
 				line.rangeTextBox.activate();
 				line.rangeDoneButton.activate();
 			}
@@ -388,6 +397,9 @@ var main = function(ex) {
 					state.topCard.setToDraw(true);
 				case 5: // for i
 					line.showRangeTextBox = true;
+					break;
+				case 6: // allPerms
+					//state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
@@ -418,23 +430,19 @@ var main = function(ex) {
 		line.clickIsLegal = function(){
 			switch (state.getCurLineNum()){
 				case 0: // def line
-					//return state.getLineFromTopCard(1).checkClick(x, y);
 					return line.lineNum == 1;
 					break;
 				case 1: // if 
 					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
-						//return state.getLineFromTopCard(2).checkClick(x, y);
 						return line.lineNum == 2;
 					}else {
 						ex.showFeedback("That's incorrect. We are now in the base case. The list length is 0.");
 					}
 					break;
 				case 2: // else
-					//return state.getLineFromTopCard(3).checkClick(x, y);
 					return line.lineNum == 3;
 					break;
 				case 3: // allPerms
-					//return state.getLineFromTopCard(4).checkClick(x, y);
 					return line.lineNum == 4;
 					break;
 				case 4: // for subperm
