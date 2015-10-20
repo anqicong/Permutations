@@ -105,7 +105,7 @@ var main = function(ex) {
 	    card.maxWidth = ex.width()-card.leftMargin;
 	    card.tabWidth = 220;
 	    card.tabHeight = 20;
-	    card.lineHeight = 15;
+	    card.lineHeight = 18;
 	    card.x = card.depth*card.leftMargin;
 		card.y = card.depth*card.topMargin;
 		card.width = card.maxWidth - card.x;
@@ -114,13 +114,12 @@ var main = function(ex) {
 		card.init = function(){
 			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
-				var depthOffsetX = card.depth*15;
-				var depthOffsetY = card.depth*60;
+				var depthOffsetX = card.depth*16;
+				var depthOffsetY = card.depth*73;
 				if (i == 0){ // extra offset for first line
 					depthOffsetX += card.depth*155;
-					if (card.depth == 2) depthOffsetX -= 140;
+					if (card.depth == 2) depthOffsetX -= 150;
 				}
-				console.log(20 + depthOffsetX);
 				card.linesList.push(Line(20 + depthOffsetX, 
 										 i * card.lineHeight + depthOffsetY, i));
 			}
@@ -134,10 +133,10 @@ var main = function(ex) {
 						newText += ex.data.content.list[numIndex].toString() + ", ";
 					}
 					newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
-					console.log(newText);
 					newText += "]):";
                     if (card.depth == ex.data.content.list.length) newText = "permutations([])";
 					card.linesList[i].setText(newText);
+					console.log(newText);
 				}
 			}
 		};
@@ -155,13 +154,13 @@ var main = function(ex) {
 					break;
 				case 1:
 					var x = card.x + card.leftMargin*11 + 4;
-					var y = card.y + card.lineHeight*2;
+					var y = card.y + card.lineHeight*2 + 10;
 					card.tabWidth -= 30;
 					break;
 				case 2:
 				    var x = card.x + card.leftMargin*12 - 7;
-				    var y = card.y + card.lineHeight*4;
-				    card.tabWidth -= 50;
+				    var y = card.y + card.lineHeight*4 + 16;
+				    card.tabWidth -= 30;
 
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
@@ -175,7 +174,7 @@ var main = function(ex) {
 				ex.graphics.ctx.fillStyle = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 				// draw card
 				if (card.depth > 0){
-					var adjustForDepth = card.lineHeight*2*card.depth;
+					var adjustForDepth = (card.lineHeight+4)*2*card.depth;
 				}
 				else{
 					var adjustForDepth = 0;
@@ -252,17 +251,18 @@ var main = function(ex) {
 		line.text = "";
 		line.highlightImage = undefined;
 		line.showBaseReturnButton = false;
+		line.showRangeTextBox = false;
 		line.highlighted = false;
 
 		line.init = function(){
 			// get text
 			line.text = line.getText();
-			// create buttons
+			// create buttons and text areas 
 			switch (line.lineNum){
 				case 1: 
 					// make the button
-					var baseReturnButtonX = line.x + 200;
-					var baseReturnButtonY = line.y;
+					var baseReturnButtonX = line.x + 180;
+					var baseReturnButtonY = line.y + 5;
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
@@ -281,6 +281,7 @@ var main = function(ex) {
 				default:
 					break;
 			}
+			line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
 		};
 
 		line.highlight = function(){
@@ -311,7 +312,10 @@ var main = function(ex) {
 
 		line.getText = function(){
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
-				return "  if (len(a) == 0): "
+				return "  if (len(a) == 0): ";
+			}
+			else if (line.lineNum == 5 && line.showRangeTextBox){
+				return "      for i in ";
 			}
 			return ex.data.content.code[line.lineNum];
 		}
@@ -333,6 +337,9 @@ var main = function(ex) {
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
+			if (line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
+				line.rangeTextBox.activate();
+			}
 		};
 
 		line.doLineAction = function(){
@@ -343,13 +350,13 @@ var main = function(ex) {
 					// activate the base case return button
 					line.showBaseReturnButton = true;
 					break;
-				case 2:
-					// deactivate the if statement's return button and rever the text
+				case 2: // else
+					// deactivate the if statement's return button and revert the text
 					state.getLineFromTopCard(1).deactivateReturnButton();
 					// next line
 					state.topCard.getAndSetNextLine();
 					break;
-				case 4:
+				case 4: // for subPerm
 					var depthToActivate = state.topCard.depth + 1;
 					// deactivate and undraw the current top card, activate new card
 					state.topCard.setToDraw(false);
@@ -357,6 +364,9 @@ var main = function(ex) {
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
 					state.getLineFromTopCard(1).showBaseReturnButton = true;
+				case 5: // for i
+					line.showRangeTextBox = true;
+					break;
 				default: 
 					state.topCard.getAndSetNextLine();
 					break;
@@ -394,7 +404,7 @@ var main = function(ex) {
 						//return state.getLineFromTopCard(2).checkClick(x, y);
 						return line.lineNum == 2;
 					}else {
-						ex.showFeedback("We are in base case: list length is now 0.");
+						ex.showFeedback("That's incorrect. We are now in the base case. The list length is 0.");
 					}
 					break;
 				case 2: // else
@@ -405,8 +415,9 @@ var main = function(ex) {
 					//return state.getLineFromTopCard(4).checkClick(x, y);
 					return line.lineNum == 4;
 					break;
-				case 4:
+				case 4: // for subperm
 					return line.lineNum == 5;
+					break;
 				default:
 					return false;
 					break;
@@ -445,6 +456,37 @@ var main = function(ex) {
 			}
 		}
 			return button;
+	}
+
+	function TextBox(x, y, text, rows, cols){
+		textBox = {};
+		textBox.x = x;
+		textBox.y = y;
+		textBox.text = text;
+		textBox.rows = rows;
+		textBox.cols = cols;
+
+		textBox.myTextBox = undefined;
+
+		textBox.activate = function(){
+			textBox.myTextBox = ex.createTextArea(textBox.x, textBox.y, textBox.text,
+				{resize: false, size: "small", rows: textBox.rows, cols : textBox.cols});
+		};
+
+		textBox.deactivate = function(){
+			if (textBox.myTextBox != undefined){
+				textBox.myTextBox.remove();
+				textBox.myTextBox = undefined;
+			}
+		};
+
+		textBox.getText = function(){
+			if (textBox.myTextBox != undefined){
+				return textBox.myTextBox.text();
+			}
+		};
+
+		return textBox;
 	}
 
 	function mouseClicked(event){
