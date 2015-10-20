@@ -110,17 +110,17 @@ var main = function(ex) {
 		//BETA_HELPER
 		state.animateCollapseHelper = function() {
 			var doAnimation = function() {
-				state.topCard.height -= 12;
+				state.topCard.height -= 10;
 				ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 				state.draw();
 			}
-			window.setTimeout(doAnimation, 10);
+			window.setTimeout(doAnimation, 15);
 			if (state.topCard.height <= 0) {
 				state.returnToPrev();
 				state.draw();
 				return;
 			}else {
-				window.setTimeout(state.animateCollapseHelper, 10);
+				window.setTimeout(state.animateCollapseHelper, 15);
 			}
 		}
 
