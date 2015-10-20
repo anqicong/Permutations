@@ -8,6 +8,11 @@
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
 
+// Todos
+// - Represent the current subPerm
+// - show allPerms
+// - button that can pop up instruction on filling in texts
+
 // Resolved
 // - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
 // - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
@@ -102,22 +107,34 @@ var main = function(ex) {
 			}
 		};
 
-		/* TO BE IMPLEMENTED
-		state.animateCollapse = function() {
+		//BETA_HELPER
+		state.animateCollapseHelper = function() {
 			var doAnimation = function() {
-				state.topCard.height -= 10;
+				state.topCard.height -= 12;
 				ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 				state.draw();
-				alert(state.topCard.height);
 			}
-			window.setTimeout(doAnimation, 1000);
+			window.setTimeout(doAnimation, 10);
 			if (state.topCard.height <= 0) {
+				state.returnToPrev();
+				state.draw();
 				return;
 			}else {
-				window.setTimeout(doAnimation, 1000);
+				window.setTimeout(state.animateCollapseHelper, 10);
 			}
 		}
-		*/
+
+		//BETA
+		state.animateCollapse = function() {
+			for (var i = 0; i < state.topCard.depth; i++) {
+				state.cardsList[i].setToDraw(true);
+			}
+			if (state.getLineFromTopCard(1).baseReturnButton != undefined) {
+				state.getLineFromTopCard(1).deactivateReturnButton();
+			}
+			state.animateCollapseHelper();
+		}
+		
 
 		state.doClick = function(x, y){
 			state.topCard.doClick(x, y);
@@ -161,6 +178,7 @@ var main = function(ex) {
 	    card.topMargin = 30;
 	    card.maxHeight = ex.height()-card.topMargin;
 	    card.maxWidth = ex.width()-card.leftMargin;
+	    card.originalTabWidth = 220;
 	    card.tabWidth = 220;
 	    card.tabHeight = 20;
 	    card.lineHeight = 18;
@@ -203,13 +221,12 @@ var main = function(ex) {
 				case 1:
 					var x = card.x + card.leftMargin*11 + 4;
 					var y = card.y + card.lineHeight*2 + 10;
-					card.tabWidth -= 30;
+					card.tabWidth = card.originalTabWidth - 30
 					break;
 				case 2:
 				    var x = card.x + card.leftMargin*12 - 7;
 				    var y = card.y + card.lineHeight*4 + 16;
-				    card.tabWidth -= 30;
-
+				    card.tabWidth = card.originalTabWidth - 30;
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
 		};
@@ -321,9 +338,9 @@ var main = function(ex) {
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
-							//state.animateCollapse();
-							state.returnToPrev();
-							state.draw();
+							state.animateCollapse();
+							//state.returnToPrev();
+							//state.draw();
 						}else {
 							ex.showFeedback(baseReturnButtonMessage);
 						}
