@@ -17,9 +17,32 @@
 
 var main = function(ex) {
 
-	/**********************************************************************
-	 * Server functions
-	**********************************************************************/
+    function permutations(list) {
+        if (list.length == 0) {
+            return [[]];
+        }
+        else {
+            var allPerms = [];
+        	var restPerms = permutations(list.slice(1, list.length));
+
+        	for (var j = 0;j < restPerms.length;j++ ) {
+            	var subPerm = restPerms[j];
+            	for (var i = 0; i < subPerm.length +1; i++) {
+                	var thisPerm = subPerm.slice(0, i);
+                	thisPerm = thisPerm.concat(list[0]);
+                	thisPerm = thisPerm.concat(subPerm.slice(i, subPerm.length));
+                	allPerms.push(thisPerm);
+            	}
+        	}
+        	return allPerms;
+     	}
+	}
+
+	function range(start, stop, step){
+		var a=[], b=start;
+		while(b<stop){a.push(b);b+=step;}
+		return a;
+	};
 
 	//generateContent is a server function that randomly generates 2 
 	//starting numbers and the corresponding print statement
@@ -292,7 +315,7 @@ var main = function(ex) {
 				case 5:
 					line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
 					line.rangeDoneButton = Button(400, 170, "Done", 5, 
-												  function() {console.log("we're here")}, 
+												  function() {console.log(line.checkTextAnswer(line.rangeTextBox.getText()))}, 
 												  "xsmall");
 				default:
 					break;
@@ -452,6 +475,19 @@ var main = function(ex) {
 					return false;
 					break;
 			}
+		};
+
+		line.checkTextAnswer = function(answer){
+			if (line.lineNum == 5){ // for i in range
+				var correct = range(0, ex.data.content.list.length - line.depth, 1);
+				var correctStr = "[" + correct.join() + "]";
+				var answer = answer.replace(/ /g, "").replace(/:/g, ""); // replace all space and : with empty str
+				return answer == correctStr;
+			}
+			else if (line.lineNum == 6){ // allPerms += 
+				return true;
+			}
+			return false;
 		};
 
 		return line;
