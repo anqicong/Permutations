@@ -7,6 +7,7 @@
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Code highlighting slightly off on different computers? Try now?
+// - Adjust text to fit high resolution displays
 
 // Resolved
 // - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
