@@ -3,6 +3,14 @@
  * @author Anqi Cong, Luyao Hou, Emma Zhong
  */
 
+// Bugs (in rough order of priority)
+// - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
+// - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
+// - Base case return button shows up a line too early for cards 1 and 2
+// - On card of depth 2, line 0 code highlight isn't wide enough
+// - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
+// - Code highlighting slightly off on different computers
+
 var main = function(ex) {
 
 	/**********************************************************************
