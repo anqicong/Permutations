@@ -4,14 +4,14 @@
  */
 
 // Bugs (in rough order of priority)
-// - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
-// - Base case return button shows up a line too early for cards 1 and 2
-// - On card of depth 2, line 0 code highlight isn't wide enough
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Code highlighting slightly off on different computers
 
 // Resolved
 // - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
+// - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
+// - Base case return button shows up a line too early for cards 1 and 2
+// - On card of depth 2, line 0 code highlight isn't wide enough
 
 var main = function(ex) {
 
@@ -228,7 +228,6 @@ var main = function(ex) {
 
 		//Prepare to be reactivated from return
 		card.prepareForEnter = function() {
-			console.log("here");
 			card.setToDraw(true);
 			card.curLineNum = 4;
 		}
@@ -286,12 +285,18 @@ var main = function(ex) {
 					break;
 			}
 			line.rangeTextBox = TextBox(170, 168, "range(len(subPerm) + 1)", 1, 33);
-			line.rangeDoneButton = Button(400, 170, "Done", 5, function() {console.log("we're here")}, "xsmall");
+			line.rangeDoneButton = Button(400, 170, "Done", 5, 
+										  function() {console.log("we're here")}, 
+										  "xsmall");
 		};
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
 			var highlightWidth = line.text.length * 9;
+			// adjust for when the if statement is cut short by the base return button
+			if (line.lineNum == 1 && line.text == ex.data.content.code[1]){
+				highlightWidth = line.text.length * 5.5;
+			}
 			if (line.highlighted) {
 				return;
 			}
@@ -299,6 +304,7 @@ var main = function(ex) {
 				width: highlightWidth,
 				height: state.topCard.lineHeight
 			});
+			// activate or deactivate the base return button
 			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
 				line.deactivateReturnButton();
 				if (line.lineNum == 1) {
@@ -317,7 +323,7 @@ var main = function(ex) {
 
 		line.getText = function(){
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
-				return "  if (len(a) == 0): ";
+				return "  if (len(a) == 0):";
 			}
 			else if (line.lineNum == 5 && line.showRangeTextBox){
 				return "      for i in ";
@@ -336,10 +342,12 @@ var main = function(ex) {
 		}
 
 		line.setText = function(newText){
+			console.log("setText: " + newText);
 			line.text = newText;
 		}
 
 		line.revertText = function(){
+			console.log("revertText: " + ex.data.content.code[line.lineNum]);
 			line.text = ex.data.content.code[line.lineNum];
 		}
 
@@ -361,13 +369,12 @@ var main = function(ex) {
 		line.doLineAction = function(){
 			switch (line.lineNum){
 				case 1: // if
-					// change the text
 					state.topCard.getAndSetNextLine();
 					// activate the base case return button
 					line.showBaseReturnButton = true;
 					break;
 				case 2: // else
-					// deactivate the if statement's return button and revert the text
+					// deactivate the if statement's return button 
 					state.getLineFromTopCard(1).deactivateReturnButton();
 					// next line
 					state.topCard.getAndSetNextLine();
@@ -379,7 +386,6 @@ var main = function(ex) {
 					state.topCard.unhighlightAll();
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
-					state.getLineFromTopCard(1).showBaseReturnButton = true;
 				case 5: // for i
 					line.showRangeTextBox = true;
 					break;
