@@ -60,6 +60,14 @@ var main = function(ex) {
 			return state.cardsList[depth];
 		};
 
+		//Return to the previous card
+		state.returnToPrev = function() {
+			if (state.topCard.depth == 0) {
+				return;
+			}
+
+		}
+
 		return state;
 	}
 
@@ -165,7 +173,7 @@ var main = function(ex) {
 					// if we're on the top card, highlight
 					if (state.topCard.depth == card.depth){
 						// highlight the current line
-						if (thisLine.lineNum == card.curLineNum){
+						if (thisLine.lineNum == card.curLineNum && thisLine.highlightImage == undefined){
 							thisLine.highlight();
 						}
 					}
@@ -184,7 +192,7 @@ var main = function(ex) {
 		// increments curLineNum and then returns it
 		card.getAndSetNextLine = function(){
 			if (card.curLineNum < ex.data.content.code.length - 1){
-				card.curLineNum += 1;
+				card.curLineNum += 1
 			}
 			return card.curLineNum;
 		};
@@ -212,6 +220,7 @@ var main = function(ex) {
 		line.text = "";
 		line.highlightImage = undefined;
 		line.showBaseReturnButton = false;
+		line.highlighted = false;
 
 		line.init = function(){
 			// get text
@@ -220,12 +229,19 @@ var main = function(ex) {
 			switch (line.lineNum){
 				case 1: 
 					// make the button
-					var baseReturnButtonX = 200;
+					var baseReturnButtonX = line.x + 200;
 					var baseReturnButtonY = line.y;
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
+					var baseReturn = function() {
+						if (state.topCard.depth == ex.data.content.list.length) {
+							state.returnToPrev();
+						}else {
+							ex.showFeedback(baseReturnButtonMessage);
+						}
+					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
-													function() {ex.showFeedback(baseReturnButtonMessage)}, 
+													baseReturn, 
 													"xsmall");
 					break;
 				default:
@@ -236,19 +252,33 @@ var main = function(ex) {
 		line.highlight = function(){
 			var img = "img/codeColor.png";
 			var highlightWidth = line.text.length * 9;
+			if (line.highlighted) {
+				return;
+			}
 			line.highlightImage = ex.createImage(line.x, line.y, img, {
 				width: highlightWidth,
 				height: state.topCard.lineHeight
 			});
+			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
+				line.deactivateReturnButton();
+				if (line.lineNum == 1) {
+					line.baseReturnButton.activate();
+				}
+			}
 		};
 
 		line.unhighlight = function(){
 			if (line.highlightImage != undefined) {
 				line.highlightImage.remove();
+				line.highlightImage = undefined;
+				line.highlighted = false;
 			}
 		};
 
 		line.getText = function(){
+			if (line.lineNum == 1 && line.showBaseReturnButton) {
+				return "  if (len(a) == 0): "
+			}
 			return ex.data.content.code[line.lineNum];
 		}
 
@@ -265,8 +295,8 @@ var main = function(ex) {
 			var numberColor = "rgb(61, 163, 239)";
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier New";
-			ex.graphics.ctx.fillText(line.text, line.x, line.y + state.topCard.lineHeight);
-			if (line.showBaseReturnButton && line.baseReturnButton != undefined) {
+			ex.graphics.ctx.fillText(line.getText(), line.x, line.y + state.topCard.lineHeight);
+			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
 		};
@@ -275,7 +305,6 @@ var main = function(ex) {
 			switch (line.lineNum){
 				case 1: // if
 					// change the text
-					line.text = "  if (len(a) == 0): ";
 					state.topCard.getAndSetNextLine();
 					// activate the base case return button
 					line.showBaseReturnButton = true;
@@ -283,7 +312,6 @@ var main = function(ex) {
 				case 2:
 					// deactivate the if statement's return button and rever the text
 					state.getLineFromTopCard(1).deactivateReturnButton();
-					state.getLineFromTopCard(1).revertText();
 					// next line
 					state.topCard.getAndSetNextLine();
 					break;
@@ -316,26 +344,30 @@ var main = function(ex) {
 		};
 
 		line.doClick = function(x, y){
-			if (line.checkClick(x, y) && line.clickIsLegal(x, y)) {
+			if (line.checkClick(x, y) && line.clickIsLegal()) {
 				line.doLineAction();
 			}
 		}
 
-		line.clickIsLegal = function(x, y){
+		line.clickIsLegal = function(){
 			switch (state.getCurLineNum()){
 				case 0: // def line
-					return state.getLineFromTopCard(1).checkClick(x, y);
+					//return state.getLineFromTopCard(1).checkClick(x, y);
+					return line.lineNum == 1;
 					break;
 				case 1: // if 
 					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
-						return state.getLineFromTopCard(2).checkClick(x, y);
+						//return state.getLineFromTopCard(2).checkClick(x, y);
+						return line.lineNum == 2;
 					}
-					break;
+					sbreak;
 				case 2: // else
-					return state.getLineFromTopCard(3).checkClick(x, y);
+					//return state.getLineFromTopCard(3).checkClick(x, y);
+					return line.lineNum == 3;
 					break;
 				case 3: // allPerms
-					return state.getLineFromTopCard(4).checkClick(x, y);
+					//return state.getLineFromTopCard(4).checkClick(x, y);
+					return line.lineNum == 4;
 					break;
 				default:
 					return false;
@@ -369,13 +401,27 @@ var main = function(ex) {
 		};
 
 		button.deactivate = function(){
-			if (button.myButton != undefined) button.myButton.remove();
+			if (button.myButton != undefined) {
+				button.myButton.remove();
+				button.myButton = undefined;
+			}
 		}
-
-		return button;
+			return button;
 	}
 
 	function mouseClicked(event){
+		//Check click legal before drawing
+		var isLegal = false;
+		for (var i = 0; i < state.topCard.linesList.length; i++) {
+			var line = state.topCard.linesList[i];
+			if (line.checkClick(event.offsetX, event.offsetY) && line.clickIsLegal()) {
+				isLegal = true;
+				break;
+			}
+		}
+		if (!isLegal) {
+			return;
+		}
 		state.doClick(event.offsetX, event.offsetY);
 		state.draw();
 	}
