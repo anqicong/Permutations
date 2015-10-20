@@ -4,12 +4,14 @@
  */
 
 // Bugs (in rough order of priority)
-// - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
 // - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
 // - Base case return button shows up a line too early for cards 1 and 2
 // - On card of depth 2, line 0 code highlight isn't wide enough
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Code highlighting slightly off on different computers
+
+// Resolved
+// - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
 
 var main = function(ex) {
 
@@ -129,22 +131,12 @@ var main = function(ex) {
 					if (card.depth == 2) depthOffsetX -= 150;
 				}
 				card.linesList.push(Line(20 + depthOffsetX, 
-										 i * card.lineHeight + depthOffsetY, i));
+										 i * card.lineHeight + depthOffsetY, 
+										 i, card.depth));
 			}
 			// init all the lines
 			for (var i = 0; i < card.linesList.length; i++){
 				card.linesList[i].init();
-				// create the text for the first line
-				if (i == 0){
-					var newText = "permutations([";
-					for (var numIndex = card.depth; numIndex < ex.data.content.list.length; numIndex++){
-						newText += ex.data.content.list[numIndex].toString() + ", ";
-					}
-					newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
-					newText += "]):";
-                    if (card.depth == ex.data.content.list.length) newText = "permutations([])";
-					card.linesList[i].setText(newText);
-				}
 			}
 		};
 
@@ -251,11 +243,12 @@ var main = function(ex) {
 		return card;
 	}
 
-	function Line(x, y, lineNum){
+	function Line(x, y, lineNum, depth){
 		var line = {};
 		line.x = x;
 		line.y = y;
 		line.lineNum = lineNum;
+		line.depth = depth;
 		line.text = "";
 		line.highlightImage = undefined;
 		line.showBaseReturnButton = false;
@@ -328,6 +321,16 @@ var main = function(ex) {
 			}
 			else if (line.lineNum == 5 && line.showRangeTextBox){
 				return "      for i in ";
+			}
+			else if (line.lineNum == 0){
+				var newText = "permutations([";
+				for (var numIndex = line.depth; numIndex < ex.data.content.list.length; numIndex++){
+					newText += ex.data.content.list[numIndex].toString() + ", ";
+				}
+				newText = newText.slice(0, newText.length - 2); // get rid of trailing comma
+				newText += "]):";
+                if (line.depth == ex.data.content.list.length) newText = "permutations([])";
+				return newText;
 			}
 			return ex.data.content.code[line.lineNum];
 		}
