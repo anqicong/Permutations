@@ -5,6 +5,8 @@
 
 // Bugs (in rough order of priority)
 // - allPerms line needs to shorten when the text box is over it, and so does the highlight
+// 		- relatedly, return allPerms line needs to go away 
+//		- basically, card.refreshText isn't working (or isn't being called in the right place)
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
@@ -310,6 +312,12 @@ var main = function(ex) {
 			card.unhighlightAll();
 		}
 
+		card.refreshText = function(){
+			for (var i = 0; i < card.linesList.length; i++){
+				card.linesList[i].getText();
+			}
+		}
+
 		return card;
 	}
 
@@ -334,6 +342,7 @@ var main = function(ex) {
 		line.rangeDoneButton = undefined;
 		line.allPermsTextBox = undefined;
 		line.allPermsDoneButton = undefined;
+		line.returnAllPermsButton = undefined;
 
 		line.init = function(){
 			// get text
@@ -354,6 +363,11 @@ var main = function(ex) {
 				console.log("allPermsDoneButtonAction");
 			}
 			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
+			// and a button for return allPerms
+			line.returnAllPermsButtonAction = function(){
+				console.log("returnAllPermsButtonAction");
+			}
+			line.returnAllPermsButton = Button(74, 204, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
 			switch (line.lineNum){
 				case 1: 
@@ -443,6 +457,12 @@ var main = function(ex) {
 				newText += "]):";
 				return newText;
 			}
+			else if (state.topCard.curLineNum >= 6 && line.lineNum == 7){
+				return "";
+			}
+			else if (state.topCard.curLineNum >= 6 && line.lineNum == 6){
+				return "allPerms += ";
+			}
 			return ex.data.content.code[line.lineNum];
 		}
 
@@ -499,15 +519,18 @@ var main = function(ex) {
 					state.topCard.returnedFromRangeTextBox = true;
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
-					// create another text area and button
-					line.showAllPermsTextBox = true; 
-					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
-															{size: "small", resize: false, rows: 1, cols: 40});
-					line.allPermsDoneButton.activate();
 					// change curLineNum to 6
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
 					state.getLineFromTopCard(6).highlight();
+					// create another text area and button
+					line.showAllPermsTextBox = true; 
+					state.topCard.refreshText();
+					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
+															{size: "small", resize: false, rows: 1, cols: 40});
+					line.allPermsDoneButton.activate();
+					// activate the return allPerms button as well
+					line.returnAllPermsButton.activate();
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
@@ -634,7 +657,6 @@ var main = function(ex) {
 		textBox.activate = function(){
 			textBox.myTextBox = ex.createTextArea(textBox.x, textBox.y, textBox.text,
 				{resize: false, size: "small", rows: textBox.rows, cols : textBox.cols});
-			console.log(textBox.myTextBox);
 		};
 
 		textBox.deactivate = function(){
