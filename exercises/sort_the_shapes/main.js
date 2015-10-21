@@ -187,6 +187,7 @@ var main = function(ex) {
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
 		card.returnedFromRecursiveCall = false;
+		card.returnedFromRangeTextBox = false;
 
 		card.init = function(){
 			// create all the lines
@@ -316,15 +317,20 @@ var main = function(ex) {
 		line.lineNum = lineNum;
 		line.depth = depth;
 		line.text = "";
+
 		line.highlightImage = undefined;
-		line.showBaseReturnButton = false;
-		line.showRangeTextBox = false;
 		line.highlighted = false;
 		line.returnedFromRecursiveCall = false;
+
+		line.showBaseReturnButton = false;
+		line.showRangeTextBox = false;
+		line.showAllPermsTextBox = false;
 
 		line.baseReturnButton = undefined;
 		line.rangeTextBox = undefined;
 		line.rangeDoneButton = undefined;
+		line.allPermsTextBox = undefined;
+		line.allPermsDoneButton = undefined;
 
 		line.init = function(){
 			// get text
@@ -357,6 +363,7 @@ var main = function(ex) {
 					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
+							state.topCard.returnedFromRangeTextBox = true;
 							state.getLineFromTopCard(6).doLineAction();
 						} 
 						else{ // incorrect
@@ -364,6 +371,12 @@ var main = function(ex) {
 						}
 					};
 					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+				case 6:
+					/*line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
+					line.allPermsDoneButtonAction = function(){
+						console.log("we're here!");
+					}
+					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);*/
 				default:
 					break;
 			}
@@ -402,11 +415,16 @@ var main = function(ex) {
 		};
 
 		line.getText = function(){
+			if (state.topCard != undefined && line.lineNum == 5) console.log(state.topCard.returnedFromRangeTextBox);
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
 				return "  if (len(a) == 0):";
 			}
 			else if (line.lineNum == 5 && line.showRangeTextBox){
 				return "      for i in ";
+			}
+			else if (line.lineNum == 5 && state.topCard != undefined && state.topCard.returnedFromRangeTextBox){
+				console.log("double");
+				return "      for i in " + "hey";
 			}
 			else if (line.lineNum == 4 && state.topCard != undefined && 
 				     state.topCard.returnedFromRecursiveCall) {
@@ -447,9 +465,13 @@ var main = function(ex) {
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
-			if (line.rangeTextBox != undefined && line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
+			else if (line.rangeTextBox != undefined && line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
 				line.rangeTextBox.activate();
 				line.rangeDoneButton.activate();
+			}
+			else if (line.allPermsTextBox != undefined && line.showAllPermsTextBox && line.allPermsTextBox.myTextBox == undefined){
+				line.allPermsTextBox.activate();
+				line.allPermsDoneButton.activate();
 			}
 		};
 
@@ -479,8 +501,18 @@ var main = function(ex) {
 					state.topCard.curLineNum = 5;
 					break;
 				case 6: // allPerms
+					// change curLineNum to 6
+					state.topCard.unhighlightAll();
+					state.topCard.curLineNum = 6;
+					state.getLineFromTopCard(6).highlight();
+					// change text to previous text box's answer
+					var correct = range(0, ex.data.content.list.length - line.depth, 1);
+					var correctStr = "[" + correct.join() + "]";
+					state.getLineFromTopCard(5).getText();
+					// deactivate previous button
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
+					state.topCard.showRangeTextBox = false;
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
