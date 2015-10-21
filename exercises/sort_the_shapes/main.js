@@ -4,6 +4,8 @@
  */
 
 // Bugs (in rough order of priority)
+// - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented?
+// - IMPORTANT: can't get the text to update in line 5 after clicking done on the range button
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
