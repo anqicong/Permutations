@@ -373,12 +373,13 @@ var main = function(ex) {
 						}
 					};
 					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+					break;
 				case 6:
-					/*line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
+					line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
 					line.allPermsDoneButtonAction = function(){
 						console.log("we're here!");
 					}
-					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);*/
+					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 				default:
 					break;
 			}
@@ -514,7 +515,7 @@ var main = function(ex) {
 					// deactivate previous button
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
-					state.topCard.showRangeTextBox = false;
+					state.getLineFromTopCard(5).showRangeTextBox = false;
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
