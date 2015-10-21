@@ -351,7 +351,7 @@ var main = function(ex) {
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
 													baseReturn, 
-													"xsmall");
+													"xsmall", undefined);
 					break;
 				case 5:
 					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
@@ -363,7 +363,7 @@ var main = function(ex) {
 							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
 						}
 					};
-					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall");
+					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 				default:
 					break;
 			}
@@ -551,7 +551,7 @@ var main = function(ex) {
 		return line;
 	}
 
-	function Button(x, y, text, lineNum, action, size){
+	function Button(x, y, text, lineNum, action, size, keybinding){
 		var button = {};
 		button.x = x;
 		button.y = y;
@@ -559,17 +559,29 @@ var main = function(ex) {
 		button.lineNum = lineNum;
 		button.action = action;
 		button.size = size;
+		button.keybinding = keybinding;
 
 		button.myButton = undefined;
 
 		button.activate = function(){
 			//@TODO create options
-			button.myButton = ex.createButton(button.x, button.y, text, 
-													 {
-													 	size:button.size,
-													  	color: "lightBlue",
-													  	height:14,
-													 });
+			if (keybinding == undefined){
+				button.myButton = ex.createButton(button.x, button.y, text, 
+														 {
+														 	size:button.size,
+														  	color: "lightBlue",
+														  	height:14,
+														 });
+			}
+			else{
+				button.myButton = ex.createButton(button.x, button.y, text, 
+														 {
+														 	size:button.size,
+														  	color: "lightBlue",
+														  	keybinding: keybinding,
+														  	height:14,
+														 });
+			}
 			button.myButton.on("click", button.action);
 		};
 
