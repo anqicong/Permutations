@@ -5,7 +5,6 @@
 
 // Bugs (in rough order of priority)
 // - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented?
-// - IMPORTANT: can't get the text to update in line 5 after clicking done on the range button
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
@@ -22,6 +21,7 @@
 // - On card of depth 2, line 0 code highlight isn't wide enough
 // - Base case 0th line missing a colon
 // - Code highlighting slightly off on different computers? Try now?
+// - can't get the text to update in line 5 after clicking done on the range button
 
 var main = function(ex) {
 
@@ -91,10 +91,10 @@ var main = function(ex) {
 			generateContent();
 			// make first card, set it to draw mode, make it the top card
 			var firstCard = Card(0);
+			state.topCard = firstCard;
 			firstCard.init();
 			firstCard.setToDraw(true);
 			state.cardsList.push(firstCard);
-			state.topCard = firstCard;
 			// generate and init the rest of the cards
 			for (var depth = 1; depth < ex.data.content.list.length + 1; depth++){
 				var newCard = Card(depth);
@@ -365,7 +365,6 @@ var main = function(ex) {
 					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
-							state.topCard.returnedFromRangeTextBox = true;
 							state.getLineFromTopCard(6).doLineAction();
 						} 
 						else{ // incorrect
@@ -375,11 +374,13 @@ var main = function(ex) {
 					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 					break;
 				case 6:
+				/*case 6:
 					line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
 					line.allPermsDoneButtonAction = function(){
 						console.log("we're here!");
 					}
 					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+					break;*/
 				default:
 					break;
 			}
@@ -418,16 +419,13 @@ var main = function(ex) {
 		};
 
 		line.getText = function(){
-			if (state.topCard != undefined && line.lineNum == 5) console.log(state.topCard.returnedFromRangeTextBox);
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
 				return "  if (len(a) == 0):";
 			}
 			else if (line.lineNum == 5 && line.showRangeTextBox){
-				return "      for i in ";
-			}
-			else if (line.lineNum == 5 && state.topCard != undefined && state.topCard.returnedFromRangeTextBox){
-				console.log("double");
-				return "      for i in " + "hey";
+				var correct = range(0, ex.data.content.list.length - line.depth, 1);
+				var correctStr = "[" + correct.join() + "]";
+				return "      for i in " + correctStr + ":";
 			}
 			else if (line.lineNum == 4 && state.topCard != undefined && 
 				     state.topCard.returnedFromRecursiveCall) {
@@ -504,6 +502,10 @@ var main = function(ex) {
 					state.topCard.curLineNum = 5;
 					break;
 				case 6: // allPerms
+					state.topCard.returnedFromRangeTextBox = true;
+					state.getLineFromTopCard(5).showRangeTextBox = false;
+					line.showRangeTextBox = false;
+					line.showAllPermsTextBox = true;
 					// change curLineNum to 6
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
