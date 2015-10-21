@@ -4,7 +4,7 @@
  */
 
 // Bugs (in rough order of priority)
-// - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented?
+// - allPerms line needs to shorten when the text box is over it, and so does the highlight
 // - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
@@ -22,6 +22,7 @@
 // - Base case 0th line missing a colon
 // - Code highlighting slightly off on different computers? Try now?
 // - can't get the text to update in line 5 after clicking done on the range button
+// - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented? -- solved, just don't use textbox class again
 
 var main = function(ex) {
 
@@ -325,18 +326,27 @@ var main = function(ex) {
 		line.returnedFromRecursiveCall = false;
 
 		line.showBaseReturnButton = false;
-		line.showRangeTextBox = false;
-		line.showAllPermsTextBox = false;
+		line.showTextBox = false;
 
 		line.baseReturnButton = undefined;
 		line.rangeTextBox = undefined;
 		line.rangeDoneButton = undefined;
 		line.allPermsTextBox = undefined;
-		line.allPermsDoneButton = undefined;
 
 		line.init = function(){
 			// get text
 			line.text = line.getText();
+			// text box and corresponding button
+			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
+			line.rangeDoneButtonAction = function(){
+				if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
+					state.getLineFromTopCard(6).doLineAction();
+				} 
+				else{ // incorrect
+					ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
+				}
+			};
+			line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 			// create buttons and text areas 
 			switch (line.lineNum){
 				case 1: 
@@ -361,25 +371,6 @@ var main = function(ex) {
 													baseReturn, 
 													"xsmall", undefined);
 					break;
-				case 5:
-					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
-					line.rangeDoneButtonAction = function(){
-						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
-							state.getLineFromTopCard(6).doLineAction();
-						} 
-						else{ // incorrect
-							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
-						}
-					};
-					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
-					break;
-				/*case 6:
-					line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
-					line.allPermsDoneButtonAction = function(){
-						console.log("we're here!");
-					}
-					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);
-					break;*/
 				default:
 					break;
 			}
@@ -421,7 +412,7 @@ var main = function(ex) {
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
 				return "  if (len(a) == 0):";
 			}
-			else if (line.lineNum == 5 && line.showRangeTextBox){
+			else if (line.lineNum == 5 && line.showTextBox){
 				var correct = range(0, ex.data.content.list.length - line.depth, 1);
 				var correctStr = "[" + correct.join() + "]";
 				return "      for i in " + correctStr + ":";
@@ -465,13 +456,9 @@ var main = function(ex) {
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
-			else if (line.rangeTextBox != undefined && line.showRangeTextBox && line.rangeTextBox.myTextBox == undefined){
+			else if (line.rangeTextBox != undefined && line.showTextBox && line.rangeTextBox.myTextBox == undefined){
 				line.rangeTextBox.activate();
 				line.rangeDoneButton.activate();
-			}
-			else if (line.allPermsTextBox != undefined && line.showAllPermsTextBox && line.allPermsTextBox.myTextBox == undefined){
-				line.allPermsTextBox.activate();
-				line.allPermsDoneButton.activate();
 			}
 		};
 
@@ -497,25 +484,22 @@ var main = function(ex) {
 					state.topCard.setToDraw(true);
 					break;
 				case 5: // for i
-					line.showRangeTextBox = true;
+					line.showTextBox = true;
 					state.topCard.curLineNum = 5;
 					break;
 				case 6: // allPerms
+					// deactivate previous button
 					state.topCard.returnedFromRangeTextBox = true;
-					state.getLineFromTopCard(5).showRangeTextBox = false;
-					line.showRangeTextBox = false;
-					line.showAllPermsTextBox = true;
+					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
+					state.getLineFromTopCard(5).rangeTextBox.deactivate();
+					// create another text area
+					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
+															{size: "small", resize: false, rows: 1, cols: 40});
+
 					// change curLineNum to 6
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
 					state.getLineFromTopCard(6).highlight();
-					// change text to previous text box's answer
-					var correct = range(0, ex.data.content.list.length - line.depth, 1);
-					var correctStr = "[" + correct.join() + "]";
-					state.getLineFromTopCard(5).getText();
-					// deactivate previous button
-					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
-					state.getLineFromTopCard(5).rangeTextBox.deactivate();
 					break;
 				default: 
 					state.topCard.getAndSetNextLine();
@@ -642,6 +626,7 @@ var main = function(ex) {
 		textBox.activate = function(){
 			textBox.myTextBox = ex.createTextArea(textBox.x, textBox.y, textBox.text,
 				{resize: false, size: "small", rows: textBox.rows, cols : textBox.cols});
+			console.log(textBox.myTextBox);
 		};
 
 		textBox.deactivate = function(){
