@@ -327,16 +327,18 @@ var main = function(ex) {
 
 		line.showBaseReturnButton = false;
 		line.showTextBox = false;
+		line.showAllPermsTextBox = false;
 
 		line.baseReturnButton = undefined;
 		line.rangeTextBox = undefined;
 		line.rangeDoneButton = undefined;
 		line.allPermsTextBox = undefined;
+		line.allPermsDoneButton = undefined;
 
 		line.init = function(){
 			// get text
 			line.text = line.getText();
-			// text box and corresponding button
+			// text box and corresponding buttons for range line
 			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
 			line.rangeDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
@@ -347,6 +349,11 @@ var main = function(ex) {
 				}
 			};
 			line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+			// and for allPerms line (the textbox is created in lineAction)
+			line.allPermsDoneButtonAction = function(){
+				console.log("allPermsDoneButtonAction");
+			}
+			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// create buttons and text areas 
 			switch (line.lineNum){
 				case 1: 
@@ -492,10 +499,11 @@ var main = function(ex) {
 					state.topCard.returnedFromRangeTextBox = true;
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
-					// create another text area
+					// create another text area and button
+					line.showAllPermsTextBox = true; 
 					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
 															{size: "small", resize: false, rows: 1, cols: 40});
-
+					line.allPermsDoneButton.activate();
 					// change curLineNum to 6
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
