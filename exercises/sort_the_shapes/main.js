@@ -191,6 +191,11 @@ var main = function(ex) {
 		card.y = card.depth*card.topMargin;
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
+		card.allPermsBoxWidth = 190	;
+		card.allPermsBoxHeight = 100;
+		card.allPermsBoxXMargin = 10;
+		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
+		card.allPermsBoxY = card.y + 35*card.depth + 65;
 		card.returnedFromRecursiveCall = false;
 		card.returnedFromRangeTextBox = false;
 
@@ -267,6 +272,12 @@ var main = function(ex) {
 						}
 					}
 					thisLine.draw();
+				}
+				// draw allPerms box
+				if (card.curLineNum >= 3){
+					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
+					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
+											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
 				}
 			}
 			
