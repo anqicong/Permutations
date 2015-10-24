@@ -278,6 +278,11 @@ var main = function(ex) {
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
 					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
 											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
+					// draw text
+					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
+					ex.graphics.ctx.font = "15px Courier";
+					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
+					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
 				}
 			}
 			
