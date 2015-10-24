@@ -22,7 +22,7 @@
 // - Base case return button shows up a line too early for cards 1 and 2
 // - On card of depth 2, line 0 code highlight isn't wide enough
 // - Base case 0th line missing a colon
-// - Code highlighting slightly off on different computers? Try now?
+// - Code highlighting slightly off on different computers
 // - can't get the text to update in line 5 after clicking done on the range button
 // - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented? -- solved, just don't use textbox class again
 
@@ -68,6 +68,10 @@ var main = function(ex) {
 		}
 		result += "]";
 		return result;
+	}
+
+	function listToString1D(list){
+		return "[" + list.join(", "); + "]";
 	}
 	
 
@@ -121,6 +125,7 @@ var main = function(ex) {
 			}
 			window.setTimeout(doAnimation, 15);
 			if (state.topCard.height <= 0) {
+				state.topCard.height = 0;
 				state.returnToPrev();
 				state.draw();
 				return;
@@ -131,8 +136,10 @@ var main = function(ex) {
 
 		//BETA
 		state.animateCollapse = function() {
-			for (var i = 0; i < state.topCard.depth; i++) {
+			if (state.topCard.depth == ex.data.content.list.length) {
+				for (var i = 0; i < state.topCard.depth; i++) {
 				state.cardsList[i].setToDraw(true);
+				}
 			}
 			if (state.getLineFromTopCard(1).baseReturnButton != undefined) {
 				state.getLineFromTopCard(1).deactivateReturnButton();
@@ -160,6 +167,10 @@ var main = function(ex) {
 		//Return to the previous card
 		state.returnToPrev = function() {
 			if (state.topCard.depth == ex.data.content.list.length) {
+				state.topCard.prepareForReturn();
+				state.topCard = state.cardsList[state.topCard.depth - 1];
+				state.topCard.prepareForEnter();
+			}else {
 				state.topCard.prepareForReturn();
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
@@ -196,8 +207,15 @@ var main = function(ex) {
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
+
+		card.allPermsBoxList = [];
+
 		card.returnedFromRecursiveCall = false;
 		card.returnedFromRangeTextBox = false;
+
+		card.curSubPerm = 0;
+		card.innerLoopI = 0;
+		card.shouldReturnAllPerm = false;
 
 		card.init = function(){
 			// create all the lines
@@ -278,6 +296,16 @@ var main = function(ex) {
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
 					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
 											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
+					// draw allPerms text
+					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
+					ex.graphics.ctx.font = "15px Courier";
+					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
+					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
+					// draw lists within allPerms
+					var startY = card.allPermsBoxY + 15;
+					for (var i = 0; i < card.allPermsBoxList.length; i++){
+						ex.graphics.ctx.fillText(listToString1D(card.allPermsBoxList[i]), card.allPermsBoxX + 10, startY + i*card.lineHeight);
+					}
 				}
 			}
 			
@@ -309,17 +337,31 @@ var main = function(ex) {
 			}
 		}
 
+		card.advanceInnerLoopI = function() {
+			card.innerLoopI += 1;
+		}
+
+		card.advanceCurSubPerm = function() {
+			card.curSubPerm += 1;
+		}
+
 		//Prepare to be reactivated from return
 		card.prepareForEnter = function() {
 			card.setToDraw(true);
 			card.curLineNum = 4;
 			card.returnedFromRecursiveCall = true;
+			card.linesList[5].rangeDoneButton.deactivate();
+			card.linesList[6].allPermsDoneButton.deactivate();
+			card.linesList[7].returnAllPermsButton.deactivate();
 		}
 
 		//Prepare to be popped off the stack
 		card.prepareForReturn = function() {
 			card.setToDraw(false);
 			card.linesList[1].deactivateReturnButton();
+			card.linesList[5].rangeDoneButton.deactivate();
+			card.linesList[6].allPermsDoneButton.deactivate();
+			card.linesList[7].returnAllPermsButton.deactivate();
 			card.unhighlightAll();
 		}
 
@@ -355,11 +397,14 @@ var main = function(ex) {
 		line.allPermsDoneButton = undefined;
 		line.returnAllPermsButton = undefined;
 
+		line.curIndexForAllPerms = 0;
+
 		line.init = function(){
 			// get text
 			line.text = line.getText();
 			// text box and corresponding buttons for range line
-			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
+			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1) e.g. [0, 1]", 1, 33);
+			/*??
 			line.rangeDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 					state.getLineFromTopCard(6).doLineAction();
@@ -369,15 +414,49 @@ var main = function(ex) {
 				}
 			};
 			line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+			*/
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
+				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
+					state.topCard.allPermsBoxList.push([1]);
+					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
+						var subPermNum = 0;
+						if (state.topCard.depth == ex.data.content.list.length){
+							subPermNum = 1;
+						}else {
+							for (var i = 1; i <= ex.data.content.list.length - state.topCard.depth; i++) {
+								subPermNum *= i;
+							}
+						}
+						if (state.topCard.curSubPerm >= subPermNum - 1) {
+							state.topCard.shouldReturnAllPerm = true;
+							line.allPermsDoneButton.deactivate();
+							line.deactivateRangeTextBox();
+						}else {
+							state.topCard.advanceCurSubPerm();
+						}
+					}else {
+						state.topCard.advanceInnerLoopI();
+					}
+				}else {
+					alert(line.allPermsTextBox.getText());
+				}
 				console.log("allPermsDoneButtonAction");
 			}
-			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
+			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth;
+			line.allPermsDoneButton = Button(485, allPermDoneButtonY, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
 			line.returnAllPermsButtonAction = function(){
-				console.log("returnAllPermsButtonAction");
+				if (state.topCard.shouldReturnAllPerm) {
+					line.returnAllPermsButton.deactivate();
+					state.animateCollapse();
+					//state.returnToPrev();
+					//state.draw();
+				}else {
+					ex.showFeedback("allPerms should contain more elements before return")
+				}
 			}
+			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth;
 			line.returnAllPermsButton = Button(74, 204, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
 			switch (line.lineNum){
@@ -403,6 +482,30 @@ var main = function(ex) {
 													baseReturn, 
 													"xsmall", undefined);
 					break;
+				case 5:
+				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+					line.rangeDoneButtonAction = function(){
+						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
+							state.getLineFromTopCard(6).doLineAction();
+							//state.topCard.getAndSetNextLine();
+							//state.draw();
+						} 
+						else{ // incorrect
+							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
+						}
+					};
+					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+					line.rangeDoneButton = Button(400, rangeDoneButtonY, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+					break;
+				case 6:
+				/*case 6:
+					line.allPermsTextBox = TextBox(190, 180, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 33);
+					line.allPermsDoneButtonAction = function(){
+						console.log("we're here!");
+					}
+					line.allPermsDoneButton = Button(400, 190, "Done", 6, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+					break;*/
 				default:
 					break;
 			}
@@ -472,7 +575,7 @@ var main = function(ex) {
 				return "";
 			}
 			else if (state.topCard.curLineNum >= 6 && line.lineNum == 6){
-				return "allPerms += ";
+				return "        allPerms += ";
 			}
 			return ex.data.content.code[line.lineNum];
 		}
@@ -534,11 +637,20 @@ var main = function(ex) {
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
 					state.getLineFromTopCard(6).highlight();
+					// change text to previous text box's answer
+					var correct = range(0, ex.data.content.list.length - line.depth, 1);
+					var correctStr = "[" + correct.join() + "]";
+					state.getLineFromTopCard(5).getText();
+					// deactivate previous button
+					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
+					state.getLineFromTopCard(5).rangeTextBox.deactivate();
+					state.getLineFromTopCard(5).showTextBox = false;
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
 					state.topCard.refreshText();
-					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
-															{size: "small", resize: false, rows: 1, cols: 40});
+					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth;
+					line.allPermsTextBox = TextBox(215, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
 					line.returnAllPermsButton.activate();
@@ -554,6 +666,14 @@ var main = function(ex) {
 				line.baseReturnButton.deactivate();
 			}
 			line.showBaseReturnButton = false;
+		}
+
+		line.deactivateRangeTextBox = function() {
+			if (line.rangeTextBox != undefined) {
+				line.rangeTextBox.deactivate();
+				line.rangeTextBox = undefined;
+				line.showTextBox = false;
+			}
 		}
 
 		line.checkClick = function(x, y){
@@ -604,11 +724,15 @@ var main = function(ex) {
 				return answer == correctStr;
 			}
 			else if (line.lineNum == 6){ // allPerms += 
-				return true;
+				var curSubPerm = (permutations(ex.data.content.list.slice(state.topCard.depth + 1,ex.data.content.list.length)))[state.topCard.curSubPerm];
+				var curI = state.topCard.innerLoopI;
+				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
+				var correctStr = "[[" + curSubPerm.join() + "]]";
+				var answer = answer.replace(/ /g, "").replace(/:/g, "");
+				return answer == correctStr;
 			}
 			return false;
 		};
-
 		return line;
 	}
 
