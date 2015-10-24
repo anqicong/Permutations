@@ -69,6 +69,10 @@ var main = function(ex) {
 		result += "]";
 		return result;
 	}
+
+	function listToString1D(list){
+		return "[" + list.join(", "); + "]";
+	}
 	
 
 	function range(start, stop, step){
@@ -196,6 +200,9 @@ var main = function(ex) {
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
+
+		card.allPermsBoxList = [];
+
 		card.returnedFromRecursiveCall = false;
 		card.returnedFromRangeTextBox = false;
 
@@ -278,11 +285,16 @@ var main = function(ex) {
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
 					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
 											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
-					// draw text
+					// draw allPerms text
 					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
 					ex.graphics.ctx.font = "15px Courier";
 					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
 					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
+					// draw lists within allPerms
+					var startY = card.allPermsBoxY + 15;
+					for (var i = 0; i < card.allPermsBoxList.length; i++){
+						ex.graphics.ctx.fillText(listToString1D(card.allPermsBoxList[i]), card.allPermsBoxX + 10, startY + i*card.lineHeight);
+					}
 				}
 			}
 			
@@ -360,6 +372,8 @@ var main = function(ex) {
 		line.allPermsDoneButton = undefined;
 		line.returnAllPermsButton = undefined;
 
+		line.curIndexForAllPerms = 0;
+
 		line.init = function(){
 			// get text
 			line.text = line.getText();
@@ -376,7 +390,23 @@ var main = function(ex) {
 			line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
-				console.log("allPermsDoneButtonAction");
+				if (line.allPermsTextBox != undefined){
+					// parse through text
+					var answer = line.allPermsTextBox.text().replace(/ /g, "").replace("[", "").replace("]", "");
+					var answerList = answer.split(","); 
+					for (var i = 0; i < answerList.length; i++){
+						answerList[i] = parseInt(answerList[i]);
+					}
+					/* NOT DONE HERE */
+					// push it onto list if correct
+					if (answerList == correctList){
+						state.getCard(line.depth).allPermsBoxList.push(answerList);
+						line.curIndexForAllPerms += 1;
+					}
+					else{
+						ex.showFeedback("That's incorrect."); //@TODO better message?
+					}
+				}
 			}
 			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
