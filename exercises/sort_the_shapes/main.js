@@ -169,7 +169,7 @@ var main = function(ex) {
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
 			}else {
-				state.topCard.prepareForEnter();
+				state.topCard.prepareForReturn();
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
 			}
@@ -348,6 +348,9 @@ var main = function(ex) {
 			card.setToDraw(true);
 			card.curLineNum = 4;
 			card.returnedFromRecursiveCall = true;
+			card.linesList[5].rangeDoneButton.deactivate();
+			card.linesList[6].allPermsDoneButton.deactivate();
+			card.linesList[7].returnAllPermsButton.deactivate();
 		}
 
 		//Prepare to be popped off the stack
@@ -413,6 +416,7 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
+					state.topCard.allPermsBoxList.push([1]);
 					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
 						var subPermNum = 0;
 						if (state.topCard.depth == ex.data.content.list.length){
@@ -424,6 +428,8 @@ var main = function(ex) {
 						}
 						if (state.topCard.curSubPerm >= subPermNum - 1) {
 							state.topCard.shouldReturnAllPerm = true;
+							line.allPermsDoneButton.deactivate();
+							line.allPermsTextBox.deactivate();
 						}else {
 							state.topCard.advanceCurSubPerm();
 						}
@@ -434,28 +440,12 @@ var main = function(ex) {
 					alert(line.allPermsTextBox.getText());
 				}
 				console.log("allPermsDoneButtonAction");
-				if (line.allPermsTextBox != undefined){
-					// parse through text
-					var answer = line.allPermsTextBox.text().replace(/ /g, "").replace("[", "").replace("]", "");
-					var answerList = answer.split(","); 
-					for (var i = 0; i < answerList.length; i++){
-						answerList[i] = parseInt(answerList[i]);
-					}
-					/* NOT DONE HERE */
-					// push it onto list if correct
-					if (answerList == correctList){
-						state.getCard(line.depth).allPermsBoxList.push(answerList);
-						line.curIndexForAllPerms += 1;
-					}
-					else{
-						ex.showFeedback("That's incorrect."); //@TODO better message?
-					}
-				}
 			}
 			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
 			line.returnAllPermsButtonAction = function(){
 				if (state.topCard.shouldReturnAllPerm) {
+					line.returnAllPermsButton.deactivate();
 					state.animateCollapse();
 				}else {
 					ex.showFeedback("allPerms should contain more elements before return")
