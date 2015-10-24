@@ -202,13 +202,14 @@ var main = function(ex) {
 		card.y = card.depth*card.topMargin;
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
-		card.allPermsBoxWidth = 170	;
+		card.allPermsBoxWidth = 160	;
 		card.allPermsBoxHeight = 100;
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
 
 		card.allPermsBoxList = [];
+		card.allPermsString = [];
 
 		card.returnedFromRecursiveCall = false;
 		card.returnedFromRangeTextBox = false;
@@ -423,7 +424,10 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
-					state.topCard.allPermsBoxList.push([1]);
+					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
+					var i = state.topCard.allPermsString.length-1;
+					ex.graphics.ctx.fillText(state.topCard.allPermsString[i],
+						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
 						var subPermNum = 0;
 						if (state.topCard.depth == ex.data.content.list.length){
