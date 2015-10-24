@@ -353,6 +353,11 @@ var main = function(ex) {
 			card.linesList[5].rangeDoneButton.deactivate();
 			card.linesList[6].allPermsDoneButton.deactivate();
 			card.linesList[7].returnAllPermsButton.deactivate();
+			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth;
+			card.linesList[5].rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+			if (card.depth == 0) {
+				card.linesList[6].allPermsDoneButton = Button(485, 108, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+			}
 		}
 
 		//Prepare to be popped off the stack
@@ -403,7 +408,7 @@ var main = function(ex) {
 			// get text
 			line.text = line.getText();
 			// text box and corresponding buttons for range line
-			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1) e.g. [0, 1]", 1, 33);
+			//line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1) e.g. [0, 1]", 1, 33);
 			/*??
 			line.rangeDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
@@ -430,7 +435,7 @@ var main = function(ex) {
 						}
 						if (state.topCard.curSubPerm >= subPermNum - 1) {
 							state.topCard.shouldReturnAllPerm = true;
-							line.allPermsDoneButton.deactivate();
+							line.deactivateAllPermsTextBox();
 							line.deactivateRangeTextBox();
 						}else {
 							state.topCard.advanceCurSubPerm();
@@ -457,7 +462,7 @@ var main = function(ex) {
 				}
 			}
 			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth;
-			line.returnAllPermsButton = Button(74, 204, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
+			line.returnAllPermsButton = Button(74, returnAllPermsButtonY, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
 			switch (line.lineNum){
 				case 1: 
@@ -673,6 +678,14 @@ var main = function(ex) {
 				line.rangeTextBox.deactivate();
 				line.rangeTextBox = undefined;
 				line.showTextBox = false;
+			}
+		}
+
+		line.deactivateAllPermsTextBox = function() {
+			if (line.allPermsTextBox != undefined) {
+				line.allPermsTextBox.deactivate();
+				line.allPermsTextBox = undefined;
+				line.showAllPermsTextBox = false;
 			}
 		}
 
