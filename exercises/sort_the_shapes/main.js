@@ -136,8 +136,10 @@ var main = function(ex) {
 
 		//BETA
 		state.animateCollapse = function() {
-			for (var i = 0; i < state.topCard.depth; i++) {
+			if (state.topCard.depth == ex.data.content.list.length) {
+				for (var i = 0; i < state.topCard.depth; i++) {
 				state.cardsList[i].setToDraw(true);
+				}
 			}
 			if (state.getLineFromTopCard(1).baseReturnButton != undefined) {
 				state.getLineFromTopCard(1).deactivateReturnButton();
@@ -429,7 +431,7 @@ var main = function(ex) {
 						if (state.topCard.curSubPerm >= subPermNum - 1) {
 							state.topCard.shouldReturnAllPerm = true;
 							line.allPermsDoneButton.deactivate();
-							line.allPermsTextBox.deactivate();
+							line.deactivateRangeTextBox();
 						}else {
 							state.topCard.advanceCurSubPerm();
 						}
@@ -441,16 +443,20 @@ var main = function(ex) {
 				}
 				console.log("allPermsDoneButtonAction");
 			}
-			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
+			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth;
+			line.allPermsDoneButton = Button(485, allPermDoneButtonY, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
 			line.returnAllPermsButtonAction = function(){
 				if (state.topCard.shouldReturnAllPerm) {
 					line.returnAllPermsButton.deactivate();
 					state.animateCollapse();
+					//state.returnToPrev();
+					//state.draw();
 				}else {
 					ex.showFeedback("allPerms should contain more elements before return")
 				}
 			}
+			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth;
 			line.returnAllPermsButton = Button(74, 204, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
 			switch (line.lineNum){
@@ -477,7 +483,8 @@ var main = function(ex) {
 													"xsmall", undefined);
 					break;
 				case 5:
-					line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
+				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.getLineFromTopCard(6).doLineAction();
@@ -488,7 +495,8 @@ var main = function(ex) {
 							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
 						}
 					};
-					line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+					line.rangeDoneButton = Button(400, rangeDoneButtonY, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 					break;
 				case 6:
 				/*case 6:
@@ -636,11 +644,12 @@ var main = function(ex) {
 					// deactivate previous button
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
-					state.getLineFromTopCard(5).showRangeTextBox = false;
+					state.getLineFromTopCard(5).showTextBox = false;
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
 					state.topCard.refreshText();
-					line.allPermsTextBox = TextBox(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth;
+					line.allPermsTextBox = TextBox(215, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
 					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
@@ -657,6 +666,14 @@ var main = function(ex) {
 				line.baseReturnButton.deactivate();
 			}
 			line.showBaseReturnButton = false;
+		}
+
+		line.deactivateRangeTextBox = function() {
+			if (line.rangeTextBox != undefined) {
+				line.rangeTextBox.deactivate();
+				line.rangeTextBox = undefined;
+				line.showTextBox = false;
+			}
 		}
 
 		line.checkClick = function(x, y){
