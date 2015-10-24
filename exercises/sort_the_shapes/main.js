@@ -22,7 +22,7 @@
 // - Base case return button shows up a line too early for cards 1 and 2
 // - On card of depth 2, line 0 code highlight isn't wide enough
 // - Base case 0th line missing a colon
-// - Code highlighting slightly off on different computers? Try now?
+// - Code highlighting slightly off on different computers
 // - can't get the text to update in line 5 after clicking done on the range button
 // - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented? -- solved, just don't use textbox class again
 
@@ -121,6 +121,7 @@ var main = function(ex) {
 			}
 			window.setTimeout(doAnimation, 15);
 			if (state.topCard.height <= 0) {
+				state.topCard.height = 0;
 				state.returnToPrev();
 				state.draw();
 				return;
@@ -163,6 +164,10 @@ var main = function(ex) {
 				state.topCard.prepareForReturn();
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
+			}else {
+				state.topCard.prepareForEnter();
+				state.topCard = state.cardsList[state.topCard.depth - 1];
+				state.topCard.prepareForEnter();
 			}
 			
 		}
@@ -198,6 +203,10 @@ var main = function(ex) {
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
 		card.returnedFromRecursiveCall = false;
 		card.returnedFromRangeTextBox = false;
+
+		card.curSubPerm = 0;
+		card.innerLoopI = 0;
+		card.shouldReturnAllPerm = false;
 
 		card.init = function(){
 			// create all the lines
@@ -309,6 +318,14 @@ var main = function(ex) {
 			}
 		}
 
+		card.advanceInnerLoopI = function() {
+			card.innerLoopI += 1;
+		}
+
+		card.advanceCurSubPerm = function() {
+			card.curSubPerm += 1;
+		}
+
 		//Prepare to be reactivated from return
 		card.prepareForEnter = function() {
 			card.setToDraw(true);
@@ -320,6 +337,9 @@ var main = function(ex) {
 		card.prepareForReturn = function() {
 			card.setToDraw(false);
 			card.linesList[1].deactivateReturnButton();
+			card.linesList[5].rangeDoneButton.deactivate();
+			card.linesList[6].allPermsDoneButton.deactivate();
+			card.linesList[7].returnAllPermsButton.deactivate();
 			card.unhighlightAll();
 		}
 
@@ -359,7 +379,8 @@ var main = function(ex) {
 			// get text
 			line.text = line.getText();
 			// text box and corresponding buttons for range line
-			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1)", 1, 33);
+			line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1) e.g. [0, 1]", 1, 33);
+			/*??
 			line.rangeDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 					state.getLineFromTopCard(6).doLineAction();
@@ -369,14 +390,40 @@ var main = function(ex) {
 				}
 			};
 			line.rangeDoneButton = Button(400, 170, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
+			*/
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
+				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
+					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
+						var subPermNum = 0;
+						if (state.topCard.depth == ex.data.content.list.length){
+							subPermNum = 1;
+						}else {
+							for (var i = 1; i <= ex.data.content.list.length - state.topCard.depth; i++) {
+								subPermNum *= i;
+							}
+						}
+						if (state.topCard.curSubPerm >= subPermNum - 1) {
+							state.topCard.shouldReturnAllPerm = true;
+						}else {
+							state.topCard.advanceCurSubPerm();
+						}
+					}else {
+						state.topCard.advanceInnerLoopI();
+					}
+				}else {
+					alert(line.allPermsTextBox.getText());
+				}
 				console.log("allPermsDoneButtonAction");
 			}
 			line.allPermsDoneButton = Button(485, 187, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
 			line.returnAllPermsButtonAction = function(){
-				console.log("returnAllPermsButtonAction");
+				if (state.topCard.shouldReturnAllPerm) {
+					state.animateCollapse();
+				}else {
+					ex.showFeedback("allPerms should contain more elements before return")
+				}
 			}
 			line.returnAllPermsButton = Button(74, 204, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
@@ -408,6 +455,8 @@ var main = function(ex) {
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.getLineFromTopCard(6).doLineAction();
+							//state.topCard.getAndSetNextLine();
+							//state.draw();
 						} 
 						else{ // incorrect
 							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
@@ -492,7 +541,7 @@ var main = function(ex) {
 				return "";
 			}
 			else if (state.topCard.curLineNum >= 6 && line.lineNum == 6){
-				return "allPerms += ";
+				return "        allPerms += ";
 			}
 			return ex.data.content.code[line.lineNum];
 		}
@@ -565,8 +614,8 @@ var main = function(ex) {
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
 					state.topCard.refreshText();
-					line.allPermsTextBox = ex.createTextArea(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]",
-															{size: "small", resize: false, rows: 1, cols: 40});
+					line.allPermsTextBox = TextBox(215, 185, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
 					line.returnAllPermsButton.activate();
@@ -632,11 +681,15 @@ var main = function(ex) {
 				return answer == correctStr;
 			}
 			else if (line.lineNum == 6){ // allPerms += 
-				return true;
+				var curSubPerm = (permutations(ex.data.content.list.slice(state.topCard.depth + 1,ex.data.content.list.length)))[state.topCard.curSubPerm];
+				var curI = state.topCard.innerLoopI;
+				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
+				var correctStr = "[[" + curSubPerm.join() + "]]";
+				var answer = answer.replace(/ /g, "").replace(/:/g, "");
+				return answer == correctStr;
 			}
 			return false;
 		};
-
 		return line;
 	}
 
