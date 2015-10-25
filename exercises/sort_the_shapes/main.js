@@ -352,9 +352,8 @@ var main = function(ex) {
 			card.curLineNum = 4;
 			card.returnedFromRecursiveCall = true;
 			card.linesList[5].rangeDoneButton.deactivate();
-			card.linesList[6].allPermsDoneButton.deactivate();
 			card.linesList[7].returnAllPermsButton.deactivate();
-			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth;
+			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
 			card.linesList[5].rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 			if (card.depth == 0) {
 				card.linesList[6].allPermsDoneButton = Button(485, 108, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
@@ -366,7 +365,6 @@ var main = function(ex) {
 			card.setToDraw(false);
 			card.linesList[1].deactivateReturnButton();
 			card.linesList[5].rangeDoneButton.deactivate();
-			card.linesList[6].allPermsDoneButton.deactivate();
 			card.linesList[7].returnAllPermsButton.deactivate();
 			card.unhighlightAll();
 		}
@@ -441,6 +439,7 @@ var main = function(ex) {
 							state.topCard.shouldReturnAllPerm = true;
 							line.deactivateAllPermsTextBox();
 							line.deactivateRangeTextBox();
+							line.deactivateAllPermsDoneButton();
 						}else {
 							state.topCard.advanceCurSubPerm();
 						}
@@ -452,7 +451,7 @@ var main = function(ex) {
 				}
 				console.log("allPermsDoneButtonAction");
 			}
-			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth;
+			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
 			line.allPermsDoneButton = Button(485, allPermDoneButtonY, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
 			// and a button for return allPerms
 			line.returnAllPermsButtonAction = function(){
@@ -465,7 +464,7 @@ var main = function(ex) {
 					ex.showFeedback("allPerms should contain more elements before return")
 				}
 			}
-			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth;
+			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 			line.returnAllPermsButton = Button(74, returnAllPermsButtonY, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
 			// create buttons and text areas 
 			switch (line.lineNum){
@@ -492,7 +491,7 @@ var main = function(ex) {
 													"xsmall", undefined);
 					break;
 				case 5:
-				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
@@ -504,7 +503,7 @@ var main = function(ex) {
 							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
 						}
 					};
-					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth;
+					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.rangeDoneButton = Button(400, rangeDoneButtonY, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
 					break;
 				case 6:
@@ -657,7 +656,7 @@ var main = function(ex) {
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
 					state.topCard.refreshText();
-					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth;
+					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.allPermsTextBox = TextBox(215, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
 					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
@@ -675,6 +674,13 @@ var main = function(ex) {
 				line.baseReturnButton.deactivate();
 			}
 			line.showBaseReturnButton = false;
+		}
+
+		line.deactivateAllPermsDoneButton = function() {
+			if (line.allPermsDoneButton != undefined) {
+				line.allPermsDoneButton.deactivate();
+				line.allPermsDoneButton = undefined;
+			}
 		}
 
 		line.deactivateRangeTextBox = function() {
@@ -848,6 +854,7 @@ var main = function(ex) {
 	}
 	ex.graphics.on("mousedown", mouseClicked);
 
+	var button_margin = 5;
 	var state = State();
 	state.init();
 	state.draw();
