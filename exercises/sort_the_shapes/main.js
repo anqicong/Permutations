@@ -313,7 +313,7 @@ var main = function(ex) {
 				}
 				//if (card.circlei){
 				//    card.linesList[4].circle(0);
-			    }
+			    //}
 				// draw allPerms box
 				if (card.curLineNum >= 3){
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
