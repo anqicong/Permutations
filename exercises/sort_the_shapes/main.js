@@ -218,6 +218,10 @@ var main = function(ex) {
 		card.innerLoopI = 0;
 		card.shouldReturnAllPerm = false;
 
+		var rgbStr = (240 - 25 * card.depth).toString();
+        card.fill = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
+
+
 		card.init = function(){
 			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
@@ -264,9 +268,7 @@ var main = function(ex) {
 		card.draw = function(){
 			if (card.toDraw){
 				// get right color
-				var rgb = 240 - 25 * card.depth;
-				var rgbStr = rgb.toString();
-				ex.graphics.ctx.fillStyle = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
+				ex.graphics.ctx.fillStyle = card.fill;
 				// draw card
 				if (card.depth > 0){
 					var adjustForDepth = (card.lineHeight+4)*2*card.depth;
@@ -388,6 +390,7 @@ var main = function(ex) {
 
 		line.highlightImage = undefined;
 		line.highlighted = false;
+		line.highlightWidth = undefined;
 		line.returnedFromRecursiveCall = false;
 
 		line.showBaseReturnButton = false;
@@ -406,6 +409,7 @@ var main = function(ex) {
 		line.init = function(){
 			// get text
 			line.text = line.getText();
+			line.highlightWidth = line.text.length * 9;
 			// text box and corresponding buttons for range line
 			//line.rangeTextBox = TextBox(170, 168, "range (len (subPerm) + 1) e.g. [0, 1]", 1, 33);
 			/*??
@@ -424,7 +428,9 @@ var main = function(ex) {
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
 					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
 					var i = state.topCard.allPermsString.length-1;
-					ex.graphics.ctx.fillText(state.topCard.allPermsString[i],
+					ex.graphics.ctx.fillStyle = "yellow";
+					var len = state.topCard.allPermsString[i].length;
+					ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
 						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
 						var subPermNum = 0;
@@ -492,7 +498,7 @@ var main = function(ex) {
 					break;
 				case 5:
 				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
-					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 35);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.getLineFromTopCard(6).doLineAction();
@@ -521,17 +527,16 @@ var main = function(ex) {
 
 		line.highlight = function(){
 			var img = "img/codeColor.png";
-			var highlightWidth = line.text.length * 9;
 			// adjust for when the if statement is cut short by the base return button
 			if (line.lineNum == 1 && line.text == ex.data.content.code[1]){
-				highlightWidth = line.text.length * 5.5;
+				line.highlightWidth = line.text.length * 5.5;
 			}
 			if (line.highlighted) {
 				return;
 			}
 			var fill = 5;
 			line.highlightImage = ex.createImage(line.x, line.y + fill, img, {
-				width: highlightWidth,
+				width: line.highlightWidth,
 				height: state.topCard.lineHeight
 			});
 			// activate or deactivate the base return button
@@ -596,6 +601,12 @@ var main = function(ex) {
 			line.text = ex.data.content.code[line.lineNum];
 		}
 
+		line.hide = function(start){
+			console.log(line.x+start,line.y,line.highlightWidth,state.topCard.lineHeight);
+            ex.graphics.ctx.fillStyle = state.topCard.fill;
+            ex.graphics.ctx.fillRect(line.x+start,line.y,line.highlightWidth-start,state.topCard.lineHeight);
+		}
+
 		line.draw = function(){
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
@@ -641,6 +652,8 @@ var main = function(ex) {
 					state.topCard.returnedFromRangeTextBox = true;
 					state.getLineFromTopCard(5).rangeDoneButton.deactivate();
 					state.getLineFromTopCard(5).rangeTextBox.deactivate();
+					//hide last line of code
+		            state.getLineFromTopCard(7).hide(0);
 					// change curLineNum to 6
 					state.topCard.unhighlightAll();
 					state.topCard.curLineNum = 6;
