@@ -224,7 +224,8 @@ var main = function(ex) {
 		card.curSubPerm = 0;
 		card.innerLoopI = 0;
 		card.shouldReturnAllPerm = false;
-
+        
+        card.circlei = false;
 		var rgbStr = (240 - 25 * card.depth).toString();
         card.fill = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 
@@ -310,6 +311,9 @@ var main = function(ex) {
 					}
 					thisLine.draw();
 				}
+				//if (card.circlei){
+				//    card.linesList[4].circle(0);
+			    }
 				// draw allPerms box
 				if (card.curLineNum >= 3){
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
@@ -578,13 +582,30 @@ var main = function(ex) {
 			}
 		};
 
+		line.circle = function(index){
+            if (line.lineNum == 4){
+            	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
+				var newText = listToString(list.slice(0,index));
+            	var offset = 160 + newText.length*10;
+            	var width = listToString(list[index]).length*10;
+            	ex.graphics.ctx.strokeStyle = "red";
+            	ex.graphics.ctx.rect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	ex.graphics.ctx.stroke();
+            	console.log(line.x+offset,line.y,width,state.topCard.lineHeight+10);
+            }
+		}
+
+		line.uncircle = function(index){
+
+		}
+
 		line.getText = function(){
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
 				return "  if (len(a) == 0):";
 			}
 			else if (line.lineNum == 5 && line.showTextBox){
 				var correct = range(0, ex.data.content.list.length - line.depth, 1);
-				var correctStr = "[" + correct.join() + "]";
+				var correctStr = "[ " + correct.join(" , ") + " ]";
 				return "      for i in " + correctStr + ":";
 			}
 			else if (line.lineNum == 4 && state.topCard != undefined && 
@@ -624,7 +645,6 @@ var main = function(ex) {
 		}
 
 		line.hide = function(start){
-			console.log(line.x+start,line.y,line.highlightWidth,state.topCard.lineHeight);
             ex.graphics.ctx.fillStyle = state.topCard.fill;
             ex.graphics.ctx.fillRect(line.x+start,line.y,line.highlightWidth-start,state.topCard.lineHeight);
 		}
@@ -634,7 +654,23 @@ var main = function(ex) {
 			var numberColor = "rgb(61, 163, 239)";
 			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier";
-			ex.graphics.ctx.fillText(line.getText(), line.x, line.y + state.topCard.lineHeight);
+			var text = line.getText();
+			if (line.lineNum == 0){
+				ex.graphics.ctx.fillText("permutations([", line.x, line.y + state.topCard.lineHeight);
+				var numText = "";
+				for (var numIndex = line.depth; numIndex < ex.data.content.list.length; numIndex++){
+					if (numIndex == ex.data.content.list.length - 1) {
+						numText += ex.data.content.list[numIndex].toString();
+					}else {
+						numText += ex.data.content.list[numIndex].toString() + ", ";
+					}
+				}
+				ex.graphics.ctx.fillStyle = "blue";
+				ex.graphics.ctx.fillText(numText, line.x+130, line.y + state.topCard.lineHeight);
+				ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
+				ex.graphics.ctx.fillText("])", line.x+130+numText.length*10, line.y + state.topCard.lineHeight);
+			}
+			else ex.graphics.ctx.fillText(text, line.x, line.y + state.topCard.lineHeight);
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
 				line.baseReturnButton.activate();
 			}
@@ -642,6 +678,7 @@ var main = function(ex) {
 				line.rangeTextBox.activate();
 				line.rangeDoneButton.activate();
 			}
+			
 		};
 
 		line.doLineAction = function(){
@@ -668,6 +705,7 @@ var main = function(ex) {
 				case 5: // for i
 					line.showTextBox = true;
 					state.topCard.curLineNum = 5;
+					state.topCard.circlei = true;
 					break;
 				case 6: // allPerms
 					// deactivate previous button
