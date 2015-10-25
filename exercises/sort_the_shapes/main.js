@@ -84,9 +84,16 @@ var main = function(ex) {
 	//generateContent is a server function that randomly generates 2 
 	//starting numbers and the corresponding print statement
 	function generateContent() {
-		var random1 = Math.round(Math.random()*100);
-		var random2 = Math.round(Math.random()*100);
-		ex.data.content.list = [random1, random2];
+		var random1 = Math.round(Math.random() * 20);
+		var random2 = Math.round(Math.random() * 20);
+		while (random2 == random1) {
+			random2 = Math.round(Math.random() * 20);
+		}
+		var random3 = Math.round(Math.random() * 20);
+		while (random3 == random2 || random3 == random1) {
+			random3 = Math.round(Math.random() * 20);
+		}
+		ex.data.content.list = [random1, random2, random3];
 	}
 
 	function State(){
@@ -203,7 +210,7 @@ var main = function(ex) {
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
 		card.allPermsBoxWidth = 160	;
-		card.allPermsBoxHeight = 100;
+		card.allPermsBoxHeight = 200;
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
@@ -225,7 +232,10 @@ var main = function(ex) {
 				var depthOffsetY = card.depth*73;
 				if (i == 0){ // extra offset for first line
 					depthOffsetX += card.depth*155;
-					if (card.depth == 2) depthOffsetX -= 150;
+					if (card.depth >= 2) {
+						depthOffsetX -= (card.depth - 1) * 150;
+					}
+
 				}
 				card.linesList.push(Line(20 + depthOffsetX, 
 										 i * card.lineHeight + depthOffsetY, 
@@ -245,18 +255,24 @@ var main = function(ex) {
 		card.drawTab = function(){
 			switch (card.depth){
 				case 0:
-					var x = card.x+card.leftMargin;
+					var x = card.x+card.leftMargin + 5;
 					var y = card.y;
+					card.tabWidth = card.originalTabWidth + 20;
 					break;
 				case 1:
-					var x = card.x + card.leftMargin*11 + 4;
+					var x = card.x + card.leftMargin*11 + 10;
 					var y = card.y + card.lineHeight*2 + 10;
-					card.tabWidth = card.originalTabWidth - 30
+					card.tabWidth = card.originalTabWidth - 25;
 					break;
 				case 2:
-				    var x = card.x + card.leftMargin*12 - 7;
+				    var x = card.x + card.leftMargin*12 - 10;
 				    var y = card.y + card.lineHeight*4 + 16;
-				    card.tabWidth = card.originalTabWidth - 30;
+				    card.tabWidth = card.originalTabWidth - 25;
+				    break;
+				case 3:
+					var x = card.x + card.leftMargin * 14 - 32;
+					var y = card.y + card.lineHeight * 6 + 25;
+					card.tabWidth = card.originalTabWidth - 25;
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
 		};
@@ -353,10 +369,14 @@ var main = function(ex) {
 			card.returnedFromRecursiveCall = true;
 			card.linesList[5].rangeDoneButton.deactivate();
 			card.linesList[7].returnAllPermsButton.deactivate();
+			var rangeTextBoxX = 174 + 4 * card.depth;
 			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
-			card.linesList[5].rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 			if (card.depth == 0) {
-				card.linesList[6].allPermsDoneButton = Button(485, 108, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+				card.linesList[6].allPermsDoneButton = Button(485, 110, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+			}
+			if (card.depth == 2) {
+				card.linesList[6].allPermsDoneButton = Button(485, 260, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
 			}
 		}
 
@@ -427,11 +447,10 @@ var main = function(ex) {
 					ex.graphics.ctx.fillText(state.topCard.allPermsString[i],
 						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
-						var subPermNum = 0;
-						if (state.topCard.depth == ex.data.content.list.length){
-							subPermNum = 1;
-						}else {
-							for (var i = 1; i <= ex.data.content.list.length - state.topCard.depth; i++) {
+						//Calculate the total number of current subPerms
+						var subPermNum = 1;
+						if (state.topCard.depth < ex.data.content.list.length) {
+							for (var i = 1; i < ex.data.content.list.length - state.topCard.depth; i++) {
 								subPermNum *= i;
 							}
 						}
@@ -441,11 +460,13 @@ var main = function(ex) {
 							line.deactivateRangeTextBox();
 							line.deactivateAllPermsDoneButton();
 						}else {
+							state.topCard.innerLoopI = 0;
 							state.topCard.advanceCurSubPerm();
 						}
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
+					line.allPermsTextBox.setText("");
 				}else {
 					alert(line.allPermsTextBox.getText());
 				}
@@ -457,6 +478,7 @@ var main = function(ex) {
 			line.returnAllPermsButtonAction = function(){
 				if (state.topCard.shouldReturnAllPerm) {
 					line.returnAllPermsButton.deactivate();
+					state.topCard.unhighlightAll();
 					state.animateCollapse();
 					//state.returnToPrev();
 					//state.draw();
@@ -564,7 +586,7 @@ var main = function(ex) {
 				     state.topCard.returnedFromRecursiveCall) {
 				var newText = "    for subPerm in ";
 				var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
-				newText += listToString(permutations(list));
+				newText += listToString(list);
 				return newText;
 			}
 			else if (line.lineNum == 0){
@@ -656,8 +678,9 @@ var main = function(ex) {
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
 					state.topCard.refreshText();
+					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
-					line.allPermsTextBox = TextBox(215, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
 					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
@@ -829,6 +852,12 @@ var main = function(ex) {
 				return textBox.myTextBox.text();
 			}
 		};
+
+		textBox.setText = function(text) {
+			if (textBox.myTextBox != undefined) {
+				textBox.myTextBox.text(text);
+			}
+		}
 
 		return textBox;
 	}
