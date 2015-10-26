@@ -528,7 +528,6 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
-					//line.allPermsTextBox.setText("");
 				}else {
 					var message = "That's incorrect. You should insert a[0] at the current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
@@ -867,7 +866,9 @@ var main = function(ex) {
 		}
 
 		line.checkClick = function(x, y){
-			if (x >= line.x && y >= line.y && y <= line.y + state.topCard.lineHeight) {
+			//Compensate for imprecision in clicks
+			var click_cmpst = 2;
+			if (x >= line.x && y >= line.y - click_cmpst && y <= line.y + state.topCard.lineHeight + click_cmpst) {
 				return true;
 			}
 			return false;
