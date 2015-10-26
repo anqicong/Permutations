@@ -117,16 +117,20 @@ var main = function(ex) {
 			}
 		};
 
+		state.drawScore = function() {
+			var score_width = 120;
+			var score_height = 18;
+			ex.graphics.ctx.clearRect(ex.width() - score_width, 0, score_width, score_height);
+			ex.graphics.ctx.fillStyle = "#000000";
+			ex.graphics.ctx.fillText("Score: " + score.toFixed(1).toString(), ex.width() - score_width, score_height);
+		}
+
 		state.draw = function(){
 			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 			for (var i = 0; i <= state.topCard.depth; i++) {
 				state.cardsList[i].draw();
 			}
-			//Draw the current score
-			var score_width = 120;
-			var score_height = 20;
-			ex.graphics.ctx.fillStyle = "#000000";
-			ex.graphics.ctx.fillText("Score: " + score.toFixed(1).toString(), ex.width() - score_width, score_height);
+			state.drawScore();
 		};
 
 		//BETA_HELPER
@@ -540,6 +544,7 @@ var main = function(ex) {
 					var message = "That's incorrect. You should insert a[0] at the current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
+						state.drawScore();
 					}
 					state.advanceState();
 					ex.showFeedback(message);
@@ -561,6 +566,7 @@ var main = function(ex) {
 					ex.showFeedback("allPerms should contain more elements before returning.")
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
+						state.drawScore();
 					}
 				}
 			}
@@ -608,6 +614,7 @@ var main = function(ex) {
 							var message = "That's incorrect. Range is endpoint exclusive"
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
+								state.drawScore();
 								message = "That's incorrect."
 							}
 							state.advanceState();
