@@ -11,7 +11,6 @@
 // - Adjust text to fit high resolution displays
 
 // Todos
-// - Represent the current subPerm
 // - show allPerms
 // - button that can pop up instruction on filling in texts
 
@@ -118,11 +117,21 @@ var main = function(ex) {
 			}
 		};
 
+		state.drawScore = function() {
+			var score_width = 120;
+			var score_height = 18;
+			ex.graphics.ctx.clearRect(ex.width() - score_width, 0, score_width, score_height);
+			ex.graphics.ctx.fillStyle = "#000000";
+			ex.graphics.ctx.fillText("Score: " + score.toFixed(1).toString(), ex.width() - score_width, score_height);
+		}
+
 		state.draw = function(){
+			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 			for (var i = 0; i <= state.topCard.depth; i++) {
 				state.cardsList[i].draw();
 				console.log("state draw",i);
 			}
+			state.drawScore();
 		};
 
 		//BETA_HELPER
@@ -190,7 +199,10 @@ var main = function(ex) {
 		}
 
 		state.subTractScore = function(delta) {
-			totalScore -= delta;
+			score -= delta;
+			if (score < 0) {
+				score = 0;
+			}
 		}
 
 		state.advanceState = function() {
@@ -531,11 +543,11 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
-					//line.allPermsTextBox.setText("");
 				}else {
 					var message = "That's incorrect. You should insert a[0] at the current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
+						state.drawScore();
 					}
 					state.advanceState();
 					ex.showFeedback(message);
@@ -550,13 +562,14 @@ var main = function(ex) {
 					line.returnAllPermsButton.deactivate();
 					state.topCard.unhighlightAll();
 					state.topCard.circlei = false;
-					state.animateCollapse();
-					//state.returnToPrev();
-					//state.draw();
+					//state.animateCollapse();
+					state.returnToPrev();
+					state.draw();
 				}else {
 					ex.showFeedback("allPerms should contain more elements before returning.")
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
+						state.drawScore();
 					}
 				}
 			}
@@ -571,9 +584,9 @@ var main = function(ex) {
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
-							state.animateCollapse();
-							//state.returnToPrev();
-							//state.draw();
+							//state.animateCollapse();
+							state.returnToPrev();
+							state.draw();
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
@@ -604,6 +617,7 @@ var main = function(ex) {
 							var message = "That's incorrect. Range is endpoint exclusive"
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
+								state.drawScore();
 								message = "That's incorrect."
 							}
 							state.advanceState();
@@ -783,7 +797,7 @@ var main = function(ex) {
 				case 4: // for subPerm
 					var depthToActivate = state.topCard.depth + 1;
 					// deactivate and undraw the current top card, activate new card
-					state.topCard.setToDraw(false);
+					//state.topCard.setToDraw(false);
 					state.topCard.unhighlightAll();
 					state.topCard = state.getCard(depthToActivate);
 					state.topCard.setToDraw(true);
@@ -867,7 +881,9 @@ var main = function(ex) {
 		}
 
 		line.checkClick = function(x, y){
-			if (x >= line.x && y >= line.y && y <= line.y + state.topCard.lineHeight) {
+			//Compensate for imprecision in clicks
+			var click_cmpst = 2;
+			if (x >= line.x && y >= line.y - click_cmpst && y <= line.y + state.topCard.lineHeight + click_cmpst) {
 				return true;
 			}
 			return false;
@@ -1055,7 +1071,7 @@ var main = function(ex) {
 
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
-	var totalScore = 1.0;
+	var score = 1.0;
 	state.init();
 	state.draw();
 };
