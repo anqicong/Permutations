@@ -175,6 +175,7 @@ var main = function(ex) {
 				state.topCard.circlei = false;
 				state.returnToPrev();
 				state.draw();
+				ex.graphics.on("mousedown", mouseClicked);
 				return;
 			}else {
 				window.setTimeout(state.animateCollapseHelper, 15);
@@ -190,6 +191,8 @@ var main = function(ex) {
 			if (state.getLineFromTopCard(1).baseReturnButton != undefined) {
 				state.getLineFromTopCard(1).deactivateReturnButton();
 			}
+			//Temporarily disable mouse clicks
+			ex.graphics.off("mousedown", mouseClicked);
 			state.animateCollapseHelper();
 		}
 		
@@ -398,7 +401,7 @@ var main = function(ex) {
 					// if we're on the top card, highlight
 					if (state.topCard.depth == card.depth){
 						// highlight the current line
-						if (thisLine.lineNum == card.curLineNum && thisLine.highlightImage == undefined){
+						if (thisLine.lineNum == card.curLineNum && thisLine.highlightImage == undefined && thisLine.lineNum != 7){
 							thisLine.highlight();
 						}
 					}
@@ -742,16 +745,20 @@ var main = function(ex) {
             	var width = listToString(list[index]).length*10;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	if (state.topCard.depth == 0) width -= 15;
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	for (var i = 0; i < 3; i++) {
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	}
             }
             if (line.lineNum == 5){
             	var offset = 150 + index*35;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
-               	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            	for (var i = 0; i < 3; i++) {
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            	}
             }
 		}
 
