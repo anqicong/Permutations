@@ -80,10 +80,31 @@ var main = function(ex) {
 		return a;
 	};
 
+	function resetTask() {
+		taskReset = true;
+		score = 1.0;
+		for (var i = 0; i < state.cardsList.length; i++) {
+			state.cardsList[i].unhighlightAll();
+			state.cardsList[i].linesList[5].deactivateRangeTextBox();
+			state.cardsList[i].linesList[5].deactivateRangeDoneButton();
+			state.cardsList[i].linesList[6].deactivateAllPermsDoneButton();
+			state.cardsList[i].linesList[6].deactivateAllPermsTextBox();
+			state.cardsList[i].linesList[7].deactivateReturnAllPermsButton();
+			state.cardsList[i].linesList[7].deactivateReturnButton();
+		}
+		state.cardsList = [];
+		state.init();
+		state.draw();
+		taskReset = false;
+	}
+
 
 	//generateContent is a server function that randomly generates 2 
 	//starting numbers and the corresponding print statement
 	function generateContent() {
+		if (taskReset) {
+			return;
+		}
 		var random1 = Math.round(Math.random() * 20);
 		var random2 = Math.round(Math.random() * 20);
 		while (random2 == random1) {
@@ -222,6 +243,7 @@ var main = function(ex) {
 				case 5:
 				var answer = listToString1D(range(0, ex.data.content.list.length - state.topCard.depth, 1));
 				state.getLineFromTopCard(5).rangeTextBox.setText(answer + "]");
+				break;
 				case 6:
 				var curSubPerm = (permutations(ex.data.content.list.slice(state.topCard.depth + 1,ex.data.content.list.length)))[state.topCard.curSubPerm];
 				var curI = state.topCard.innerLoopI;
@@ -535,6 +557,9 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
+					if (line.allPermsTextBox != undefined) {
+						line.allPermsTextBox.setText("");
+					}
 				}else {
 					var message = "That's incorrect. You should insert a[0] at the current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
@@ -736,9 +761,11 @@ var main = function(ex) {
 			return ex.data.content.code[line.lineNum];
 		}
 
+		
 		line.setText = function(newText){
 			line.text = newText;
 		}
+
 
 		line.revertText = function(){
 			line.text = ex.data.content.code[line.lineNum];
@@ -865,6 +892,13 @@ var main = function(ex) {
 			}
 		}
 
+		line.deactivateRangeDoneButton = function() {
+			if (line.rangeDoneButton != undefined) {
+				line.rangeDoneButton.deactivate();
+				line.rangeDoneButton = undefined;
+			}
+		}
+
 		line.deactivateReturnAllPermsButton = function() {
 			if (line.returnAllPermsButton != undefined) {
 				line.returnAllPermsButton.deactivate();
@@ -903,8 +937,6 @@ var main = function(ex) {
 				case 1: // if 
 					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
 						return line.lineNum == 2;
-					}else {
-						ex.alert("That's incorrect. We are now in the base case. The list length is 0.");
 					}
 					break;
 				case 2: // else
@@ -1069,8 +1101,11 @@ var main = function(ex) {
 	var state = State();
 	var mode = ex.data.meta.mode;
 
+	var taskReset = false;
+
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
+	ex.chromeElements.resetButton.on("click", resetTask);
 	var score = 1.0;
 	state.init();
 	state.draw();
