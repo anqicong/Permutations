@@ -7,7 +7,6 @@
 // - allPerms line needs to shorten when the text box is over it, and so does the highlight
 // 		- relatedly, return allPerms line needs to go away 
 //		- basically, card.refreshText isn't working (or isn't being called in the right place)
-// - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - Bottoms of cards are too long, card 1 should be inside card 0 etc.
 // - Adjust text to fit high resolution displays
 
@@ -24,6 +23,7 @@
 // - Base case 0th line missing a colon
 // - Code highlighting slightly off on different computers
 // - can't get the text to update in line 5 after clicking done on the range button
+// - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
 // - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented? -- solved, just don't use textbox class again
 
 var main = function(ex) {
@@ -81,6 +81,7 @@ var main = function(ex) {
 		return a;
 	};
 
+
 	//generateContent is a server function that randomly generates 2 
 	//starting numbers and the corresponding print statement
 	function generateContent() {
@@ -118,7 +119,7 @@ var main = function(ex) {
 		};
 
 		state.draw = function(){
-			for (var i = 0; i < state.cardsList.length; i++) {
+			for (var i = 0; i <= state.topCard.depth; i++) {
 				state.cardsList[i].draw();
 			}
 		};
@@ -132,6 +133,7 @@ var main = function(ex) {
 			}
 			window.setTimeout(doAnimation, 15);
 			if (state.topCard.height <= 0) {
+				state.topCard.setToDraw(false);
 				state.topCard.height = 0;
 				state.returnToPrev();
 				state.draw();
@@ -183,6 +185,38 @@ var main = function(ex) {
 				state.topCard.prepareForEnter();
 			}
 			
+		}
+
+		state.subTractScore = function(delta) {
+			totalScore -= delta;
+		}
+
+		state.advanceState = function() {
+			switch (state.topCard.curLineNum) {
+				case 0:
+				state.getLineFromTopCard(1).doLineAction();
+				break;
+				case 1:
+				if (state.topCard.depth < ex.data.content.list.length) {
+					state.getLineFromTopCard(2).doLineAction();
+				}else {
+					state.getLineFromTopCard(1).baseReturnButton.action();
+				}
+				break;
+				case 2:
+				state.getLineFromTopCard(3).doLineAction();
+				break;
+				case 3:
+				state.getLineFromTopCard(4).doLineAction();
+				break;
+				case 5:
+				var answer = listToString1D(range(0, ex.data.content.list.length - state.topCard.depth, 1));
+				state.getLineFromTopCard(5).rangeTextBox.setText(answer + "]");
+				state.getLineFromTopCard(5).rangeDoneButton.action();
+				default:
+				break;
+			}
+			state.draw();
 		}
 
 		return state;
@@ -419,6 +453,7 @@ var main = function(ex) {
 
 		line.showBaseReturnButton = false;
 		line.showTextBox = false;
+		line.rangeEntered = false;
 		line.showAllPermsTextBox = false;
 
 		line.baseReturnButton = undefined;
@@ -469,6 +504,10 @@ var main = function(ex) {
 							line.deactivateAllPermsTextBox();
 							line.deactivateRangeTextBox();
 							line.deactivateAllPermsDoneButton();
+							state.topCard.getAndSetNextLine();
+							state.topCard.curLineNum = 7;
+							state.draw();
+							state.topCard.linesList[7].unhighlight();
 						}else {
 							state.topCard.innerLoopI = 0;
 							state.topCard.advanceCurSubPerm();
@@ -478,7 +517,11 @@ var main = function(ex) {
 					}
 					line.allPermsTextBox.setText("");
 				}else {
-					alert(line.allPermsTextBox.getText());
+					var message = "This is incorrect. Insert a[0] at current index."
+					if (mode == "quiz-immediate" || mode == "quiz-delay") {
+						state.subTractScore(0.1);
+					}
+					ex.showFeedback(message);
 				}
 				console.log("allPermsDoneButtonAction");
 			}
@@ -489,11 +532,15 @@ var main = function(ex) {
 				if (state.topCard.shouldReturnAllPerm) {
 					line.returnAllPermsButton.deactivate();
 					state.topCard.unhighlightAll();
+					state.topCard.circlei = false;
 					state.animateCollapse();
 					//state.returnToPrev();
 					//state.draw();
 				}else {
 					ex.showFeedback("allPerms should contain more elements before return")
+					if (mode == "quiz-immediate" || mode == "quiz-delay") {
+						state.subTractScore(0.1);
+					}
 				}
 			}
 			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth + button_margin;
@@ -511,6 +558,10 @@ var main = function(ex) {
 							//state.returnToPrev();
 							//state.draw();
 						}else {
+							if (mode == "quiz-immediate" || mode == "quiz-delay") {
+								state.subTractScore(0.1);
+								state.advanceState();
+							}
 							ex.showFeedback(baseReturnButtonMessage);
 						}
 						console.log("Depth & curLineNum from base return button:");
@@ -527,12 +578,19 @@ var main = function(ex) {
 					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 35);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
+							state.topCard.getAndSetNextLine();
+							state.getLineFromTopCard(5).rangeEntered = true;
+							state.draw();
 							state.getLineFromTopCard(6).doLineAction();
-							//state.topCard.getAndSetNextLine();
-							//state.draw();
 						} 
 						else{ // incorrect
-							ex.showFeedback("That's incorrect. Try again."); // @TODO probably need a better statement here...
+							var message = "That's incorrect. Range is end point exclusive"
+							if (mode == "quiz-immediate" || mode == "quiz-delay") {
+								state.subTractScore(0.1);
+								message = "That's incorrect."
+							}
+							state.advanceState();
+							ex.showFeedback(message);
 						}
 					};
 					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
@@ -565,6 +623,7 @@ var main = function(ex) {
 				width: line.highlightWidth,
 				height: state.topCard.lineHeight
 			});
+			line.highlighted = true;
 			// activate or deactivate the base return button
 			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
 				line.deactivateReturnButton();
@@ -603,10 +662,13 @@ var main = function(ex) {
 			if (line.lineNum == 1 && line.showBaseReturnButton) {
 				return "  if (len(a) == 0):";
 			}
-			else if (line.lineNum == 5 && line.showTextBox){
+			else if (line.lineNum == 5 && line.rangeEntered){
 				var correct = range(0, ex.data.content.list.length - line.depth, 1);
 				var correctStr = "[ " + correct.join(" , ") + " ]";
 				return "      for i in " + correctStr + ":";
+			}
+			else if (line.lineNum == 5 && line.showTextBox) {
+				return "      for i in "
 			}
 			else if (line.lineNum == 4 && state.topCard != undefined && 
 				     state.topCard.returnedFromRecursiveCall) {
@@ -630,7 +692,7 @@ var main = function(ex) {
 			else if (state.topCard.curLineNum >= 6 && line.lineNum == 7){
 				return "";
 			}
-			else if (state.topCard.curLineNum >= 6 && line.lineNum == 6){
+			else if (state.topCard.curLineNum == 6 && line.lineNum == 6){
 				return "        allPerms += ";
 			}
 			return ex.data.content.code[line.lineNum];
@@ -715,9 +777,9 @@ var main = function(ex) {
 					//hide last line of code
 		            state.getLineFromTopCard(7).hide(0);
 					// change curLineNum to 6
-					state.topCard.unhighlightAll();
-					state.topCard.curLineNum = 6;
-					state.getLineFromTopCard(6).highlight();
+					//state.topCard.unhighlightAll();
+					//state.topCard.curLineNum = 6;
+					//state.getLineFromTopCard(6).highlight();
 					// change text to previous text box's answer
 					var correct = range(0, ex.data.content.list.length - line.depth, 1);
 					var correctStr = "[" + correct.join() + "]";
@@ -728,7 +790,7 @@ var main = function(ex) {
 					state.getLineFromTopCard(5).showTextBox = false;
 					// create another text area and button
 					line.showAllPermsTextBox = true; 
-					state.topCard.refreshText();
+					//state.topCard.refreshText();
 					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
@@ -762,6 +824,13 @@ var main = function(ex) {
 				line.rangeTextBox.deactivate();
 				line.rangeTextBox = undefined;
 				line.showTextBox = false;
+			}
+		}
+
+		line.deactivateReturnAllPermsButton = function() {
+			if (line.returnAllPermsButton != undefined) {
+				line.returnAllPermsButton.deactivate();
+				line.returnAllPermsButton = undefined;
 			}
 		}
 
@@ -873,7 +942,7 @@ var main = function(ex) {
 				button.myButton = undefined;
 			}
 		}
-			return button;
+		return button;
 	}
 
 	function TextBox(x, y, text, rows, cols){
@@ -925,6 +994,27 @@ var main = function(ex) {
 			}
 		}
 		if (!isLegal) {
+			if (state.topCard.curLineNum == 5) {
+				ex.showFeedback("Please fill in the list value first.");
+				return;
+			}
+			if (state.topCard.curLineNum == 6) {
+				ex.showFeedback("Please fill in the list value first.");
+				return;
+			}
+			state.subTractScore(0.1);
+			var message = "This is not the next line that executes. Try again.";
+			if (mode == "quiz-immediate" || mode == "quiz-delay") {
+				if (state.topCard.depth < ex.data.content.list.length) {
+					message = "This is incorrect."
+				}else {
+					message = "We are in base case now."
+				}	
+			}
+			ex.showFeedback(message);
+			if (mode == "quiz-immediate" || mode == "quiz-delay") {
+				state.advanceState();
+			}
 			return;
 		}
 		console.log("Depth and curLineNum from mouseClicked");
@@ -936,6 +1026,11 @@ var main = function(ex) {
 
 	var button_margin = 5;
 	var state = State();
+	var mode = ex.data.meta.mode;
+
+	ex.chromeElements.undoButton.disable();
+	ex.chromeElements.redoButton.disable();
+	var totalScore = 1.0;
 	state.init();
 	state.draw();
 };
