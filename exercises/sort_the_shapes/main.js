@@ -100,6 +100,7 @@ var main = function(ex) {
 		var state = {};
 		state.cardsList = [];
 		state.topCard = undefined;
+		state.taskFinished = false;
 
 		state.init = function(){
 			generateContent();
@@ -184,15 +185,9 @@ var main = function(ex) {
 
 		//Return to the previous card
 		state.returnToPrev = function() {
-			if (state.topCard.depth == ex.data.content.list.length) {
-				state.topCard.prepareForReturn();
-				state.topCard = state.cardsList[state.topCard.depth - 1];
-				state.topCard.prepareForEnter();
-			}else {
-				state.topCard.prepareForReturn();
-				state.topCard = state.cardsList[state.topCard.depth - 1];
-				state.topCard.prepareForEnter();
-			}			
+			state.topCard.prepareForReturn();
+			state.topCard = state.cardsList[state.topCard.depth - 1];
+			state.topCard.prepareForEnter();	
 		}
 
 		state.subTractScore = function(delta) {
@@ -545,9 +540,10 @@ var main = function(ex) {
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
+						message = message + " (score -0.1)";
 					}
 					state.advanceState();
-					ex.showFeedback(message);
+					ex.alert(message);
 				}
 				console.log("allPermsDoneButtonAction");
 			}
@@ -559,11 +555,18 @@ var main = function(ex) {
 					line.returnAllPermsButton.deactivate();
 					state.topCard.unhighlightAll();
 					state.topCard.circlei = false;
-					//state.animateCollapse();
-					state.returnToPrev();
-					state.draw();
+					if (state.topCard.depth == 0) {
+						state.taskFinished = true;
+						state.getLineFromTopCard(7).deactivateReturnAllPermsButton();
+						state.draw();
+						state.topCard.unhighlightAll();
+						ex.graphics.off("mousedown", mouseClicked);
+						ex.showFeedback("Congratulations! You have finished the task.");
+					}else {
+						state.animateCollapse();
+					}
 				}else {
-					ex.showFeedback("allPerms should contain more elements before returning.")
+					ex.alert("allPerms should contain more elements before returning.")
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
@@ -581,15 +584,16 @@ var main = function(ex) {
 					var baseReturnButtonMessage = "That's incorrect. We're in the recursive case right now.";
 					var baseReturn = function() {
 						if (state.topCard.depth == ex.data.content.list.length) {
-							//state.animateCollapse();
-							state.returnToPrev();
-							state.draw();
+							state.animateCollapse();
+							//state.returnToPrev();
+							//state.draw();
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
+								message += " (score -0.1)";
 								state.advanceState();
 							}
-							ex.showFeedback(baseReturnButtonMessage);
+							ex.alert(baseReturnButtonMessage);
 						}
 						console.log("Depth & curLineNum from base return button:");
 						console.log(state.topCard.depth);
@@ -615,9 +619,9 @@ var main = function(ex) {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
 								state.drawScore();
-								message = "That's incorrect."
+								message = "That's incorrect. (score -0.1)"
 							}
-							ex.showFeedback(message);
+							ex.alert(message);
 							state.advanceState();
 						}
 					};
@@ -723,7 +727,7 @@ var main = function(ex) {
 				newText += "]):";
 				return newText;
 			}
-			else if (state.topCard.curLineNum >= 6 && line.lineNum == 7){
+			else if (state.topCard.curLineNum >= 6 && line.lineNum == 7 && !state.taskFinished){
 				return "";
 			}
 			else if (state.topCard.curLineNum == 6 && line.lineNum == 6){
@@ -878,7 +882,7 @@ var main = function(ex) {
 
 		line.checkClick = function(x, y){
 			//Compensate for imprecision in clicks
-			var click_cmpst = 2;
+			var click_cmpst = 4;
 			if (x >= line.x && y >= line.y - click_cmpst && y <= line.y + state.topCard.lineHeight + click_cmpst) {
 				return true;
 			}
@@ -900,7 +904,7 @@ var main = function(ex) {
 					if (state.topCard.depth < ex.data.content.list.length){ // if not the base case
 						return line.lineNum == 2;
 					}else {
-						ex.showFeedback("That's incorrect. We are now in the base case. The list length is 0.");
+						ex.alert("That's incorrect. We are now in the base case. The list length is 0.");
 					}
 					break;
 				case 2: // else
@@ -1032,23 +1036,23 @@ var main = function(ex) {
 		}
 		if (!isLegal) {
 			if (state.topCard.curLineNum == 5) {
-				ex.showFeedback("Please fill in the value of the list first.");
+				ex.alert("Please fill in the value of the list first.");
 				return;
 			}
 			if (state.topCard.curLineNum == 6) {
-				ex.showFeedback("Please fill in the value of the list first.");
+				ex.alert("Please fill in the value of the list first.");
 				return;
 			}
 			state.subTractScore(0.1);
 			var message = "This is not the next line that executes. Try again.";
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
 				if (state.topCard.depth < ex.data.content.list.length) {
-					message = "That's incorrect."
+					message = "That's incorrect. (score -0.1)"
 				}else {
-					message = "We are in the base case now."
+					message = "We are in the base case now. (score -0.1)"
 				}	
 			}
-			ex.showFeedback(message);
+			ex.alert(message);
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
 				state.advanceState();
 			}
