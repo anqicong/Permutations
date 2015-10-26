@@ -522,7 +522,7 @@ var main = function(ex) {
 					}
 					//line.allPermsTextBox.setText("");
 				}else {
-					var message = "This is incorrect. Insert a[0] at current index."
+					var message = "That's incorrect. You should insert a[0] at the current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 					}
@@ -542,7 +542,7 @@ var main = function(ex) {
 					//state.returnToPrev();
 					//state.draw();
 				}else {
-					ex.showFeedback("allPerms should contain more elements before return")
+					ex.showFeedback("allPerms should contain more elements before returning.")
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 					}
@@ -589,7 +589,7 @@ var main = function(ex) {
 							state.getLineFromTopCard(6).doLineAction();
 						} 
 						else{ // incorrect
-							var message = "That's incorrect. Range is end point exclusive"
+							var message = "That's incorrect. Range is endpoint exclusive"
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
 								message = "That's incorrect."
@@ -1011,20 +1011,20 @@ var main = function(ex) {
 		}
 		if (!isLegal) {
 			if (state.topCard.curLineNum == 5) {
-				ex.showFeedback("Please fill in the list value first.");
+				ex.showFeedback("Please fill in the value of the list first.");
 				return;
 			}
 			if (state.topCard.curLineNum == 6) {
-				ex.showFeedback("Please fill in the list value first.");
+				ex.showFeedback("Please fill in the value of the list first.");
 				return;
 			}
 			state.subTractScore(0.1);
 			var message = "This is not the next line that executes. Try again.";
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
 				if (state.topCard.depth < ex.data.content.list.length) {
-					message = "This is incorrect."
+					message = "That's incorrect."
 				}else {
-					message = "We are in base case now."
+					message = "We are in the base case now."
 				}	
 			}
 			ex.showFeedback(message);
