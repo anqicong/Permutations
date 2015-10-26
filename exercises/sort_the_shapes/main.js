@@ -345,6 +345,22 @@ var main = function(ex) {
 	            	card.width, card.height);
 	            // draw tab
 	            card.drawTab();
+	            // draw allPerms box
+				if (card.curLineNum >= 3){
+					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
+					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
+											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
+					// draw allPerms text
+					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
+					ex.graphics.ctx.font = "15px Courier";
+					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
+					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
+					// draw lists within allPerms
+					var startY = card.allPermsBoxY + 15;
+					for (var i = 0; i < card.allPermsBoxList.length; i++){
+						ex.graphics.ctx.fillText(listToString1D(card.allPermsBoxList[i]), card.allPermsBoxX + 10, startY + i*card.lineHeight);
+					}	
+				}
 	            // draw lines
 				for (var i = 0; i < card.linesList.length; i++){
 					var thisLine = card.linesList[i];
@@ -366,24 +382,8 @@ var main = function(ex) {
 			        }
 			        card.linesList[4].circle(card.curSubPerm);
 			    }
-
-				// draw allPerms box
-				if (card.curLineNum >= 3){
-					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
-					ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
-											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
-					// draw allPerms text
-					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
-					ex.graphics.ctx.font = "15px Courier";
-					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
-					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
-					// draw lists within allPerms
-					var startY = card.allPermsBoxY + 15;
-					for (var i = 0; i < card.allPermsBoxList.length; i++){
-						ex.graphics.ctx.fillText(listToString1D(card.allPermsBoxList[i]), card.allPermsBoxX + 10, startY + i*card.lineHeight);
-					}
 				}
-			}
+			
 			
 		};
 
@@ -506,11 +506,12 @@ var main = function(ex) {
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
 					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
-					var i = state.topCard.allPermsString.length-1;
-					ex.graphics.ctx.fillStyle = "yellow";
-					var len = state.topCard.allPermsString[i].length;
-					ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
-						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
+					
+					//var i = state.topCard.allPermsString.length-1;
+					//ex.graphics.ctx.fillStyle = "yellow";
+					///var len = state.topCard.allPermsString[i].length;
+					//ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
+					//	state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 					if (state.topCard.innerLoopI >= ex.data.content.list.length - state.topCard.depth - 1) {
 						//Calculate the total number of current subPerms
 						var subPermNum = 1;
@@ -534,6 +535,12 @@ var main = function(ex) {
 						}
 					}else {
 						state.topCard.advanceInnerLoopI();
+					}
+					for (var i = 0;i < state.topCard.allPermsString.length;i++){
+				    	ex.graphics.ctx.fillStyle = "yellow";
+			   			var len = state.topCard.allPermsString[i].length;
+						ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
+						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 					}
 				}else {
 					var message = "That's incorrect. You should insert a[0] at the current index."
@@ -752,7 +759,7 @@ var main = function(ex) {
 		line.draw = function(){
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
-			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
+   			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier";
 			var text = line.getText();
 			if (line.lineNum == 0){
