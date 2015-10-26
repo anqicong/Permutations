@@ -151,8 +151,14 @@ var main = function(ex) {
 			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 			for (var i = 0; i <= state.topCard.depth; i++) {
 				state.cardsList[i].draw();
-				console.log("state draw",i);
 			}
+			for (var i = 0;i<state.topCard.allPermsString.length;i++){
+				ex.graphics.ctx.fillStyle = "yellow";
+			 	var len = state.topCard.allPermsString[i].length;
+				ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
+				state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
+			}
+			
 			state.drawScore();
 		};
 
@@ -284,7 +290,7 @@ var main = function(ex) {
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
-
+     
 		card.allPermsBoxList = [];
 		card.allPermsString = [];
 
@@ -296,6 +302,7 @@ var main = function(ex) {
 		card.shouldReturnAllPerm = false;
         
         card.circlei = false;
+        card.circleInner = false;
 		var rgbStr = (240 - 25 * card.depth).toString();
         card.fill = "rgb(" + rgbStr + ", " + rgbStr + "," + rgbStr + ")";
 
@@ -397,13 +404,7 @@ var main = function(ex) {
 					}
 					thisLine.draw();
 				}
-				if (card.circlei){
-					console.log("circle in card.draw",card.depth,card.curSubPerm);
-				    for (var i = 0;i<card.curSubPerm+1;i++){
-				        card.linesList[4].uncircle(i);
-			        }
-			        card.linesList[4].circle(card.curSubPerm);
-			    }
+				
 				}
 			
 			
@@ -558,12 +559,22 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
-					for (var i = 0;i < state.topCard.allPermsString.length;i++){
-				    	ex.graphics.ctx.fillStyle = "yellow";
-			   			var len = state.topCard.allPermsString[i].length;
-						ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
-						state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
+					var i = state.topCard.allPermsString.length-1
+				    ex.graphics.ctx.fillStyle = "yellow";
+			   		var len = state.topCard.allPermsString[i].length;
+					ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
+					state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
+					for (var i = 0;i<state.topCard.curSubPerm;i++){
+				        state.topCard.linesList[4].uncircle(i);
+			        }
+			        state.topCard.linesList[4].circle(state.topCard.curSubPerm);
+			        if (state.topCard.circleInner){
+                		for (var i = 0;i<state.topCard.innerLoopI;i++){
+			    			state.topCard.linesList[5].uncircle(i);
+						}
+			    		state.topCard.linesList[5].circle(state.topCard.innerLoopI);
 					}
+
 					if (line.allPermsTextBox != undefined) {
 						line.allPermsTextBox.setText("");
 					}
@@ -586,7 +597,6 @@ var main = function(ex) {
 				if (state.topCard.shouldReturnAllPerm) {
 					line.returnAllPermsButton.deactivate();
 					state.topCard.unhighlightAll();
-					state.topCard.circlei = false;
 					if (state.topCard.depth == 0) {
 						state.taskFinished = true;
 						state.getLineFromTopCard(7).deactivateReturnAllPermsButton();
@@ -643,6 +653,7 @@ var main = function(ex) {
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.topCard.getAndSetNextLine();
 							state.getLineFromTopCard(5).rangeEntered = true;
+							state.topCard.circleInner = true;
 							state.draw();
 							state.getLineFromTopCard(6).doLineAction();
 						} 
@@ -712,7 +723,14 @@ var main = function(ex) {
             	var offset = 160 + newText.length*10;
             	var width = listToString(list[index]).length*10;            	
             	ex.graphics.ctx.strokeStyle = "red";
+            	if (state.topCard.depth == 0) width -= 15;
+            	if (index == 1) offset += 10;
             	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            }
+            if (line.lineNum == 5){
+            	var offset = 150 + index*35;
+            	ex.graphics.ctx.strokeStyle = "red";
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
             }
 		}
 
@@ -723,8 +741,17 @@ var main = function(ex) {
             	var offset = 160 + newText.length*10;
             	var width = listToString(list[index]).length*10;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
-            	ex.graphics.ctx.rect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            	ex.graphics.ctx.stroke();
+            	if (state.topCard.depth == 0) width -= 15;
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            }
+            if (line.lineNum == 5){
+            	var offset = 150 + index*35;
+            	ex.graphics.ctx.strokeStyle = state.topCard.fill;
+               	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
             }
 		}
 
@@ -789,6 +816,10 @@ var main = function(ex) {
    			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "15px Courier";
 			var text = line.getText();
+			if (state.topCard.circlei) state.topCard.linesList[4].circle(state.topCard.curSubPerm);
+			if (state.topCard.circleInner) {
+				state.topCard.linesList[5].circle(state.topCard.innerLoopI);
+			}
 			if (line.lineNum == 0){
 				ex.graphics.ctx.fillText("permutations([", line.x, line.y + state.topCard.lineHeight);
 				var numText = "";
