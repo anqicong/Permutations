@@ -195,6 +195,7 @@ var main = function(ex) {
 			switch (state.topCard.curLineNum) {
 				case 0:
 				state.getLineFromTopCard(1).doLineAction();
+				state.draw();
 				break;
 				case 1:
 				if (state.topCard.depth < ex.data.content.list.length) {
@@ -202,21 +203,28 @@ var main = function(ex) {
 				}else {
 					state.getLineFromTopCard(1).baseReturnButton.action();
 				}
+				state.draw();
 				break;
 				case 2:
 				state.getLineFromTopCard(3).doLineAction();
+				state.draw();
 				break;
 				case 3:
 				state.getLineFromTopCard(4).doLineAction();
+				state.draw();
 				break;
 				case 5:
 				var answer = listToString1D(range(0, ex.data.content.list.length - state.topCard.depth, 1));
 				state.getLineFromTopCard(5).rangeTextBox.setText(answer + "]");
-				state.getLineFromTopCard(5).rangeDoneButton.action();
+				case 6:
+				var curSubPerm = (permutations(ex.data.content.list.slice(state.topCard.depth + 1,ex.data.content.list.length)))[state.topCard.curSubPerm];
+				var curI = state.topCard.innerLoopI;
+				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
+				var correctStr = "[[" + curSubPerm.join() + "]]";
+				state.getLineFromTopCard(6).allPermsTextBox.setText(correctStr);
 				default:
 				break;
 			}
-			state.draw();
 		}
 
 		return state;
@@ -526,6 +534,7 @@ var main = function(ex) {
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 					}
+					state.advanceState();
 					ex.showFeedback(message);
 				}
 				console.log("allPermsDoneButtonAction");
