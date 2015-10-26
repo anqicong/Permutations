@@ -345,8 +345,8 @@ var main = function(ex) {
 					}
 					thisLine.draw();
 				}
-				if (card.circlei){
-				    card.linesList[4].circle(0);
+				if ((state.topCard.circlei) && (state.topCard.curSubPerm == 0)){
+				    state.topCard.linesList[4].circle(0);
 			    }
 				// draw allPerms box
 				if (card.curLineNum >= 3){
@@ -400,6 +400,11 @@ var main = function(ex) {
 
 		card.advanceCurSubPerm = function() {
 			card.curSubPerm += 1;
+			for (var i = 0;i<card.curSubPerm+1;i++){
+				state.topCard.linesList[4].uncircle(i);
+				console.log(i,uncircle);
+			}
+			state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 		}
 
 		//Prepare to be reactivated from return
@@ -515,7 +520,7 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
-					line.allPermsTextBox.setText("");
+					//line.allPermsTextBox.setText("");
 				}else {
 					var message = "This is incorrect. Insert a[0] at current index."
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
@@ -655,7 +660,17 @@ var main = function(ex) {
 		}
 
 		line.uncircle = function(index){
-
+            if (line.lineNum == 4){
+            	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
+				var newText = listToString(list.slice(0,index));
+            	var offset = 160 + newText.length*10;
+            	var width = listToString(list[index]).length*10;
+            	ex.graphics.ctx.strokeStyle = state.topCard.fill;
+            	console.log(state.topCard.fill);
+            	ex.graphics.ctx.rect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	ex.graphics.ctx.stroke();
+            	console.log(line.x+offset,line.y,width,state.topCard.lineHeight+10);
+            }
 		}
 
 		line.getText = function(){
@@ -895,6 +910,7 @@ var main = function(ex) {
 				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
 				var correctStr = "[[" + curSubPerm.join() + "]]";
 				var answer = answer.replace(/ /g, "").replace(/:/g, "");
+				console.log(correctStr);
 				return answer == correctStr;
 			}
 			return false;
