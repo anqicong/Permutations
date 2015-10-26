@@ -481,7 +481,7 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
-					line.allPermsTextBox.setText("");
+					//line.allPermsTextBox.setText("");
 				}else {
 					alert(line.allPermsTextBox.getText());
 				}
@@ -841,6 +841,7 @@ var main = function(ex) {
 				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
 				var correctStr = "[[" + curSubPerm.join() + "]]";
 				var answer = answer.replace(/ /g, "").replace(/:/g, "");
+				console.log(correctStr);
 				return answer == correctStr;
 			}
 			return false;
