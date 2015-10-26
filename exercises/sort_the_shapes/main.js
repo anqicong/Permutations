@@ -574,7 +574,7 @@ var main = function(ex) {
 			        }
 			        state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			        if (state.topCard.circleInner){
-				        for (var i = 0;i<state.topCard.innerLoopI;i++){
+				        for (var i = 0;i < ex.data.content.list.length - line.depth;i++){ // hax...
 	                		
 				    		state.topCard.linesList[5].uncircle(i);
 						}

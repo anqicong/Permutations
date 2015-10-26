@@ -11,7 +11,7 @@
         "instrFile": "instr.html",
         "constructorName": "main",
         "menuDisplayName": "Permutations",
-        "mode": "quiz-immediate",
+        "mode": "practice",
         "requires": {
         }
     },
