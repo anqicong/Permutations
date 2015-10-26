@@ -133,7 +133,6 @@ var main = function(ex) {
 			state.drawScore();
 		};
 
-		//BETA_HELPER
 		state.animateCollapseHelper = function() {
 			var doAnimation = function() {
 				state.topCard.height -= 10;
@@ -152,7 +151,6 @@ var main = function(ex) {
 			}
 		}
 
-		//BETA
 		state.animateCollapse = function() {
 			if (state.topCard.depth == ex.data.content.list.length) {
 				for (var i = 0; i < state.topCard.depth; i++) {
@@ -192,8 +190,7 @@ var main = function(ex) {
 				state.topCard.prepareForReturn();
 				state.topCard = state.cardsList[state.topCard.depth - 1];
 				state.topCard.prepareForEnter();
-			}
-			
+			}			
 		}
 
 		state.subTractScore = function(delta) {
@@ -617,8 +614,8 @@ var main = function(ex) {
 								state.drawScore();
 								message = "That's incorrect."
 							}
-							state.advanceState();
 							ex.showFeedback(message);
+							state.advanceState();
 						}
 					};
 					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
@@ -674,10 +671,10 @@ var main = function(ex) {
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
             	var offset = 160 + newText.length*10;
-            	var width = listToString(list[index]).length*10;
+            	var width = listToString(list[index]).length*10;            	
             	ex.graphics.ctx.strokeStyle = "red";
-            	ex.graphics.ctx.rect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            	ex.graphics.ctx.stroke();
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	//ex.graphics.ctx.stroke();
             	console.log(line.x+offset,line.y,width,state.topCard.lineHeight+10);
             }
 		}
