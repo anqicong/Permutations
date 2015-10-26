@@ -129,6 +129,7 @@ var main = function(ex) {
 			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height());
 			for (var i = 0; i <= state.topCard.depth; i++) {
 				state.cardsList[i].draw();
+				console.log("state draw",i);
 			}
 			state.drawScore();
 		};
@@ -143,6 +144,7 @@ var main = function(ex) {
 			if (state.topCard.height <= 0) {
 				state.topCard.setToDraw(false);
 				state.topCard.height = 0;
+				state.topCard.circlei = false;
 				state.returnToPrev();
 				state.draw();
 				return;
@@ -362,9 +364,14 @@ var main = function(ex) {
 					}
 					thisLine.draw();
 				}
-				if ((state.topCard.circlei) && (state.topCard.curSubPerm == 0)){
-				    state.topCard.linesList[4].circle(0);
+				if (card.circlei){
+					console.log("circle in card.draw",card.depth,card.curSubPerm);
+				    for (var i = 0;i<card.curSubPerm+1;i++){
+				        card.linesList[4].uncircle(i);
+			        }
+			        card.linesList[4].circle(card.curSubPerm);
 			    }
+
 				// draw allPerms box
 				if (card.curLineNum >= 3){
 					ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
@@ -417,11 +424,7 @@ var main = function(ex) {
 
 		card.advanceCurSubPerm = function() {
 			card.curSubPerm += 1;
-			for (var i = 0;i<card.curSubPerm+1;i++){
-				state.topCard.linesList[4].uncircle(i);
-				console.log(i,uncircle);
-			}
-			state.topCard.linesList[4].circle(state.topCard.curSubPerm);
+			
 		}
 
 		//Prepare to be reactivated from return
@@ -674,8 +677,6 @@ var main = function(ex) {
             	var width = listToString(list[index]).length*10;            	
             	ex.graphics.ctx.strokeStyle = "red";
             	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            	//ex.graphics.ctx.stroke();
-            	console.log(line.x+offset,line.y,width,state.topCard.lineHeight+10);
             }
 		}
 
@@ -686,10 +687,8 @@ var main = function(ex) {
             	var offset = 160 + newText.length*10;
             	var width = listToString(list[index]).length*10;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
-            	console.log(state.topCard.fill);
             	ex.graphics.ctx.rect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
             	ex.graphics.ctx.stroke();
-            	console.log(line.x+offset,line.y,width,state.topCard.lineHeight+10);
             }
 		}
 
