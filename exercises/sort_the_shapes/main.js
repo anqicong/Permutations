@@ -562,18 +562,21 @@ var main = function(ex) {
 					}else {
 						state.topCard.advanceInnerLoopI();
 					}
+					// draw text in allPerms box
 					var i = state.topCard.allPermsString.length-1
 				    ex.graphics.ctx.fillStyle = "yellow";
 			   		var len = state.topCard.allPermsString[i].length;
 					ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
 					state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
+					// uncircle things
 					for (var i = 0;i<state.topCard.curSubPerm;i++){
 				        state.topCard.linesList[4].uncircle(i);
 			        }
 			        state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			        if (state.topCard.circleInner){
-                		for (var i = 0;i<state.topCard.innerLoopI;i++){
-			    			state.topCard.linesList[5].uncircle(i);
+				        for (var i = 0;i<state.topCard.innerLoopI;i++){
+	                		
+				    		state.topCard.linesList[5].uncircle(i);
 						}
 			    		state.topCard.linesList[5].circle(state.topCard.innerLoopI);
 					}
@@ -582,16 +585,21 @@ var main = function(ex) {
 						line.allPermsTextBox.setText("");
 					}
 				}else {
-					var message = "That's incorrect. You should insert a[0] at the current index."
+					var ans = line.allPermsTextBox.getText();
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
-						message = message + " (score -0.1)";
+						var message = "That's incorrect. (score -0.1)";
+					}
+					else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
+						var message = "That's incorrect. Be sure to have the right type of lists."
+					}
+					else{
+						var message = "That's incorrect. You should insert a[0] at the current index.";
 					}
 					state.advanceState();
 					ex.alert(message);
 				}
-				console.log("allPermsDoneButtonAction");
 			}
 			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
 			line.allPermsDoneButton = Button(485, allPermDoneButtonY, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
@@ -606,7 +614,7 @@ var main = function(ex) {
 						state.draw();
 						state.topCard.unhighlightAll();
 						ex.graphics.off("mousedown", mouseClicked);
-						ex.showFeedback("Congratulations! You have finished the task.");
+						ex.showFeedback("Congratulations! You have finished the task. Please click Submit.");
 					}else {
 						state.animateCollapse();
 					}
@@ -640,9 +648,9 @@ var main = function(ex) {
 							}
 							ex.alert(baseReturnButtonMessage);
 						}
-						console.log("Depth & curLineNum from base return button:");
+						/*console.log("Depth & curLineNum from base return button:");
 						console.log(state.topCard.depth);
-						console.log(state.topCard.curLineNum);
+						console.log(state.topCard.curLineNum);*/
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
@@ -1012,7 +1020,6 @@ var main = function(ex) {
 				curSubPerm.splice(curI, 0, ex.data.content.list[state.topCard.depth]);
 				var correctStr = "[[" + curSubPerm.join() + "]]";
 				var answer = answer.replace(/ /g, "").replace(/:/g, "");
-				console.log(correctStr);
 				return answer == correctStr;
 			}
 			return false;
@@ -1135,9 +1142,9 @@ var main = function(ex) {
 			}
 			return;
 		}
-		console.log("Depth and curLineNum from mouseClicked");
+		/*console.log("Depth and curLineNum from mouseClicked");
 		console.log(state.topCard.depth);
-		console.log(state.topCard.curLineNum);
+		console.log(state.topCard.curLineNum);*/
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
