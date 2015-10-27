@@ -6,7 +6,7 @@
         "id": "andrewid-assignment1",
         "languages": ["python"],
         "difficulty": "medium",
-        "mode": "practice",
+        "mode": "quiz-immediate",
         "exercises": [{
             "path": "exercises/sort_the_shapes"
         },{
