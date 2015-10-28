@@ -117,6 +117,11 @@ var main = function(ex) {
 		ex.data.content.list = [random1, random2, random3];
 	}
 
+	//Grade function
+	function grade(content, state) {
+		return content.score;
+	}
+
 	function State(){
 		var state = {};
 		state.cardsList = [];
@@ -144,7 +149,7 @@ var main = function(ex) {
 			var score_height = 18;
 			ex.graphics.ctx.clearRect(ex.width() - score_width, 0, score_width, score_height);
 			ex.graphics.ctx.fillStyle = "#000000";
-			ex.graphics.ctx.fillText("Score: " + ex.data.content.score.toFixed(1).toString(), ex.width() - score_width, score_height);
+			ex.graphics.ctx.fillText("Score: " + grade(ex.data.content, ex.data).toFixed(1).toString(), ex.width() - score_width, score_height);
 		}
 
 		state.draw = function(){
