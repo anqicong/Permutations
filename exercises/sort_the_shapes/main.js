@@ -144,7 +144,7 @@ var main = function(ex) {
 			var score_height = 18;
 			ex.graphics.ctx.clearRect(ex.width() - score_width, 0, score_width, score_height);
 			ex.graphics.ctx.fillStyle = "#000000";
-			ex.graphics.ctx.fillText("Score: " + score.toFixed(1).toString(), ex.width() - score_width, score_height);
+			ex.graphics.ctx.fillText("Score: " + ex.data.content.score.toFixed(1).toString(), ex.width() - score_width, score_height);
 		}
 
 		state.draw = function(){
@@ -221,9 +221,9 @@ var main = function(ex) {
 		}
 
 		state.subTractScore = function(delta) {
-			score -= delta;
-			if (score < 0) {
-				score = 0;
+			ex.data.content.score -= delta;
+			if (ex.data.content.score < 0) {
+				ex.data.content.score = 0;
 			}
 		}
 
@@ -1158,7 +1158,7 @@ var main = function(ex) {
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
 	ex.chromeElements.resetButton.on("click", resetTask);
-	var score = 1.0;
+	ex.data.content.score = 1.0;
 	state.init();
 	state.draw();
 };
