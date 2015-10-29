@@ -750,9 +750,11 @@ var main = function(ex) {
 			if (line.lineNum == 1 && line.text == ex.data.content.code[1]){
 				line.highlightWidth = line.text.length * 5.5;
 			}
+			/*
 			if (line.highlighted) {
 				return;
 			}
+			*/
 			var fill = 5;
 			ex.graphics.ctx.fillStyle = "rgba(255, 250, 153, 120)"
 			ex.graphics.ctx.fillRect(line.x, line.y + fill, line.highlightWidth, state.topCard.lineHeight)
