@@ -27,8 +27,46 @@
 
 var main = function(ex) {
 
+	ex.data = {
+		"meta": {
+        "author": "Luyao Hou",
+        "email": "lhou@andrew.cmu.edu",
+        "title": "Permutations",
+        "description": "Permutations",
+        "id": "lhou",
+        "language": "",
+        "difficulty": "medium",
+        "mainFile": "main.js",
+        "instrFile": "instr.html",
+        "constructorName": "main",
+        "menuDisplayName": "Permutations",
+        "mode": "practice",
+        "requires": {
+        }
+    	},
+	    "code": {
+	        "display": "def permutations(a):\n  if(len(a) == 0):\n    return [[]]\n  else:\n    allPerms = []\n    for subPerm in permutations(a[1:]):\n      for i in range(len(subPerm) + 1):\n        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]\n    return allPerms\n\n",
+	        "lines": 11,
+	        "language": "python"
+	    },
+	    "content": {
+	        "list": [1, 2],
+	        "printStatement": "print permutations([1, 2])",
+	        "code": ["def permutations(a):", 
+	                 "  if (len(a) == 0): return [[]]",
+	                 "  else:",
+	                 "    allPerms = []",
+	                 "    for subPerm in permutations(a[1:]):",
+	                 "      for i in range(len(subPerm) + 1):",
+	                 "        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]",
+	                 "    return allPerms"],
+	        "lines": 11,
+	        "language": "python"
+	    }
+	}
+
     function permutations(list) {
-        if (list.length == 0) {
+        if (list.length === 0) {
             return [[]];
         }
         else {
@@ -47,6 +85,12 @@ var main = function(ex) {
         	return allPerms;
      	}
 	}
+
+	//Save current state
+	function saveCurState() {
+		var curState = []
+		ex.saveState(curState)
+	}	
 
 	//Take in a 2d list
 	function listToString(list) {
@@ -70,7 +114,7 @@ var main = function(ex) {
 	}
 
 	function listToString1D(list){
-		return "[" + list.join(", "); + "]";
+		return "[" + list.join(", ") + "]";
 	}
 	
 
@@ -78,7 +122,7 @@ var main = function(ex) {
 		var a=[], b=start;
 		while(b<stop){a.push(b);b+=step;}
 		return a;
-	};
+	}
 
 	function resetTask() {
 		taskReset = true;
@@ -256,7 +300,7 @@ var main = function(ex) {
 				break;
 				case 5:
 				var answer = listToString1D(range(0, ex.data.content.list.length - state.topCard.depth, 1));
-				state.getLineFromTopCard(5).rangeTextBox.setText(answer + "]");
+				state.getLineFromTopCard(5).rangeTextBox.setText(answer);
 				break;
 				case 6:
 				var curSubPerm = (permutations(ex.data.content.list.slice(state.topCard.depth + 1,ex.data.content.list.length)))[state.topCard.curSubPerm];
@@ -603,7 +647,7 @@ var main = function(ex) {
 						var message = "That's incorrect. You should insert a[0] at the current index.";
 					}
 					state.advanceState();
-					ex.alert(message);
+					ex.alert(message, {color: "yellow"});
 				}
 			}
 			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
@@ -624,7 +668,7 @@ var main = function(ex) {
 						state.animateCollapse();
 					}
 				}else {
-					ex.alert("allPerms should contain more elements before returning.")
+					ex.alert("allPerms should contain more elements before returning.", {color: "yellow"})
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
@@ -648,10 +692,10 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								message += " (score -0.1)";
+								baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
-							ex.alert(baseReturnButtonMessage);
+							ex.alert(baseReturnButtonMessage, {color: "yellow"});
 						}
 						/*console.log("Depth & curLineNum from base return button:");
 						console.log(state.topCard.depth);
@@ -680,7 +724,7 @@ var main = function(ex) {
 								state.drawScore();
 								message = "That's incorrect. (score -0.1)"
 							}
-							ex.alert(message);
+							ex.alert("That is incorrect", {color: "yellow"});
 							state.advanceState();
 						}
 					};
@@ -710,10 +754,14 @@ var main = function(ex) {
 				return;
 			}
 			var fill = 5;
+			ex.graphics.ctx.fillStyle = "rgba(255, 250, 153, 120)"
+			ex.graphics.ctx.fillRect(line.x, line.y + fill, line.highlightWidth, state.topCard.lineHeight)
+			/*
 			line.highlightImage = ex.createImage(line.x, line.y + fill, img, {
 				width: line.highlightWidth,
 				height: state.topCard.lineHeight
 			});
+            */
 			line.highlighted = true;
 			// activate or deactivate the base return button
 			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
@@ -1125,11 +1173,11 @@ var main = function(ex) {
 		}
 		if (!isLegal) {
 			if (state.topCard.curLineNum == 5) {
-				ex.alert("Please fill in the value of the list first.");
+				ex.alert("Please fill in the value of the list first.", {color: "yellow"});
 				return;
 			}
 			if (state.topCard.curLineNum == 6) {
-				ex.alert("Please fill in the value of the list first.");
+				ex.alert("Please fill in the value of the list first.", {color: "yellow"});
 				return;
 			}
 			state.subTractScore(0.1);
@@ -1141,7 +1189,7 @@ var main = function(ex) {
 					message = "We are in the base case now. (score -0.1)"
 				}	
 			}
-			ex.alert(message);
+			ex.alert(message, {color: "yellow"});
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
 				state.advanceState();
 			}
@@ -1157,6 +1205,7 @@ var main = function(ex) {
 	var button_margin = 5;
 	var state = State();
 	var mode = ex.data.meta.mode;
+	mode = "quiz-immediate"
 
 	var taskReset = false;
 
