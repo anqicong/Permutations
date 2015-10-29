@@ -1163,6 +1163,12 @@ var main = function(ex) {
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
 	ex.chromeElements.resetButton.on("click", resetTask);
+	ex.chromeElements.submitButton.on("click", function() {
+		if (ex.data.content.score != undefined) {
+			var feedBack = "You have completed the task";
+			ex.setGrade(ex.data.content.score, feedBack);
+		}
+	});
 	ex.data.content.score = 1.0;
 	state.init();
 	state.draw();
