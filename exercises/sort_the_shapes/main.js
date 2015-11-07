@@ -308,15 +308,17 @@ var main = function(ex) {
 
 		//card constants
 	    card.leftMargin = 15;
-	    card.topMargin = 30;
+	    card.topMargin = 27;
 	    card.maxHeight = ex.height()-card.topMargin;
 	    card.maxWidth = ex.width()-card.leftMargin;
 	    card.originalTabWidth = 220;
 	    card.tabWidth = 220;
-	    card.tabHeight = 20;
+	    card.tabHeight = 22;
 	    card.lineHeight = 16;
 	    card.x = card.depth*card.leftMargin;
 		card.y = card.depth*card.topMargin;
+		if (card.depth == 1) card.y += 5;
+		if (card.depth == 3) card.y -= 5;
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
 		card.allPermsBoxWidth = 100	;
@@ -345,14 +347,15 @@ var main = function(ex) {
 			// create all the lines
 			for (var i = 0; i < ex.data.content.code.length; i++) {
 				var depthOffsetX = card.depth*16;
-				var depthOffsetY = card.depth*73;
+				var depthOffsetY = card.depth*65;
 				if (i == 0){ // extra offset for first line
-					depthOffsetX += card.depth*155;
+					depthOffsetX += card.depth*151;
 					if (card.depth >= 2) {
 						depthOffsetX -= (card.depth - 1) * 150;
 					}
 
 				}
+				if (card.depth != 0) depthOffsetY -= 1;
 				card.linesList.push(Line(20 + depthOffsetX, 
 										 i * card.lineHeight + depthOffsetY, 
 										 i, card.depth));
@@ -377,20 +380,20 @@ var main = function(ex) {
 					break;
 				case 1:
 					var x = card.x + card.leftMargin*11;
-					var y = card.y + card.lineHeight*2 + 10;
+					var y = card.y + card.lineHeight*2;
 					card.tabWidth = card.originalTabWidth - 25;
 					break;
 				case 2:
 				    var x = card.x + card.leftMargin*12 - 20;
-				    var y = card.y + card.lineHeight*4 + 16;
+				    var y = card.y + card.lineHeight*4 + 10;
 				    card.tabWidth = card.originalTabWidth - 25;
 				    break;
 				case 3:
-					var x = card.x + card.leftMargin * 14 - 42;
-					var y = card.y + card.lineHeight * 6 + 25;
+					var x = card.x + card.leftMargin * 14 - 45;
+					var y = card.y + card.lineHeight * 6 + 20;
 					card.tabWidth = card.originalTabWidth - 25;
 			}
-			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight); 
+			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight+5); 
 		};
 
 		card.draw = function(){
@@ -399,7 +402,7 @@ var main = function(ex) {
 				ex.graphics.ctx.fillStyle = card.fill;
 				// draw card
 				if (card.depth > 0){
-					var adjustForDepth = (card.lineHeight+4)*2*card.depth;
+					var adjustForDepth = (card.lineHeight+4)*2*card.depth-(4-card.depth)*3;
 				}
 				else{
 					var adjustForDepth = 0;
@@ -786,17 +789,17 @@ var main = function(ex) {
             if (line.lineNum == 4){
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
-            	var offset = 160 + newText.length*10;
-            	var width = listToString(list[index]).length*10;            	
+            	var offset = 148 + newText.length*10;
+            	var width = listToString(list[index]).length*9;            	
             	ex.graphics.ctx.strokeStyle = "red";
             	if (state.topCard.depth == 0) width -= 15;
             	if (index == 1) offset += 10;
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
             }
             if (line.lineNum == 5){
-            	var offset = 150 + index*35;
+            	var offset = 140 + index*35;
             	ex.graphics.ctx.strokeStyle = "red";
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
             }
 		}
 
@@ -804,23 +807,23 @@ var main = function(ex) {
             if (line.lineNum == 4){
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
-            	var offset = 160 + newText.length*10;
-            	var width = listToString(list[index]).length*10;
+            	var offset = 148 + newText.length*10;
+            	var width = listToString(list[index]).length*9;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	if (state.topCard.depth == 0) width -= 15;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
             	}
             }
             if (line.lineNum == 5){
-            	var offset = 150 + index*35;
+            	var offset = 140 + index*35;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,20,state.topCard.lineHeight);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
             	}
             }
 		}
@@ -894,6 +897,7 @@ var main = function(ex) {
 				state.topCard.linesList[5].circle(state.topCard.innerLoopI);
 			}
 			if (line.lineNum == 0){
+               
 				ex.graphics.ctx.fillText("permutations([", line.x, line.y + state.topCard.lineHeight);
 				var numText = "";
 				for (var numIndex = line.depth; numIndex < ex.data.content.list.length; numIndex++){
@@ -904,9 +908,9 @@ var main = function(ex) {
 					}
 				}
 				ex.graphics.ctx.fillStyle = "blue";
-				ex.graphics.ctx.fillText(numText, line.x+130, line.y + state.topCard.lineHeight);
+				ex.graphics.ctx.fillText(numText, line.x+120, line.y + state.topCard.lineHeight);
 				ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
-				ex.graphics.ctx.fillText("])", line.x+130+numText.length*10, line.y + state.topCard.lineHeight);
+				ex.graphics.ctx.fillText("])", line.x+120+numText.length*10, line.y + state.topCard.lineHeight);
 			}
 			else ex.graphics.ctx.fillText(text, line.x, line.y + state.topCard.lineHeight);
 			if (line.showBaseReturnButton && line.baseReturnButton.myButton == undefined) {
