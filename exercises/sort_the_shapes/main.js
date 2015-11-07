@@ -497,11 +497,12 @@ var main = function(ex) {
 			var rangeTextBoxX = 174 + 4 * card.depth;
 			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
 			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+			
 			if (card.depth == 0) {
-				card.linesList[6].allPermsDoneButton = Button(485, 110, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+				card.linesList[6].allPermsDoneButton = Button(485, 103, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
 			}
 			if (card.depth == 2) {
-				card.linesList[6].allPermsDoneButton = Button(485, 260, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+				card.linesList[6].allPermsDoneButton = Button(485, 230, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
 			}
 		}
 
