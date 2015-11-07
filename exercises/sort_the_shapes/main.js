@@ -689,7 +689,7 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								baseReturnButtonMessage += " (score -0.1)";
+								//baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow", transition: "alert-long"});
@@ -1210,7 +1210,7 @@ var main = function(ex) {
 			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
-						message = "That's incorrect. (score -0.1)"
+						message = "That's incorrect."
 					}else {
 						message = "That's incorrect. We are in the base case now."
 					}	
