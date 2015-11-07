@@ -987,6 +987,7 @@ var main = function(ex) {
 					state.topCard.getAndSetNextLine();
 					break;
 			}
+
 		};
 
 		line.drawIndicator = function(x, y, width) {
@@ -1055,7 +1056,7 @@ var main = function(ex) {
 
 		line.checkClick = function(x, y){
 			//Compensate for imprecision in clicks
-			var click_cmpst = 4;
+			var click_cmpst = 0;
 			if (x >= line.x && y >= line.y - click_cmpst && y <= line.y + state.topCard.lineHeight + click_cmpst) {
 				return true;
 			}
@@ -1197,6 +1198,8 @@ var main = function(ex) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
 				if (currentLineMouseHovers == undefined || line.lineNum != currentLineMouseHovers[0] || state.topCard.depth != currentLineMouseHovers[1]) {
+					console.log("Move")
+					console.log(line.lineNum)
 					line.showMouseOver();
 					currentLineMouseHovers = [line.lineNum, state.topCard.depth];
 				}
@@ -1212,6 +1215,8 @@ var main = function(ex) {
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
+				console.log("Click")
+				console.log(line.lineNum)
 				validLineClick = true;
 				if (line.lineNum == state.topCard.curLineNum) {
 					clickOnCurLine = true;
