@@ -659,8 +659,8 @@ var main = function(ex) {
 						state.draw();
 						state.topCard.unhighlightAll();
 						ex.graphics.off("mousedown", mouseClicked);
-						ex.showFeedback("Congratulations! You have finished the task. Please click Submit.");
-						ex.chromeElements.submitButton.enable();x
+						ex.alert("Congratulations! You have finished the task. Please click Submit.", {color: "blue", stay: true});
+						ex.chromeElements.submitButton.enable();
 					}else {
 						state.animateCollapse();
 					}
