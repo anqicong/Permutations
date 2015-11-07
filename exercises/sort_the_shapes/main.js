@@ -489,7 +489,7 @@ var main = function(ex) {
 			card.returnedFromRecursiveCall = true;
 			card.linesList[5].rangeDoneButton.deactivate();
 			card.linesList[7].returnAllPermsButton.deactivate();
-			var rangeTextBoxX = 174 + 4 * card.depth;
+			var rangeTextBoxX = 150 + 13 * card.depth;
 			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
 			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 			
@@ -704,7 +704,7 @@ var main = function(ex) {
 					break;
 				case 5:
 				    var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
-					line.rangeTextBox = TextBox(170, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 35);
+					line.rangeTextBox = TextBox(160, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 35);
 					line.rangeDoneButtonAction = function(){
 						if (line.checkTextAnswer(line.rangeTextBox.getText())){ // correct
 							state.topCard.getAndSetNextLine();
@@ -752,6 +752,9 @@ var main = function(ex) {
 			// adjust for when the if statement is cut short by the base return button
 			if (line.lineNum == 1 && line.text == ex.data.content.code[1]){
 				line.highlightWidth = line.text.length * 5.5;
+			}
+			if (line.highlightWidth+line.x > state.topCard.allPermsBoxX){
+				line.highlightWidth = state.topCard.allPermsBoxX - line.x;
 			}
 			/*
 			if (line.highlighted) {
