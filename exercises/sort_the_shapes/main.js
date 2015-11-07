@@ -701,7 +701,7 @@ var main = function(ex) {
 						console.log(state.topCard.curLineNum);*/
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
-													"returns [ [ ] ]", 1, 
+													"return [ [ ] ]", 1, 
 													baseReturn, 
 													"xsmall", undefined);
 					break;
@@ -921,6 +921,10 @@ var main = function(ex) {
 					state.topCard.getAndSetNextLine();
 					// activate the base case return button
 					line.showBaseReturnButton = true;
+					// display feedback if needed
+					if (state.topCard.depth == 0){
+						ex.alert("Does the function return here? <br>If so, click the return button. <br>If not, keep clicking on the next line to execute.", {color: "blue", stay: true});
+					}
 					break;
 				case 2: // else
 					// deactivate the if statement's return button 
@@ -1219,7 +1223,7 @@ var main = function(ex) {
 	var button_margin = 5;
 	var state = State();
 	var mode = ex.data.meta.mode;
-	mode = "quiz-immediate"
+	mode = "quiz-immediate";
 
 	var taskReset = false;
 
@@ -1237,4 +1241,6 @@ var main = function(ex) {
 	ex.data.content.score = 1.0;
 	state.init();
 	state.draw();
+	ex.alert("Click on the next line that executes", {color: "blue", stay: true});
+
 };
