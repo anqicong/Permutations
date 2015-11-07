@@ -14,17 +14,6 @@
 // - show allPerms
 // - button that can pop up instruction on filling in texts
 
-// Resolved
-// - The actual list doesn't show up in the permutations(a) line (should look like permutations([x, y]))
-// - Clicking on the if line on cards of depth 1 and 2 makes the return statement appear instead of disappear
-// - Base case return button shows up a line too early for cards 1 and 2
-// - On card of depth 2, line 0 code highlight isn't wide enough
-// - Base case 0th line missing a colon
-// - Code highlighting slightly off on different computers
-// - can't get the text to update in line 5 after clicking done on the range button
-// - Clicking on the for subperms line over and over makes the card grow to the left and line 0 get bolder??
-// - IMPORTANT: why does the allPerms text box show instead of the range text box when uncommented? -- solved, just don't use textbox class again
-
 var main = function(ex) {
 
 	ex.data = {
@@ -702,7 +691,7 @@ var main = function(ex) {
 						console.log(state.topCard.curLineNum);*/
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
-													"return [ [ ] ]", 1, 
+													"returns [ [ ] ]", 1, 
 													baseReturn, 
 													"xsmall", undefined);
 					break;
@@ -1165,11 +1154,15 @@ var main = function(ex) {
 		//Check click legal before drawing
 		var isLegal = false;
 		var validLineClick = false;
+		var clickOnCurLine = false;
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
 				validLineClick = true;
-				if (line.clickIsLegal()) {
+				if (line.lineNum == state.topCard.curLineNum) {
+					clickOnCurLine = true;
+				}
+				else if (line.clickIsLegal()) {
 					line.doClick();
 					isLegal = true;
 					break;
@@ -1189,7 +1182,10 @@ var main = function(ex) {
 				state.subTractScore(0.1);
 			}
 			var message = "This is not the next line that executes. Try again.";
-			if (validLineClick) {
+			if (clickOnCurLine) {
+				message = "Click on the next line rather than the current line"
+			}
+			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
 						message = "That's incorrect. (score -0.1)"
