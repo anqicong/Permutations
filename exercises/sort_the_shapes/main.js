@@ -633,19 +633,25 @@ var main = function(ex) {
 					}
 				}else {
 					var ans = line.allPermsTextBox.getText();
-					if (mode == "quiz-immediate" || mode == "quiz-delay") {
+					if (trim_spaces(ans) == "") {
+						message = "Probably not an empty answer"
+						ex.alert(message, {color: "yellow"})
+						line.allPermsTextBox.setText("")
+					}else {
+						if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
 						var message = "That's incorrect.";
+						}
+						else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
+							var message = "That's incorrect. Be sure to have the right type of lists."
+						}
+						else{
+							var message = "That's incorrect. You should insert a[0] at the current index.";
+						}		
+						state.advanceState();
+						ex.alert(message, {color: "yellow"});
 					}
-					else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
-						var message = "That's incorrect. Be sure to have the right type of lists."
-					}
-					else{
-						var message = "That's incorrect. You should insert a[0] at the current index.";
-					}
-					state.advanceState();
-					ex.alert(message, {color: "yellow"});
 				}
 			}
 			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
@@ -717,14 +723,20 @@ var main = function(ex) {
 							state.getLineFromTopCard(6).doLineAction();
 						} 
 						else{ // incorrect
-							var message = "That's incorrect. Range is endpoint exclusive"
-							if (mode == "quiz-immediate" || mode == "quiz-delay") {
-								state.subTractScore(0.1);
-								state.drawScore();
-								message = "That's incorrect."
+							if (trim_spaces(line.rangeTextBox.getText()) == "") {
+								message = "Probably not an empty answer"
+								ex.alert(message, {color: "yellow"})
+								line.rangeTextBox.setText("")
+							}else {
+								var message = "That's incorrect. Range is endpoint exclusive"
+								if (mode == "quiz-immediate" || mode == "quiz-delay") {
+									state.subTractScore(0.1);
+									state.drawScore();
+									message = "That's incorrect."
+								}
+								ex.alert("That is incorrect", {color: "yellow"});
+								state.advanceState();
 							}
-							ex.alert("That is incorrect", {color: "yellow"});
-							state.advanceState();
 						}
 					};
 					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
