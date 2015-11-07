@@ -614,7 +614,11 @@ var main = function(ex) {
 					var ans = line.allPermsTextBox.getText();
 					if (trim_spaces(ans) == "") {
 						message = "Probably not an empty answer"
-						ex.alert(message, {color: "yellow"})
+
+						
+
+						ex.alert(message, {color: "yellow", transition: "alert-long"})
+
 						line.allPermsTextBox.setText("")
 					}else {
 						if (mode == "quiz-immediate" || mode == "quiz-delay") {
@@ -629,7 +633,9 @@ var main = function(ex) {
 							var message = "That's incorrect. You should insert a[0] at the current index.";
 						}		
 						state.advanceState();
-						ex.alert(message, {color: "yellow"});
+
+						ex.alert(message, {color: "yellow", transition: "alert-long"});
+
 					}
 				}
 			}
@@ -652,7 +658,7 @@ var main = function(ex) {
 						state.animateCollapse();
 					}
 				}else {
-					ex.alert("allPerms should contain more elements before returning.", {color: "yellow"})
+					ex.alert("allPerms should contain more elements before returning.", {color: "yellow", transition: "alert-long"})
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
@@ -679,7 +685,7 @@ var main = function(ex) {
 								baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
-							ex.alert(baseReturnButtonMessage, {color: "yellow"});
+							ex.alert(baseReturnButtonMessage, {color: "yellow", transition: "alert-long"});
 						}
 						/*console.log("Depth & curLineNum from base return button:");
 						console.log(state.topCard.depth);
@@ -704,7 +710,9 @@ var main = function(ex) {
 						else{ // incorrect
 							if (trim_spaces(line.rangeTextBox.getText()) == "") {
 								message = "Probably not an empty answer"
-								ex.alert(message, {color: "yellow"})
+
+								ex.alert(message, {color: "yellow", transition: "alert-long"})
+
 								line.rangeTextBox.setText("")
 							}else {
 								var message = "That's incorrect. Range is endpoint exclusive"
@@ -713,7 +721,9 @@ var main = function(ex) {
 									state.drawScore();
 									message = "That's incorrect."
 								}
-								ex.alert("That is incorrect", {color: "yellow"});
+
+
+								ex.alert("That is incorrect", {color: "yellow", transition: "alert-long"});
 								state.advanceState();
 							}
 						}
@@ -912,6 +922,10 @@ var main = function(ex) {
 					state.topCard.getAndSetNextLine();
 					// activate the base case return button
 					line.showBaseReturnButton = true;
+					// display feedback if needed
+					if (state.topCard.depth == 0){
+						ex.alert("Does the function return here? <br>If so, click the return button. <br>If not, keep clicking on the next line to execute.", {color: "blue", stay: true});
+					}
 					break;
 				case 2: // else
 					// deactivate the if statement's return button 
@@ -1172,11 +1186,11 @@ var main = function(ex) {
 		}
 		if (!isLegal) {
 			if (state.topCard.curLineNum == 5) {
-				ex.alert("Please fill in the value of the list first.", {color: "yellow"});
+				ex.alert("Please fill in the value of the list first.", {color: "yellow", transition: "alert-long"});
 				return;
 			}
 			if (state.topCard.curLineNum == 6) {
-				ex.alert("Please fill in the value of the list first.", {color: "yellow"});
+				ex.alert("Please fill in the value of the list first.", {color: "yellow", transition: "alert-long"});
 				return;
 			}
 			if (validLineClick) {
@@ -1210,7 +1224,7 @@ var main = function(ex) {
 	var button_margin = 5;
 	var state = State();
 	var mode = ex.data.meta.mode;
-	mode = "quiz-immediate"
+	mode = "quiz-immediate";
 
 	var taskReset = false;
 
@@ -1228,4 +1242,6 @@ var main = function(ex) {
 	ex.data.content.score = 1.0;
 	state.init();
 	state.draw();
+	ex.alert("Click on the next line that executes", {color: "blue", stay: true});
+
 };
