@@ -75,6 +75,10 @@ var main = function(ex) {
      	}
 	}
 
+	function trim_spaces(str) {
+
+	}
+
 	//Save current state
 	function saveCurState() {
 		var curState = []
@@ -626,7 +630,7 @@ var main = function(ex) {
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
-						var message = "That's incorrect. (score -0.1)";
+						var message = "That's incorrect.";
 					}
 					else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
 						var message = "That's incorrect. Be sure to have the right type of lists."
@@ -681,7 +685,7 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								baseReturnButtonMessage += " (score -0.1)";
+								//baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow"});
@@ -711,7 +715,7 @@ var main = function(ex) {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
 								state.drawScore();
-								message = "That's incorrect. (score -0.1)"
+								message = "That's incorrect."
 							}
 							ex.alert("That is incorrect", {color: "yellow"});
 							state.advanceState();
@@ -1188,9 +1192,9 @@ var main = function(ex) {
 			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
-						message = "That's incorrect. (score -0.1)"
+						message = "That's incorrect."
 					}else {
-						message = "We are in the base case now. (score -0.1)"
+						message = "We are in the base case now."
 					}	
 				}
 			}else {
