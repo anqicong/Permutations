@@ -566,7 +566,7 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
-					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
+					state.topCard.allPermsString.push(trim_spaces(line.allPermsTextBox.getText());
 					
 					//var i = state.topCard.allPermsString.length-1;
 					//ex.graphics.ctx.fillStyle = "yellow";
