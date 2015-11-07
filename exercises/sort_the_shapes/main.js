@@ -126,7 +126,7 @@ var main = function(ex) {
 
 	function resetTask() {
 		taskReset = true;
-		score = 1.0;
+		ex.data.content.score = 1.0;
 		for (var i = 0; i < state.cardsList.length; i++) {
 			state.cardsList[i].unhighlightAll();
 			state.cardsList[i].linesList[5].deactivateRangeTextBox();
@@ -664,6 +664,7 @@ var main = function(ex) {
 						state.topCard.unhighlightAll();
 						ex.graphics.off("mousedown", mouseClicked);
 						ex.showFeedback("Congratulations! You have finished the task. Please click Submit.");
+						ex.chromeElements.submitButton.enable();x
 					}else {
 						state.animateCollapse();
 					}
@@ -1165,12 +1166,16 @@ var main = function(ex) {
 	function mouseClicked(event){
 		//Check click legal before drawing
 		var isLegal = false;
+		var validLineClick = false;
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
-			if (line.checkClick(event.offsetX, event.offsetY) && line.clickIsLegal()) {
-				line.doClick();
-				isLegal = true;
-				break;
+			if (line.checkClick(event.offsetX, event.offsetY)) {
+				validLineClick = true;
+				if (line.clickIsLegal()) {
+					line.doClick();
+					isLegal = true;
+					break;
+				}
 			}
 		}
 		if (!isLegal) {
@@ -1182,24 +1187,27 @@ var main = function(ex) {
 				ex.alert("Please fill in the value of the list first.", {color: "yellow"});
 				return;
 			}
-			state.subTractScore(0.1);
+			if (validLineClick) {
+				state.subTractScore(0.1);
+			}
 			var message = "This is not the next line that executes. Try again.";
-			if (mode == "quiz-immediate" || mode == "quiz-delay") {
-				if (state.topCard.depth < ex.data.content.list.length) {
-					message = "That's incorrect. (score -0.1)"
-				}else {
-					message = "We are in the base case now. (score -0.1)"
-				}	
+			if (validLineClick) {
+				if (mode == "quiz-immediate" || mode == "quiz-delay") {
+					if (state.topCard.depth < ex.data.content.list.length) {
+						message = "That's incorrect. (score -0.1)"
+					}else {
+						message = "We are in the base case now. (score -0.1)"
+					}	
+				}
+			}else {
+				message = "Please click on the code"
 			}
 			ex.alert(message, {color: "yellow"});
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
-				state.advanceState();
+				//state.advanceState();
 			}
 			return;
-		}
-		/*console.log("Depth and curLineNum from mouseClicked");
-		console.log(state.topCard.depth);
-		console.log(state.topCard.curLineNum);*/
+		} 
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
@@ -1214,6 +1222,8 @@ var main = function(ex) {
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
 	ex.chromeElements.resetButton.on("click", resetTask);
+	ex.chromeElements.displayCAButton.disable();
+	ex.chromeElements.submitButton.disable();
 	ex.chromeElements.submitButton.on("click", function() {
 		if (ex.data.content.score != undefined) {
 			var feedBack = "You have completed the task";
