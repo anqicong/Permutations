@@ -129,12 +129,12 @@ var main = function(ex) {
 		ex.data.content.score = 1.0;
 		for (var i = 0; i < state.cardsList.length; i++) {
 			state.cardsList[i].unhighlightAll();
+			state.cardsList[i].linesList[1].deactivateReturnButton();
 			state.cardsList[i].linesList[5].deactivateRangeTextBox();
 			state.cardsList[i].linesList[5].deactivateRangeDoneButton();
 			state.cardsList[i].linesList[6].deactivateAllPermsDoneButton();
 			state.cardsList[i].linesList[6].deactivateAllPermsTextBox();
 			state.cardsList[i].linesList[7].deactivateReturnAllPermsButton();
-			state.cardsList[i].linesList[7].deactivateReturnButton();
 		}
 		state.cardsList = [];
 		state.init();
@@ -207,7 +207,6 @@ var main = function(ex) {
 				ex.graphics.ctx.fillText(state.topCard.allPermsString[i].substring(1,len-1),
 				state.topCard.allPermsBoxX+10,state.topCard.allPermsBoxY+30+20*i);
 			}
-			
 			state.drawScore();
 		};
 
@@ -506,7 +505,7 @@ var main = function(ex) {
 			card.linesList[7].returnAllPermsButton.deactivate();
 			var rangeTextBoxX = 174 + 4 * card.depth;
 			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
-			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
+			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1) e.g [0]", 1, 33);
 			if (card.depth == 0) {
 				card.linesList[6].allPermsDoneButton = Button(485, 110, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
 			}
@@ -967,7 +966,7 @@ var main = function(ex) {
 					//state.topCard.refreshText();
 					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
-					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]] e.g [[2]]", 1, 40);
 					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
@@ -1096,7 +1095,6 @@ var main = function(ex) {
 		button.myButton = undefined;
 
 		button.activate = function(){
-			//@TODO create options
 			if (keybinding == undefined){
 				button.myButton = ex.createButton(button.x, button.y, text, 
 														 {
@@ -1206,7 +1204,7 @@ var main = function(ex) {
 			if (mode == "quiz-immediate" || mode == "quiz-delay") {
 				//state.advanceState();
 			}
-			return;
+			//return;
 		} 
 		state.draw();
 	}
