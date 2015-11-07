@@ -64,6 +64,16 @@ var main = function(ex) {
      	}
 	}
 
+	function trim_spaces(str) {
+		result = "";
+		for (var i = 0; i < str.length; i++) {
+			if (str.charAt(i) != ' ') {
+				result += str.charAt(i);
+			}
+		}
+		return result;
+	}
+
 	//Save current state
 	function saveCurState() {
 		var curState = []
