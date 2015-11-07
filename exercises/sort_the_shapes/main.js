@@ -692,7 +692,7 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								baseReturnButtonMessage += " (score -0.1)";
+								//baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow", transition: "alert-long"});
@@ -773,12 +773,13 @@ var main = function(ex) {
             */
 			line.highlighted = true;
 			// activate or deactivate the base return button
+			/*
 			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
 				line.deactivateReturnButton();
 				if (line.lineNum == 1) {
 					line.baseReturnButton.activate();
 				}
-			}
+			}*/
 		};
 
 		line.unhighlight = function(){
@@ -892,6 +893,9 @@ var main = function(ex) {
 			var numberColor = "rgb(61, 163, 239)";
    			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "14px Courier";
+			if (line.lineNum == 1) {
+				console.log(line.showBaseReturnButton);
+			}
 			var text = line.getText();
 			if (state.topCard.circlei) state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			if (state.topCard.circleInner) {
@@ -991,11 +995,33 @@ var main = function(ex) {
 					state.topCard.getAndSetNextLine();
 					break;
 			}
+
 		};
+
+		line.drawIndicator = function(x, y, width) {
+			var ctx = ex.graphics.ctx
+			ctx.strokeStyle = "#1221df"
+			ctx.beginPath()
+			ctx.moveTo(x, y)
+			ctx.lineTo(x + width, y)
+			ctx.lineTo(x + width - width / 4, y - width / 4);
+			ctx.moveTo(x + width, y)
+			ctx.lineTo(x + width - width / 4, y + width / 4);
+			ctx.stroke();
+		}
+
+		line.showMouseOver = function() {
+			var lineHeight = state.topCard.lineHeight
+			var start_x = line.x - lineHeight;
+			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height())
+			state.draw();
+			line.drawIndicator(start_x, line.y + lineHeight / 2 + 4, lineHeight)
+		}
 
 		line.deactivateReturnButton = function() {
 			if (line.baseReturnButton != undefined) {
 				line.baseReturnButton.deactivate();
+				line.baseReturnButton = undefined;
 			}
 			line.showBaseReturnButton = false;
 		}
@@ -1039,7 +1065,7 @@ var main = function(ex) {
 
 		line.checkClick = function(x, y){
 			//Compensate for imprecision in clicks
-			var click_cmpst = 4;
+			var click_cmpst = 0;
 			if (x >= line.x && y >= line.y - click_cmpst && y <= line.y + state.topCard.lineHeight + click_cmpst) {
 				return true;
 			}
@@ -1176,6 +1202,18 @@ var main = function(ex) {
 		return textBox;
 	}
 
+	function mouseMoved(event) {
+		for (var i = 0; i < state.topCard.linesList.length; i++) {
+			var line = state.topCard.linesList[i];
+			if (line.checkClick(event.offsetX, event.offsetY)) {
+				if (currentLineMouseHovers == undefined || line.lineNum != currentLineMouseHovers[0] || state.topCard.depth != currentLineMouseHovers[1]) {
+					line.showMouseOver();
+					currentLineMouseHovers = [line.lineNum, state.topCard.depth];
+				}
+			}
+		}
+	}
+
 	function mouseClicked(event){
 		//Check click legal before drawing
 		var isLegal = false;
@@ -1214,7 +1252,7 @@ var main = function(ex) {
 			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
-						message = "That's incorrect. (score -0.1)"
+						message = "That's incorrect."
 					}else {
 						message = "That's incorrect. We are in the base case now."
 					}	
@@ -1231,6 +1269,7 @@ var main = function(ex) {
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
+	ex.graphics.on("mousemove", mouseMoved);
 
 	var button_margin = 5;
 	var state = State();
@@ -1238,6 +1277,7 @@ var main = function(ex) {
 	mode = "quiz-immediate";
 
 	var taskReset = false;
+	var currentLineMouseHovers = undefined
 
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
