@@ -659,8 +659,8 @@ var main = function(ex) {
 						state.draw();
 						state.topCard.unhighlightAll();
 						ex.graphics.off("mousedown", mouseClicked);
-						ex.showFeedback("Congratulations! You have finished the task. Please click Submit.");
-						ex.chromeElements.submitButton.enable();x
+						ex.alert("Congratulations! You have finished the task. Please click Submit.", {color: "blue", stay: true});
+						ex.chromeElements.submitButton.enable();
 					}else {
 						state.animateCollapse();
 					}
@@ -689,7 +689,7 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								baseReturnButtonMessage += " (score -0.1)";
+								//baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow", transition: "alert-long"});
@@ -1242,7 +1242,7 @@ var main = function(ex) {
 			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
-						message = "That's incorrect. (score -0.1)"
+						message = "That's incorrect."
 					}else {
 						message = "That's incorrect. We are in the base case now."
 					}	
