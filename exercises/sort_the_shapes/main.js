@@ -76,7 +76,13 @@ var main = function(ex) {
 	}
 
 	function trim_spaces(str) {
-
+		result = "";
+		for (var i = 0; i < str.length; i++) {
+			if (str.charAt(i) != ' ') {
+				result += str.charAt(i);
+			}
+		}
+		return result;
 	}
 
 	//Save current state
@@ -572,7 +578,7 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
-					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
+					state.topCard.allPermsString.push(trim_spaces(line.allPermsTextBox.getText()));
 					
 					//var i = state.topCard.allPermsString.length-1;
 					//ex.graphics.ctx.fillStyle = "yellow";
