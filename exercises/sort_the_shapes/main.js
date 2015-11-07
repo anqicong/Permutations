@@ -493,7 +493,7 @@ var main = function(ex) {
 			card.linesList[7].returnAllPermsButton.deactivate();
 			var rangeTextBoxX = 174 + 4 * card.depth;
 			var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * card.depth + button_margin;
-			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1) e.g [0]", 1, 33);
+			card.linesList[5].rangeTextBox = TextBox(rangeTextBoxX, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 33);
 			if (card.depth == 0) {
 				card.linesList[6].allPermsDoneButton = Button(485, 110, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
 			}
@@ -623,24 +623,21 @@ var main = function(ex) {
 				}else {
 					var ans = line.allPermsTextBox.getText();
 					if (trim_spaces(ans) == "") {
-						message = "Probably not an empty answer"
-
-						
-
+						message = "Please enter a value, like [[2, 3]]";
 						ex.alert(message, {color: "yellow", transition: "alert-long"})
 
 						line.allPermsTextBox.setText("")
 					}else {
 						if (mode == "quiz-immediate" || mode == "quiz-delay") {
-						state.subTractScore(0.1);
-						state.drawScore();
-						var message = "That's incorrect.";
+							state.subTractScore(0.1);
+							state.drawScore();
+							var message = "That's incorrect.";
 						}
 						else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
-							var message = "That's incorrect. Be sure to have the right type of lists."
+							var message = "Be sure to have the right type of lists. Here's the correct answer."
 						}
 						else{
-							var message = "That's incorrect. You should insert a[0] at the current index.";
+							var message = "You should insert a[0] at the current index. Here's the correct answer.";
 						}		
 						state.advanceState();
 
@@ -719,8 +716,7 @@ var main = function(ex) {
 						} 
 						else{ // incorrect
 							if (trim_spaces(line.rangeTextBox.getText()) == "") {
-								message = "Probably not an empty answer"
-
+								message = "Please enter a value, like [0, 1]";
 								ex.alert(message, {color: "yellow", transition: "alert-long"})
 
 								line.rangeTextBox.setText("")
@@ -731,9 +727,7 @@ var main = function(ex) {
 									state.drawScore();
 									message = "That's incorrect."
 								}
-
-
-								ex.alert("That is incorrect", {color: "yellow", transition: "alert-long"});
+								ex.alert("That is incorrect. Here's the correct answer.", {color: "yellow", transition: "alert-long"});
 								state.advanceState();
 							}
 						}
@@ -952,6 +946,9 @@ var main = function(ex) {
 					state.topCard.setToDraw(true);
 					break;
 				case 5: // for i
+					if (state.topCard.depth == 2){
+						ex.alert("Fill in the value to replace the line of code.<br>e.g. [0, 1]", {color: "blue", stay: true});
+					}
 					line.showTextBox = true;
 					state.topCard.curLineNum = 5;
 					state.topCard.circlei = true;
@@ -980,7 +977,7 @@ var main = function(ex) {
 					//state.topCard.refreshText();
 					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
-					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]] e.g [[2]]", 1, 40);
+					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
 					line.allPermsTextBox.activate();
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
@@ -1226,7 +1223,7 @@ var main = function(ex) {
 					if (state.topCard.depth < ex.data.content.list.length) {
 						message = "That's incorrect. (score -0.1)"
 					}else {
-						message = "We are in the base case now. (score -0.1)"
+						message = "That's incorrect. We are in the base case now."
 					}	
 				}
 			}else {
