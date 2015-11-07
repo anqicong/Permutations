@@ -770,12 +770,13 @@ var main = function(ex) {
             */
 			line.highlighted = true;
 			// activate or deactivate the base return button
+			/*
 			if (line.baseReturnButton != undefined && line.baseReturnButton.myButton != undefined) {
 				line.deactivateReturnButton();
 				if (line.lineNum == 1) {
 					line.baseReturnButton.activate();
 				}
-			}
+			}*/
 		};
 
 		line.unhighlight = function(){
@@ -889,6 +890,9 @@ var main = function(ex) {
 			var numberColor = "rgb(61, 163, 239)";
    			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "14px Courier";
+			if (line.lineNum == 1) {
+				console.log(line.showBaseReturnButton);
+			}
 			var text = line.getText();
 			if (state.topCard.circlei) state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			if (state.topCard.circleInner) {
@@ -1013,6 +1017,7 @@ var main = function(ex) {
 		line.deactivateReturnButton = function() {
 			if (line.baseReturnButton != undefined) {
 				line.baseReturnButton.deactivate();
+				line.baseReturnButton = undefined;
 			}
 			line.showBaseReturnButton = false;
 		}
@@ -1198,8 +1203,6 @@ var main = function(ex) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
 				if (currentLineMouseHovers == undefined || line.lineNum != currentLineMouseHovers[0] || state.topCard.depth != currentLineMouseHovers[1]) {
-					console.log("Move")
-					console.log(line.lineNum)
 					line.showMouseOver();
 					currentLineMouseHovers = [line.lineNum, state.topCard.depth];
 				}
@@ -1215,8 +1218,6 @@ var main = function(ex) {
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
-				console.log("Click")
-				console.log(line.lineNum)
 				validLineClick = true;
 				if (line.lineNum == state.topCard.curLineNum) {
 					clickOnCurLine = true;
