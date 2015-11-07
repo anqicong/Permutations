@@ -134,7 +134,7 @@ var main = function(ex) {
 			state.cardsList[i].linesList[5].deactivateRangeDoneButton();
 			state.cardsList[i].linesList[6].deactivateAllPermsDoneButton();
 			state.cardsList[i].linesList[6].deactivateAllPermsTextBox();
-			state.cardsList[i].linesList[7].deactivateReturnAllPermsButton();
+			state.cardsList[i].linesList[6].deactivateReturnAllPermsButton();
 		}
 		state.cardsList = [];
 		state.init();
