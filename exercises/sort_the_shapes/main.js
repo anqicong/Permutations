@@ -5,9 +5,8 @@
 
 var main = function(ex) {
 
-	ex.data = {
-		"meta": {
-        "author": "Luyao Hou",
+	ex.data.meta = {
+		"author": "Luyao Hou",
         "email": "lhou@andrew.cmu.edu",
         "title": "Permutations",
         "description": "Permutations",
@@ -21,27 +20,23 @@ var main = function(ex) {
         "mode": "practice",
         "requires": {
         }
-    	},
-	    "code": {
-	        "display": "def permutations(a):\n  if(len(a) == 0):\n    return [[]]\n  else:\n    allPerms = []\n    for subPerm in permutations(a[1:]):\n      for i in range(len(subPerm) + 1):\n        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]\n    return allPerms\n\n",
-	        "lines": 11,
-	        "language": "python"
-	    },
-	    "content": {
-	        "list": [1, 2],
-	        "printStatement": "print permutations([1, 2])",
-	        "code": ["def permutations(a):", 
-	                 "  if (len(a) == 0): return [[]]",
-	                 "  else:",
-	                 "    allPerms = []",
-	                 "    for subPerm in permutations(a[1:]):",
-	                 "      for i in range(len(subPerm) + 1):",
-	                 "        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]",
-	                 "    return allPerms"],
-	        "lines": 11,
-	        "language": "python"
-	    }
-	}
+	};
+
+	ex.data.content = {
+		"list": [1, 2],
+        "printStatement": "print permutations([1, 2])",
+        "code": ["def permutations(a):", 
+                 "  if (len(a) == 0): return [[]]",
+                 "  else:",
+                 "    allPerms = []",
+                 "    for subPerm in permutations(a[1:]):",
+                 "      for i in range(len(subPerm) + 1):",
+                 "        allPerms += [subPerm[:i] + [a[0]] + subPerm[i:]]",
+                 "    return allPerms"],
+        "lines": 11,
+        "language": "python"
+	};
+
 
     function permutations(list) {
         if (list.length === 0) {
