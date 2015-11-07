@@ -3,17 +3,6 @@
  * @author Anqi Cong, Luyao Hou, Emma Zhong
  */
 
-// Bugs (in rough order of priority)
-// - allPerms line needs to shorten when the text box is over it, and so does the highlight
-// 		- relatedly, return allPerms line needs to go away 
-//		- basically, card.refreshText isn't working (or isn't being called in the right place)
-// - Bottoms of cards are too long, card 1 should be inside card 0 etc.
-// - Adjust text to fit high resolution displays
-
-// Todos
-// - show allPerms
-// - button that can pop up instruction on filling in texts
-
 var main = function(ex) {
 
 	ex.data = {
@@ -73,16 +62,6 @@ var main = function(ex) {
         	}
         	return allPerms;
      	}
-	}
-
-	function trim_spaces(str) {
-		result = "";
-		for (var i = 0; i < str.length; i++) {
-			if (str.charAt(i) != ' ') {
-				result += str.charAt(i);
-			}
-		}
-		return result;
 	}
 
 	//Save current state
@@ -330,13 +309,13 @@ var main = function(ex) {
 	    card.originalTabWidth = 220;
 	    card.tabWidth = 220;
 	    card.tabHeight = 20;
-	    card.lineHeight = 18;
+	    card.lineHeight = 16;
 	    card.x = card.depth*card.leftMargin;
 		card.y = card.depth*card.topMargin;
 		card.width = card.maxWidth - card.x;
 		card.height = card.maxHeight - card.y;
-		card.allPermsBoxWidth = 160	;
-		card.allPermsBoxHeight = 200;
+		card.allPermsBoxWidth = 100	;
+		card.allPermsBoxHeight = 200 - card.depth*20;
 		card.allPermsBoxXMargin = 10;
 		card.allPermsBoxX = card.x + card.width - card.allPermsBoxWidth;
 		card.allPermsBoxY = card.y + 35*card.depth + 65;
@@ -392,17 +371,17 @@ var main = function(ex) {
 					card.tabWidth = card.originalTabWidth + 20;
 					break;
 				case 1:
-					var x = card.x + card.leftMargin*11 + 10;
+					var x = card.x + card.leftMargin*11;
 					var y = card.y + card.lineHeight*2 + 10;
 					card.tabWidth = card.originalTabWidth - 25;
 					break;
 				case 2:
-				    var x = card.x + card.leftMargin*12 - 10;
+				    var x = card.x + card.leftMargin*12 - 20;
 				    var y = card.y + card.lineHeight*4 + 16;
 				    card.tabWidth = card.originalTabWidth - 25;
 				    break;
 				case 3:
-					var x = card.x + card.leftMargin * 14 - 32;
+					var x = card.x + card.leftMargin * 14 - 42;
 					var y = card.y + card.lineHeight * 6 + 25;
 					card.tabWidth = card.originalTabWidth - 25;
 			}
@@ -431,7 +410,7 @@ var main = function(ex) {
 											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
 					// draw allPerms text
 					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
-					ex.graphics.ctx.font = "15px Courier";
+					ex.graphics.ctx.font = "14px Courier";
 					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
 					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
 					// draw lists within allPerms
@@ -578,7 +557,7 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
-					state.topCard.allPermsString.push(trim_spaces(line.allPermsTextBox.getText()));
+					state.topCard.allPermsString.push(line.allPermsTextBox.getText());
 					
 					//var i = state.topCard.allPermsString.length-1;
 					//ex.graphics.ctx.fillStyle = "yellow";
@@ -633,19 +612,25 @@ var main = function(ex) {
 					}
 				}else {
 					var ans = line.allPermsTextBox.getText();
-					if (mode == "quiz-immediate" || mode == "quiz-delay") {
+					if (trim_spaces(ans) == "") {
+						message = "Probably not an empty answer"
+						ex.alert(message, {color: "yellow"})
+						line.allPermsTextBox.setText("")
+					}else {
+						if (mode == "quiz-immediate" || mode == "quiz-delay") {
 						state.subTractScore(0.1);
 						state.drawScore();
 						var message = "That's incorrect.";
+						}
+						else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
+							var message = "That's incorrect. Be sure to have the right type of lists."
+						}
+						else{
+							var message = "That's incorrect. You should insert a[0] at the current index.";
+						}		
+						state.advanceState();
+						ex.alert(message, {color: "yellow"});
 					}
-					else if (ans.substring(0, 2) != "[[" || ans.substring(ans.length - 2, ans.length) != "]]") {
-						var message = "That's incorrect. Be sure to have the right type of lists."
-					}
-					else{
-						var message = "That's incorrect. You should insert a[0] at the current index.";
-					}
-					state.advanceState();
-					ex.alert(message, {color: "yellow"});
 				}
 			}
 			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
@@ -691,7 +676,7 @@ var main = function(ex) {
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
 								state.subTractScore(0.1);
-								//baseReturnButtonMessage += " (score -0.1)";
+								baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow"});
@@ -701,7 +686,7 @@ var main = function(ex) {
 						console.log(state.topCard.curLineNum);*/
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
-													"returns [ [ ] ]", 1, 
+													"return [ [ ] ]", 1, 
 													baseReturn, 
 													"xsmall", undefined);
 					break;
@@ -717,14 +702,20 @@ var main = function(ex) {
 							state.getLineFromTopCard(6).doLineAction();
 						} 
 						else{ // incorrect
-							var message = "That's incorrect. Range is endpoint exclusive"
-							if (mode == "quiz-immediate" || mode == "quiz-delay") {
-								state.subTractScore(0.1);
-								state.drawScore();
-								message = "That's incorrect."
+							if (trim_spaces(line.rangeTextBox.getText()) == "") {
+								message = "Probably not an empty answer"
+								ex.alert(message, {color: "yellow"})
+								line.rangeTextBox.setText("")
+							}else {
+								var message = "That's incorrect. Range is endpoint exclusive"
+								if (mode == "quiz-immediate" || mode == "quiz-delay") {
+									state.subTractScore(0.1);
+									state.drawScore();
+									message = "That's incorrect."
+								}
+								ex.alert("That is incorrect", {color: "yellow"});
+								state.advanceState();
 							}
-							ex.alert("That is incorrect", {color: "yellow"});
-							state.advanceState();
 						}
 					};
 					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
@@ -883,7 +874,7 @@ var main = function(ex) {
 			var keywordColor = "rgb(249, 38, 114)";
 			var numberColor = "rgb(61, 163, 239)";
    			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
-			ex.graphics.ctx.font = "15px Courier";
+			ex.graphics.ctx.font = "14px Courier";
 			var text = line.getText();
 			if (state.topCard.circlei) state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			if (state.topCard.circleInner) {
@@ -1198,9 +1189,9 @@ var main = function(ex) {
 			else if (validLineClick) {
 				if (mode == "quiz-immediate" || mode == "quiz-delay") {
 					if (state.topCard.depth < ex.data.content.list.length) {
-						message = "That's incorrect."
+						message = "That's incorrect. (score -0.1)"
 					}else {
-						message = "We are in the base case now."
+						message = "We are in the base case now. (score -0.1)"
 					}	
 				}
 			}else {
