@@ -989,6 +989,26 @@ var main = function(ex) {
 			}
 		};
 
+		line.drawIndicator = function(x, y, width) {
+			var ctx = ex.graphics.ctx
+			ctx.strokeStyle = "#1221df"
+			ctx.beginPath()
+			ctx.moveTo(x, y)
+			ctx.lineTo(x + width, y)
+			ctx.lineTo(x + width - width / 4, y - width / 4);
+			ctx.moveTo(x + width, y)
+			ctx.lineTo(x + width - width / 4, y + width / 4);
+			ctx.stroke();
+		}
+
+		line.showMouseOver = function() {
+			var lineHeight = state.topCard.lineHeight
+			var start_x = line.x - lineHeight;
+			ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height())
+			state.draw();
+			line.drawIndicator(start_x, line.y + lineHeight / 2 + 4, lineHeight)
+		}
+
 		line.deactivateReturnButton = function() {
 			if (line.baseReturnButton != undefined) {
 				line.baseReturnButton.deactivate();
@@ -1173,14 +1193,15 @@ var main = function(ex) {
 	}
 
 	function mouseMoved(event) {
-		ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height())
 		for (var i = 0; i < state.topCard.linesList.length; i++) {
 			var line = state.topCard.linesList[i];
 			if (line.checkClick(event.offsetX, event.offsetY)) {
-				
+				if (currentLineMouseHovers == undefined || line.lineNum != currentLineMouseHovers[0] || state.topCard.depth != currentLineMouseHovers[1]) {
+					line.showMouseOver();
+					currentLineMouseHovers = [line.lineNum, state.topCard.depth];
+				}
 			}
 		}
-		state.draw()
 	}
 
 	function mouseClicked(event){
@@ -1246,6 +1267,7 @@ var main = function(ex) {
 	mode = "quiz-immediate";
 
 	var taskReset = false;
+	var currentLineMouseHovers = undefined
 
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
