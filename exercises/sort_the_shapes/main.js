@@ -410,8 +410,8 @@ var main = function(ex) {
 											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
 					// draw allPerms text
 					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
-					ex.graphics.ctx.font = "14px Courier";
-					ex.graphics.ctx.fillText("allPerms = [", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
+					ex.graphics.ctx.font = "13px Courier";
+					ex.graphics.ctx.fillText("allPerms=[", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
 					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
 					// draw lists within allPerms
 					var startY = card.allPermsBoxY + 15;
