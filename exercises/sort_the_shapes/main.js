@@ -1175,6 +1175,17 @@ var main = function(ex) {
 		return textBox;
 	}
 
+	function mouseMoved(event) {
+		ex.graphics.ctx.clearRect(0, 0, ex.width(), ex.height())
+		for (var i = 0; i < state.topCard.linesList.length; i++) {
+			var line = state.topCard.linesList[i];
+			if (line.checkClick(event.offsetX, event.offsetY)) {
+				
+			}
+		}
+		state.draw()
+	}
+
 	function mouseClicked(event){
 		//Check click legal before drawing
 		var isLegal = false;
@@ -1230,6 +1241,7 @@ var main = function(ex) {
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
+	ex.graphics.on("mousemove", mouseMoved);
 
 	var button_margin = 5;
 	var state = State();
