@@ -190,6 +190,7 @@ var main = function(ex) {
 					state.topCard.linesList[5].rangeDoneButton.activate();
 				}else if (storedState.curLineNum == 6) {
 					var line = state.topCard.linesList[6];
+					state.topCard.returnedFromRecursiveCall = true;
 					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
