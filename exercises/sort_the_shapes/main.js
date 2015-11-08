@@ -69,12 +69,6 @@ var main = function(ex) {
 		return result;
 	}
 
-	//Save current state
-	function saveCurState() {
-		var curState = []
-		ex.saveState(curState)
-	}	
-
 	//Take in a 2d list
 	function listToString(list) {
 		var result = "[";
@@ -122,7 +116,6 @@ var main = function(ex) {
 		state.cardsList = [];
 		state.init();
 		state.draw();
-		taskReset = false;
 	}
 
 
@@ -169,7 +162,44 @@ var main = function(ex) {
 				newCard.init();
 				state.cardsList.push(newCard);
 			}
+			if (!taskReset) {
+				state.retrieveState();
+			}else {
+				state.saveCurState();
+				taskReset = false;
+			}
 		};
+
+		state.retrieveState = function() {
+			if (ex.data.instance.state != null) {
+				var storedState = ex.data.instance.state;
+				ex.data.content.list = storedState.list;
+				state.topCard = state.cardsList[storedState.topCardDepth];
+				state.topCard.curLineNum = storedState.curLineNum;
+				ex.data.content.score = storedState.score;
+				state.topCard.allPermsString = storedState.allPermsStr;
+				state.topCard.curSubPerm = storedState.loopIndex;
+				state.topCard.innerLoopI = storedState.innerLoopIndex;
+				if (storedState.curLineNum == 5) {
+					var line = state.topCard.linesList[5];
+					var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
+					state.topCard.linesList[5].rangeTextBox = TextBox(160, rangeTextBoxY, "range (len (subPerm) + 1)", 1, 35);
+					state.topCard.returnedFromRecursiveCall = true;
+					state.topCard.linesList[5].showTextBox = true;
+					state.topCard.linesList[5].rangeTextBox.activate();
+					state.topCard.linesList[5].rangeDoneButton.activate();
+				}else if (storedState.curLineNum == 6) {
+					var line = state.topCard.linesList[6];
+					var allPermTextBoxX = 218 + 4 * line.depth;
+					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
+					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
+					line.allPermsTextBox.activate();
+					line.allPermsDoneButton.activate();
+					// activate the return allPerms button as well
+					line.returnAllPermsButton.activate();
+				}
+			}
+		}
 
 		state.drawScore = function() {
 			var score_width = 120;
@@ -256,6 +286,7 @@ var main = function(ex) {
 			if (ex.data.content.score < 0) {
 				ex.data.content.score = 0;
 			}
+			state.saveCurState();
 		}
 
 		state.advanceState = function() {
@@ -295,6 +326,20 @@ var main = function(ex) {
 			}
 		}
 
+		//Save current state
+		state.saveCurState = function() {
+			var curState = {
+				"list": ex.data.content.list,
+				"topCardDepth": state.topCard.depth,
+				"curLineNum": state.topCard.curLineNum,
+				"score": ex.data.content.score,
+				"loopIndex": state.topCard.curSubPerm,
+				"innerLoopIndex": state.topCard.innerLoopI,
+				"allPermsStr": state.topCard.allPermsString
+			};
+			ex.saveState(curState);
+		}	
+
 		return state;
 	}
 
@@ -304,7 +349,7 @@ var main = function(ex) {
 		card.curLine = undefined;
 		card.curLineNum = 0;
 		card.linesList = [];
-		card.toDraw = false;
+		card.toDraw = true;
 
 		//card constants
 	    card.leftMargin = 15;
@@ -566,7 +611,7 @@ var main = function(ex) {
 			// and for allPerms line (the textbox is created in lineAction)
 			line.allPermsDoneButtonAction = function(){
 				if (line.checkTextAnswer(line.allPermsTextBox.getText())) {
-					state.topCard.allPermsString.push(trim_spaces(line.allPermsTextBox.getText());
+					state.topCard.allPermsString.push(trim_spaces(line.allPermsTextBox.getText()));
 					
 					//var i = state.topCard.allPermsString.length-1;
 					//ex.graphics.ctx.fillStyle = "yellow";
@@ -892,9 +937,6 @@ var main = function(ex) {
 			var numberColor = "rgb(61, 163, 239)";
    			ex.graphics.ctx.fillStyle = "rgb(0, 0, 0)";
 			ex.graphics.ctx.font = "14px Courier";
-			if (line.lineNum == 1) {
-				console.log(line.showBaseReturnButton);
-			}
 			var text = line.getText();
 			if (state.topCard.circlei) state.topCard.linesList[4].circle(state.topCard.curSubPerm);
 			if (state.topCard.circleInner) {
