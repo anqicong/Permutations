@@ -899,6 +899,7 @@ var main = function(ex) {
 		}
 
 		line.uncircle = function(index){
+			var retinaIssue = 6;
             if (line.lineNum == 4){
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
