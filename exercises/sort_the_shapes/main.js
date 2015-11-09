@@ -162,7 +162,7 @@ var main = function(ex) {
 				var newCard = Card(depth);
 				newCard.init();
 				state.cardsList.push(newCard);
-			}
+			}			
 			if (!taskReset && !taskNew) {
 				state.retrieveState();
 			}else {
@@ -172,7 +172,9 @@ var main = function(ex) {
 		};
 
 		state.retrieveState = function() {
-			if (ex.data.instance.state != null) {
+			if (ex.data.instance.state == null) {
+				return;
+			}else{
 				var storedState = ex.data.instance.state;
 				ex.data.content.list = storedState.list;
 				state.topCard = state.cardsList[storedState.topCardDepth];
@@ -185,7 +187,7 @@ var main = function(ex) {
 				for (var i = 0; i < state.topCard.depth; i++) {
 					state.cardsList[i].curLineNum = 4;
 				}
-				if (storedState.curLineNum == 5 || storedState.curLineNum == 6) {
+				if (storedState.curLineNum >= 5) {
 					state.topCard.circlei = true;
 					state.topCard.circleInner = true;
 				}
@@ -218,6 +220,11 @@ var main = function(ex) {
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
 					line.returnAllPermsButton.activate();
+				}else if (storedState.curLineNum == 7) {
+					state.topCard.returnedFromRecursiveCall = true;
+					state.topCard.linesList[5].rangeEntered = true;
+					state.topCard.linesList[6].returnAllPermsButton.activate();
+					state.topCard.shouldReturnAllPerm = true;
 				}
 			}
 		}
@@ -227,7 +234,7 @@ var main = function(ex) {
 			var score_height = 18;
 			ex.graphics.ctx.clearRect(ex.width() - score_width, 0, score_width, score_height);
 			ex.graphics.ctx.fillStyle = "#000000";
-			ex.graphics.ctx.fillText("Score: " + grade(ex.data.content, ex.data).toFixed(1).toString(), ex.width() - score_width, score_height);
+			ex.graphics.ctx.fillText("Score: " + grade(ex.data.content, ex.data).toFixed(2).toString(), ex.width() - score_width, score_height);
 		}
 
 		state.draw = function(){
@@ -698,7 +705,7 @@ var main = function(ex) {
 						line.allPermsTextBox.setText("")
 					}else {
 						if (mode == "quiz-immediate" || mode == "quiz-delay") {
-							state.subTractScore(0.1);
+							state.subTractScore(0.02);
 							state.drawScore();
 							var message = "That's incorrect.";
 						}
@@ -737,7 +744,7 @@ var main = function(ex) {
 				}else {
 					ex.alert("allPerms should contain more elements before returning.", {color: "yellow", transition: "alert-long"})
 					if (mode == "quiz-immediate" || mode == "quiz-delay") {
-						state.subTractScore(0.1);
+						state.subTractScore(0.02);
 						state.drawScore();
 					}
 				}
@@ -759,7 +766,7 @@ var main = function(ex) {
 							//state.draw();
 						}else {
 							if (mode == "quiz-immediate" || mode == "quiz-delay") {
-								state.subTractScore(0.1);
+								state.subTractScore(0.02);
 								//baseReturnButtonMessage += " (score -0.1)";
 								state.advanceState();
 							}
@@ -792,7 +799,7 @@ var main = function(ex) {
 							}else {
 								var message = "That's incorrect. Range is endpoint exclusive"
 								if (mode == "quiz-immediate" || mode == "quiz-delay") {
-									state.subTractScore(0.1);
+									state.subTractScore(0.02);
 									state.drawScore();
 									message = "That's incorrect."
 								}
@@ -1310,7 +1317,7 @@ var main = function(ex) {
 				return;
 			}
 			if (validLineClick) {
-				state.subTractScore(0.1);
+				state.subTractScore(0.02);
 			}
 			var message = "This is not the next line that executes. Try again.";
 			if (clickOnCurLine) {
