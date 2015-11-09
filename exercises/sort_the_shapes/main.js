@@ -162,7 +162,7 @@ var main = function(ex) {
 				var newCard = Card(depth);
 				newCard.init();
 				state.cardsList.push(newCard);
-			}			
+			}
 			if (!taskReset && !taskNew) {
 				state.retrieveState();
 			}else {
@@ -172,10 +172,14 @@ var main = function(ex) {
 		};
 
 		state.retrieveState = function() {
-			if (ex.data.instance.state == null) {
+			if (ex.data.instance.state.loaded == undefined) {
 				return;
-			}else{
+			}
+			else{
 				var storedState = ex.data.instance.state;
+				console.log(storedState);
+				console.log(storedState.curLineNum);
+				console.log(state.topCard.curLineNum);
 				ex.data.content.list = storedState.list;
 				state.topCard = state.cardsList[storedState.topCardDepth];
 				state.topCard.curLineNum = storedState.curLineNum;
@@ -202,6 +206,13 @@ var main = function(ex) {
 					state.topCard.linesList[5].showTextBox = true;
 					state.topCard.linesList[5].rangeTextBox.activate();
 					state.topCard.linesList[5].rangeDoneButton.activate();
+					var card = state.topCard;
+					if (card.depth == 0) {
+						card.linesList[6].allPermsDoneButton = Button(485, 103, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+					}
+					if (card.depth == 2) {
+						card.linesList[6].allPermsDoneButton = Button(485, 230, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+					}
 				}else if (storedState.curLineNum == 6) {
 					var line = state.topCard.linesList[6];
 					var card = state.topCard;
@@ -363,7 +374,8 @@ var main = function(ex) {
 				"score": ex.data.content.score,
 				"loopIndex": state.topCard.curSubPerm,
 				"innerLoopIndex": state.topCard.innerLoopI,
-				"allPermsStr": state.topCard.allPermsString
+				"allPermsStr": state.topCard.allPermsString,
+				"loaded": true
 			};
 			ex.saveState(curState);
 		}	
@@ -868,6 +880,7 @@ var main = function(ex) {
 		};
 
 		line.circle = function(index){
+			var retinaIssue = 6;
             if (line.lineNum == 4){
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
@@ -876,12 +889,12 @@ var main = function(ex) {
             	ex.graphics.ctx.strokeStyle = "red";
             	if (state.topCard.depth == 0) width -= 15;
             	if (index == 1) offset += 10;
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
+            	ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
             }
             if (line.lineNum == 5){
             	var offset = 140 + index*35;
             	ex.graphics.ctx.strokeStyle = "red";
-            	ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
+            	ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
             }
 		}
 
@@ -1345,7 +1358,6 @@ var main = function(ex) {
 		state.draw();
 	}
 	ex.graphics.on("mousedown", mouseClicked);
-	ex.graphics.on("mousemove", mouseMoved);
 
 	var button_margin = 5;
 	var state = State();
@@ -1372,6 +1384,7 @@ var main = function(ex) {
 	ex.data.content.score = 1.0;
 	state.init();
 	state.draw();
+	ex.graphics.on("mousemove", mouseMoved);
 	ex.alert("Click on the next line that executes", {color: "blue", stay: true});
 
 };
