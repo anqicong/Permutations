@@ -1207,6 +1207,7 @@ var main = function(ex) {
 		button.action = action;
 		button.size = size;
 		button.keybinding = keybinding;
+		button.height = 14
 
 		button.myButton = undefined;
 
@@ -1216,7 +1217,7 @@ var main = function(ex) {
 														 {
 														 	size:button.size,
 														  	color: "lightBlue",
-														  	height:14,
+														  	height:button.height,
 														 });
 			}
 			else{
@@ -1225,9 +1226,10 @@ var main = function(ex) {
 														 	size:button.size,
 														  	color: "lightBlue",
 														  	keybinding: keybinding,
-														  	height:14,
+														  	height:button.height,
 														 });
 			}
+			console.log(button.height);
 			button.myButton.on("click", button.action);
 		};
 
