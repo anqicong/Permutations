@@ -906,19 +906,20 @@ var main = function(ex) {
             	var width = listToString(list[index]).length*9;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	if (state.topCard.depth == 0) width -= 15;
+            	if (index == 1) offset += 10;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
             	}
             }
             if (line.lineNum == 5){
             	var offset = 140 + index*35;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
             	}
             }
 		}
