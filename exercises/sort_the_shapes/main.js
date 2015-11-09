@@ -101,8 +101,9 @@ var main = function(ex) {
 		return a;
 	}
 
-	function resetTask() {
-		taskReset = true;
+	function resetTask(isReset) {
+		taskReset = isReset;
+		taskNew = !isReset;
 		ex.data.content.score = 1.0;
 		for (var i = 0; i < state.cardsList.length; i++) {
 			state.cardsList[i].unhighlightAll();
@@ -162,7 +163,7 @@ var main = function(ex) {
 				newCard.init();
 				state.cardsList.push(newCard);
 			}
-			if (!taskReset) {
+			if (!taskReset && !taskNew) {
 				state.retrieveState();
 			}else {
 				state.saveCurState();
@@ -180,6 +181,13 @@ var main = function(ex) {
 				state.topCard.allPermsString = storedState.allPermsStr;
 				state.topCard.curSubPerm = storedState.loopIndex;
 				state.topCard.innerLoopI = storedState.innerLoopIndex;
+				if (storedState.curLineNum == 5 || storedState.curLineNum == 6) {
+					state.topCard.circlei = true;
+					state.topCard.circleInner = true;
+				}
+				if (storedState.curLineNum == 1) {
+					state.topCard.linesList[1].showBaseReturnButton = true;
+				}
 				if (storedState.curLineNum == 5) {
 					var line = state.topCard.linesList[5];
 					var rangeTextBoxY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
@@ -190,11 +198,19 @@ var main = function(ex) {
 					state.topCard.linesList[5].rangeDoneButton.activate();
 				}else if (storedState.curLineNum == 6) {
 					var line = state.topCard.linesList[6];
+					var card = state.topCard;
 					state.topCard.returnedFromRecursiveCall = true;
+					state.topCard.linesList[5].rangeEntered = true;
 					var allPermTextBoxX = 218 + 4 * line.depth;
 					var allPermTextBoxY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.allPermsTextBox = TextBox(allPermTextBoxX, allPermTextBoxY, "[subPerm[:i] + [a[0]] + subPerm[i:]]", 1, 40);
 					line.allPermsTextBox.activate();
+					if (card.depth == 0) {
+						card.linesList[6].allPermsDoneButton = Button(485, 103, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+					}
+					if (card.depth == 2) {
+						card.linesList[6].allPermsDoneButton = Button(485, 230, "Done", 6, card.linesList[6].allPermsDoneButtonAction, "xsmall", ['', 13]);
+					}
 					line.allPermsDoneButton.activate();
 					// activate the return allPerms button as well
 					line.returnAllPermsButton.activate();
@@ -441,6 +457,22 @@ var main = function(ex) {
 			}
 			ex.graphics.ctx.fillRect(x, y, card.tabWidth,card.tabHeight+5); 
 		};
+
+		card.drawAllPermsBox = function() {
+			ex.graphics.ctx.fillStyle = "rgb(91, 192, 222)";
+			ex.graphics.ctx.fillRect(card.allPermsBoxX, card.allPermsBoxY, 
+											 card.allPermsBoxWidth - card.allPermsBoxXMargin, card.allPermsBoxHeight);
+					// draw allPerms text
+					ex.graphics.ctx.fillStyle = "rgb(255, 255, 255)";
+					ex.graphics.ctx.font = "13px Courier";
+					ex.graphics.ctx.fillText("allPerms=[", card.allPermsBoxX + 5, card.allPermsBoxY + 15);
+					ex.graphics.ctx.fillText("]", card.allPermsBoxX + card.allPermsBoxWidth - 20, card.allPermsBoxY + card.allPermsBoxHeight - 10);
+					// draw lists within allPerms
+					var startY = card.allPermsBoxY + 15;
+					for (var i = 0; i < card.allPermsBoxList.length; i++){
+						ex.graphics.ctx.fillText(listToString1D(card.allPermsBoxList[i]), card.allPermsBoxX + 10, startY + i*card.lineHeight);
+					}	
+		}
 
 		card.draw = function(){
 			if (card.toDraw){
@@ -690,6 +722,7 @@ var main = function(ex) {
 
 					}
 				}
+				state.saveCurState();
 			}
 			var allPermDoneButtonY = state.topCard.lineHeight * 6 + state.topCard.lineHeight * 4 + line.depth + button_margin;
 			line.allPermsDoneButton = Button(485, allPermDoneButtonY, "Done", 6, line.allPermsDoneButtonAction, "xsmall", ['', 13]);
@@ -716,6 +749,7 @@ var main = function(ex) {
 						state.drawScore();
 					}
 				}
+				state.saveCurState();
 			}
 			var returnAllPermsButtonY = state.topCard.lineHeight * 7 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 			line.returnAllPermsButton = Button(74, returnAllPermsButtonY, "return allPerms", 7, line.returnAllPermsButtonAction, "xsmall");
@@ -739,9 +773,7 @@ var main = function(ex) {
 							}
 							ex.alert(baseReturnButtonMessage, {color: "yellow", transition: "alert-long"});
 						}
-						/*console.log("Depth & curLineNum from base return button:");
-						console.log(state.topCard.depth);
-						console.log(state.topCard.curLineNum);*/
+						state.saveCurState();
 					};
 					line.baseReturnButton = Button(baseReturnButtonX, baseReturnButtonY, 
 													"return [ [ ] ]", 1, 
@@ -776,6 +808,7 @@ var main = function(ex) {
 								state.advanceState();
 							}
 						}
+						state.saveCurState();
 					};
 					var rangeDoneButtonY = state.topCard.lineHeight * 5 + state.topCard.lineHeight * 4 * line.depth + button_margin;
 					line.rangeDoneButton = Button(400, rangeDoneButtonY, "Done", 5, line.rangeDoneButtonAction, "xsmall", ['', 13]);
@@ -1037,7 +1070,7 @@ var main = function(ex) {
 					state.topCard.getAndSetNextLine();
 					break;
 			}
-
+			state.saveCurState();
 		};
 
 		line.drawIndicator = function(x, y, width) {
@@ -1319,11 +1352,14 @@ var main = function(ex) {
 	mode = "quiz-immediate";
 
 	var taskReset = false;
+	var taskNew = false;
 	var currentLineMouseHovers = undefined
 
 	ex.chromeElements.undoButton.disable();
 	ex.chromeElements.redoButton.disable();
-	ex.chromeElements.resetButton.on("click", resetTask);
+	ex.chromeElements.resetButton.on("click", function () {resetTask(true)});
+	ex.chromeElements.newButton.enable();
+	ex.chromeElements.newButton.on("click", function() {resetTask(false)});
 	ex.chromeElements.displayCAButton.disable();
 	ex.chromeElements.submitButton.disable();
 	ex.chromeElements.submitButton.on("click", function() {
