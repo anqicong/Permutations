@@ -899,7 +899,7 @@ var main = function(ex) {
 		}
 
 		line.uncircle = function(index){
-			var retinaIssue = 6;
+		    var retinaIssue = 6;
             if (line.lineNum == 4){
             	var list = permutations(ex.data.content.list.slice(state.topCard.depth + 1, ex.data.content.list.length));
 				var newText = listToString(list.slice(0,index));
@@ -909,18 +909,18 @@ var main = function(ex) {
             	if (state.topCard.depth == 0) width -= 15;
             	if (index == 1) offset += 10;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,width+retinaIssue,state.topCard.lineHeight-2);
             	}
             }
             if (line.lineNum == 5){
             	var offset = 140 + index*35;
             	ex.graphics.ctx.strokeStyle = state.topCard.fill;
             	for (var i = 0; i < 3; i++) {
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
-            		ex.graphics.ctx.strokeRect(line.x+offset,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
+            		ex.graphics.ctx.strokeRect(line.x+offset-retinaIssue,line.y+5,17+retinaIssue,state.topCard.lineHeight-2);
             	}
             }
 		}
